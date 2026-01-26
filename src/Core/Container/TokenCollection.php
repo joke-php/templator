@@ -1,13 +1,17 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Vasoft\Joke\Templator\Core\Container;
 
+use Vasoft\Joke\Templator\Core\Lexer\PrintToken;
+use Vasoft\Joke\Templator\Core\Lexer\StatementToken;
 use Vasoft\Joke\Templator\Core\Lexer\TokenDescriptor;
 use Vasoft\Joke\Templator\Exceptions\TemplatorException;
 
 /**
  * Коллекция для хранения токенов и подготовки списка для работы лексера
+ * по умолчанию регистрируются токены вывода и стейта
  */
 class TokenCollection
 {
@@ -15,6 +19,17 @@ class TokenCollection
      * @var array<string,TokenDescriptor> Реестр описаний токенов
      */
     private array $descriptors = [];
+
+    public function __construct()
+    {
+        $this->initDefault();
+    }
+
+    protected function initDefault(): void
+    {
+        $this->descriptors['{{'] = new TokenDescriptor('{{', '}}', PrintToken::class);
+        $this->descriptors['{%'] = new TokenDescriptor('{%', '%}', StatementToken::class);
+    }
 
     /**
      * Добавляет описание токена с проверкой на существование

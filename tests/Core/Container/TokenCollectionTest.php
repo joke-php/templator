@@ -11,9 +11,22 @@ use Vasoft\Joke\Templator\Exceptions\TemplatorException;
 
 class TokenCollectionTest extends TestCase
 {
+    public function testAddWithDefault(): void
+    {
+        $collection = new TokenCollection();
+        $collection->add(new TokenDescriptor('{++++', '++++}', PrintToken::class));
+        self::assertCount(3, $collection->list());
+        $expected = ['{++++', '{{', '{%'];
+        sort($expected);
+        $exists = array_keys($collection->list());
+        sort($exists);
+        self::assertSame($expected, $exists);
+    }
+
     public function testAdd(): void
     {
         $collection = new TokenCollection();
+        $collection->reset([]);
         $collection->add(new TokenDescriptor('{{', '}}', PrintToken::class));
         self::assertCount(1, $collection->list());
     }
@@ -21,6 +34,7 @@ class TokenCollectionTest extends TestCase
     public function testAddTwice(): void
     {
         $collection = new TokenCollection();
+        $collection->reset([]);
         $collection->add(new TokenDescriptor('{{', '}}', PrintToken::class));
         self::expectException(TemplatorException::class);
         self::expectExceptionMessage('Token already exists');
@@ -30,6 +44,7 @@ class TokenCollectionTest extends TestCase
     public function testUpsert(): void
     {
         $collection = new TokenCollection();
+        $collection->reset([]);
         $descriptor = new TokenDescriptor('{{', '}}', StatementToken::class);
         $collection->add(new TokenDescriptor('{{', '}}', PrintToken::class));
         $collection->upsert($descriptor);
@@ -41,6 +56,7 @@ class TokenCollectionTest extends TestCase
     public function testAddSeveral(): void
     {
         $collection = new TokenCollection();
+        $collection->reset([]);
         $collection->add(new TokenDescriptor('{{', '}}', PrintToken::class), 100);
         $collection->add(new TokenDescriptor('{%', '%}', StatementToken::class), 100);
         self::assertCount(2, $collection->list());
@@ -50,6 +66,7 @@ class TokenCollectionTest extends TestCase
     public function testReset(): void
     {
         $collection = new TokenCollection();
+        $collection->reset([]);
         $collection->add(new TokenDescriptor('{9', '}}', PrintToken::class));
         $collection->add(new TokenDescriptor('{1', '}}', PrintToken::class));
         self::assertCount(2, $collection->list());
