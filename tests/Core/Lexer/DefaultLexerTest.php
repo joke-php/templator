@@ -2,15 +2,11 @@
 
 namespace Vasoft\Joke\Templator\Tests\Core\Lexer;
 
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Vasoft\Joke\Templator\Core\Container\TemplateContainer;
 use Vasoft\Joke\Templator\Core\Lexer\DefaultLexer;
 use Vasoft\Joke\Templator\Core\Lexer\TextToken;
-use Vasoft\Joke\Templator\Core\Tokens\CloseTagToken;
-use Vasoft\Joke\Templator\Core\Tokens\OpenTagToken;
-use Vasoft\Joke\Templator\Core\Tokens\SelfClosingTagToken;
-use Vasoft\Joke\Templator\Exceptions\LexerException;
 
 #[Group("skip")]
 class DefaultLexerTest extends TestCase
@@ -20,11 +16,15 @@ class DefaultLexerTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
-        self::$defaultLexer = new DefaultLexer();
+        $container = new TemplateContainer();
+        print_r($container->tokenDescriptors->list());
+        self::$defaultLexer = new DefaultLexer($container);
+
     }
 
     public function testTextOnly(): void
     {
+
         $tokens = self::$defaultLexer->tokenize('Hello world');
         self::assertCount(1, $tokens);
         self::assertInstanceOf(TextToken::class, $tokens[0]);
