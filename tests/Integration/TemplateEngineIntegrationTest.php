@@ -5,12 +5,12 @@ namespace Vasoft\Joke\Templator\Tests\Integration;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Vasoft\Joke\Core\ServiceContainer;
-use Vasoft\Joke\Templator\Core\Render\Handlers\EachHandler;
-use Vasoft\Joke\Templator\Core\Render\Handlers\EchoHandler;
-use Vasoft\Joke\Templator\Core\Render\Handlers\IfHandler;
-use Vasoft\Joke\Templator\Core\TemplateEngine;
 use Vasoft\Joke\Templator\Exceptions\RenderingException;
 use Vasoft\Joke\Templator\Exceptions\TemplatorException;
+use Vasoft\Joke\Templator\Render\Handlers\EachHandler;
+use Vasoft\Joke\Templator\Render\Handlers\EchoHandler;
+use Vasoft\Joke\Templator\Render\Handlers\IfHandler;
+use Vasoft\Joke\Templator\TemplateEngine;
 
 #[Group("skip")]
 class TemplateEngineIntegrationTest extends TestCase

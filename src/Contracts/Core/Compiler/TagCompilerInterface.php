@@ -2,7 +2,7 @@
 
 namespace Vasoft\Joke\Templator\Contracts\Core\Compiler;
 
-use Vasoft\Joke\Templator\Core\Ast\TagNode;
+use Vasoft\Joke\Templator\Ast\TagNode;
 
 interface TagCompilerInterface
 {

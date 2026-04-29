@@ -2,9 +2,9 @@
 
 namespace Vasoft\Joke\Templator\Tests\Fixtures;
 
+use Vasoft\Joke\Templator\Ast\TextNode;
 use Vasoft\Joke\Templator\Contracts\Core\Ast\RendererInterface;
 use Vasoft\Joke\Templator\Contracts\Core\Ast\TagHandlerInterface;
-use Vasoft\Joke\Templator\Core\Ast\TextNode;
 
 class MockRenderer implements RendererInterface
 {
