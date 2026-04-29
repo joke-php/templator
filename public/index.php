@@ -1,8 +1,10 @@
 <?php
 
-use Vasoft\Joke\Core\Application;
-use Vasoft\Joke\Core\Request\HttpRequest;
 
 /** @var Application $app */
+
+use Vasoft\Joke\Application\Application;
+use Vasoft\Joke\Http\HttpRequest;
+
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 $app->handle(HttpRequest::fromGlobals());

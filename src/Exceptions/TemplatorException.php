@@ -2,7 +2,7 @@
 
 namespace Vasoft\Joke\Templator\Exceptions;
 
-use Vasoft\Joke\Core\Exceptions\JokeException;
+use Vasoft\Joke\Exceptions\JokeException;
 
 class TemplatorException extends JokeException
 {

@@ -2,8 +2,10 @@
 
 namespace Vasoft\Joke\Templator\Container;
 
-use Vasoft\Joke\Core\BaseContainer;
-use Vasoft\Joke\Core\Exceptions\ParameterResolveException;
+
+use Vasoft\Joke\Container\BaseContainer;
+use Vasoft\Joke\Container\Exceptions\ContainerException;
+use Vasoft\Joke\Container\Exceptions\ParameterResolveException;
 
 /**
  * DI контейнер шаблонизатора
@@ -19,6 +21,7 @@ class TemplateContainer extends BaseContainer
     /**
      * Возвращает коллекцию описаний токенов
      * @return TokenCollection
+     * @throws ContainerException
      * @throws ParameterResolveException
      */
     public function getTokenCollection(): TokenCollection

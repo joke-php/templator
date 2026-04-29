@@ -1,9 +1,10 @@
 <?php
 
+use Vasoft\Joke\Application\Application;
+use Vasoft\Joke\Container\ServiceContainer;
+
 require __DIR__ . '/../vendor/autoload.php';
 
-use Vasoft\Joke\Core\Application;
-use Vasoft\Joke\Core\ServiceContainer;
 
 session_set_cookie_params([
     'samesite' => 'Lax',
@@ -14,5 +15,5 @@ session_set_cookie_params([
     'domain' => '',
 ]);
 
-return new Application(dirname(__DIR__), 'routes/web.php', new ServiceContainer());
+return new Application(dirname(__DIR__), '', new ServiceContainer());
 

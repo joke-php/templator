@@ -1,13 +1,17 @@
 <?php
 
-use Vasoft\Joke\Core\Response\HtmlResponse;
-use Vasoft\Joke\Core\Response\ResponseStatus;
-use Vasoft\Joke\Core\Routing\Router;
+use Vasoft\Joke\Container\ServiceContainer;
+use Vasoft\Joke\Http\Response\HtmlPageResponse;
+use Vasoft\Joke\Http\Response\ResponseStatus;
+use Vasoft\Joke\Routing\Router;
 
 /**
  * @var Router $router
  */
 $router->get(
     '/{*}',
-    static fn(string $path) => new HtmlResponse()->setStatus(ResponseStatus::NOT_FOUND)->setBody('Not found ' . $path)
+    static fn(string $path, ServiceContainer $container) => new HtmlPageResponse($container)->setStatus(
+        ResponseStatus::NOT_FOUND
+    )
+        ->setBody('Not found ' . $path)
 );

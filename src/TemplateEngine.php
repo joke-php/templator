@@ -2,7 +2,7 @@
 
 namespace Vasoft\Joke\Templator;
 
-use Vasoft\Joke\Core\ServiceContainer;
+use Vasoft\Joke\Container\ServiceContainer;
 use Vasoft\Joke\Templator\Ast\DefaultParser;
 use Vasoft\Joke\Templator\Compiler\DefaultCompiler;
 use Vasoft\Joke\Templator\Contracts\Core\Ast\ParserInterface;
