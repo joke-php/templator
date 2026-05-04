@@ -2,7 +2,7 @@
 
 namespace Vasoft\Joke\Templator\Contracts\Compiler;
 
-use Vasoft\Joke\Templator\Contracts\Ast\NodeInterface;
+use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
 
 interface NodeCompilerInterface
 {

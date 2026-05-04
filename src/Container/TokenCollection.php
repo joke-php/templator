@@ -5,31 +5,14 @@ declare(strict_types=1);
 namespace Vasoft\Joke\Templator\Container;
 
 use Vasoft\Joke\Templator\Exceptions\TemplatorException;
-use Vasoft\Joke\Templator\Lexer\PrintToken;
-use Vasoft\Joke\Templator\Lexer\StatementToken;
 use Vasoft\Joke\Templator\Lexer\TokenDescriptor;
 
-/**
- * Коллекция для хранения токенов и подготовки списка для работы лексера
- * по умолчанию регистрируются токены вывода и стейта
- */
 class TokenCollection
 {
     /**
      * @var array<string,TokenDescriptor> Реестр описаний токенов
      */
     private array $descriptors = [];
-
-    public function __construct()
-    {
-        $this->initDefault();
-    }
-
-    protected function initDefault(): void
-    {
-        $this->descriptors['{{'] = new TokenDescriptor('{{', '}}', PrintToken::class);
-        $this->descriptors['{%'] = new TokenDescriptor('{%', '%}', StatementToken::class);
-    }
 
     /**
      * Добавляет описание токена с проверкой на существование
@@ -60,7 +43,7 @@ class TokenCollection
 
     /**
      * Полная замена списка
-     * @param list<TokenDescriptor>|array<string,TokenDescriptor> $items
+     * @param list<TokenDescriptor> $items
      * @return $this
      */
     public function reset(array $items): static

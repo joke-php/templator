@@ -2,29 +2,21 @@
 
 namespace Vasoft\Joke\Templator\Contracts\Compiler;
 
-use Vasoft\Joke\Templator\Contracts\Ast\NodeInterface;
+use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
 
 /**
  * Компилятор AST дерева в PHP код
  */
 interface CompilerInterface
 {
+    public bool $renderMode {
+        get;
+        set;
+    }
+
     /**
      * @param $ast array<NodeInterface> AST дерево
      * @return string
      */
-    public function compile(array $ast): string;
-
-    /**
-     * @param string $tagName имя тега
-     * @param string $compilerClass класс компилятора тега
-     * @return $this
-     */
-    public function registerTagCompiler(string $tagName, string $compilerClass): static;
-    /**
-     * @param string $tagClass класс ноды
-     * @param string $compilerClass класс компилятора тега
-     * @return $this
-     */
-    public function registerNodeCompiler(string $nodeClass, string $compilerClass): static;
+    public function compile(array $ast, array $context, array $localVars = []): string;
 }

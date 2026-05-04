@@ -2,7 +2,6 @@
 
 namespace Vasoft\Joke\Templator\Contracts;
 
-use Vasoft\Joke\Templator\Contracts\Ast\TagHandlerInterface;
 use Vasoft\Joke\Templator\Exceptions\TemplatorException;
 
 /**
@@ -10,14 +9,6 @@ use Vasoft\Joke\Templator\Exceptions\TemplatorException;
  */
 interface TemplateEngineInterface
 {
-    /**
-     * Регистрирует обработчик для тега.
-     *
-     * @param string $tagName Имя тега (без префикса)
-     * @param TagHandlerInterface $handler
-     */
-    public function registerTag(string $tagName, TagHandlerInterface $handler): void;
-
     /**
      * Рендерит шаблон из строки.
      *
