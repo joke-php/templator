@@ -3,8 +3,8 @@
 namespace Vasoft\Joke\Templator\Tests\Fixtures;
 
 use Vasoft\Joke\Templator\Ast\TagNode;
-use Vasoft\Joke\Templator\Contracts\Core\Ast\RendererInterface;
-use Vasoft\Joke\Templator\Contracts\Core\Ast\TagHandlerInterface;
+use Vasoft\Joke\Templator\Contracts\Ast\RendererInterface;
+use Vasoft\Joke\Templator\Contracts\Ast\TagHandlerInterface;
 
 class DummyTagHandler implements TagHandlerInterface
 {

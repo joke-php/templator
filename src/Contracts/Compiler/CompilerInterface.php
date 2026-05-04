@@ -1,8 +1,8 @@
 <?php
 
-namespace Vasoft\Joke\Templator\Contracts\Core\Compiler;
+namespace Vasoft\Joke\Templator\Contracts\Compiler;
 
-use Vasoft\Joke\Templator\Contracts\Core\Ast\NodeInterface;
+use Vasoft\Joke\Templator\Contracts\Ast\NodeInterface;
 
 /**
  * Компилятор AST дерева в PHP код

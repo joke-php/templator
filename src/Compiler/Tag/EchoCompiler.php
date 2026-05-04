@@ -3,8 +3,8 @@
 namespace Vasoft\Joke\Templator\Compiler\Tag;
 
 use Vasoft\Joke\Templator\Ast\TagNode;
-use Vasoft\Joke\Templator\Contracts\Core\Compiler\CompilerInterface;
-use Vasoft\Joke\Templator\Contracts\Core\Compiler\TagCompilerInterface;
+use Vasoft\Joke\Templator\Contracts\Compiler\CompilerInterface;
+use Vasoft\Joke\Templator\Contracts\Compiler\TagCompilerInterface;
 
 class EchoCompiler implements TagCompilerInterface
 {

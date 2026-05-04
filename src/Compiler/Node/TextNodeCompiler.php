@@ -3,9 +3,9 @@
 namespace Vasoft\Joke\Templator\Compiler\Node;
 
 use Vasoft\Joke\Templator\Ast\TextNode;
-use Vasoft\Joke\Templator\Contracts\Core\Ast\NodeInterface;
-use Vasoft\Joke\Templator\Contracts\Core\Compiler\CompilerInterface;
-use Vasoft\Joke\Templator\Contracts\Core\Compiler\NodeCompilerInterface;
+use Vasoft\Joke\Templator\Contracts\Ast\NodeInterface;
+use Vasoft\Joke\Templator\Contracts\Compiler\CompilerInterface;
+use Vasoft\Joke\Templator\Contracts\Compiler\NodeCompilerInterface;
 
 class TextNodeCompiler implements NodeCompilerInterface
 {

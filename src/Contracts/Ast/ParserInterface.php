@@ -1,8 +1,8 @@
 <?php
 
-namespace Vasoft\Joke\Templator\Contracts\Core\Ast;
+namespace Vasoft\Joke\Templator\Contracts\Ast;
 
-use Vasoft\Joke\Templator\Contracts\Core\TokenInterface;
+use Vasoft\Joke\Templator\Contracts\TokenInterface;
 use Vasoft\Joke\Templator\Exceptions\ParserException;
 
 interface ParserInterface

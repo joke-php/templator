@@ -2,7 +2,7 @@
 
 namespace Vasoft\Joke\Templator\Lexer;
 
-use Vasoft\Joke\Templator\Contracts\Core\TokenInterface;
+use Vasoft\Joke\Templator\Contracts\TokenInterface;
 
 /**
  * Абстрактный Класс токенов

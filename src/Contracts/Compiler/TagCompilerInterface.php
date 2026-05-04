@@ -1,6 +1,6 @@
 <?php
 
-namespace Vasoft\Joke\Templator\Contracts\Core\Compiler;
+namespace Vasoft\Joke\Templator\Contracts\Compiler;
 
 use Vasoft\Joke\Templator\Ast\TagNode;
 

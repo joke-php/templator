@@ -5,12 +5,13 @@ namespace Vasoft\Joke\Templator;
 use Vasoft\Joke\Container\ServiceContainer;
 use Vasoft\Joke\Templator\Ast\DefaultParser;
 use Vasoft\Joke\Templator\Compiler\DefaultCompiler;
-use Vasoft\Joke\Templator\Contracts\Core\Ast\ParserInterface;
-use Vasoft\Joke\Templator\Contracts\Core\Ast\RendererInterface;
-use Vasoft\Joke\Templator\Contracts\Core\Ast\TagHandlerInterface;
-use Vasoft\Joke\Templator\Contracts\Core\Compiler\CompilerInterface;
-use Vasoft\Joke\Templator\Contracts\Core\LexerInterface;
-use Vasoft\Joke\Templator\Contracts\Core\TemplateEngineInterface;
+use Vasoft\Joke\Templator\Container\TemplateContainer;
+use Vasoft\Joke\Templator\Contracts\Ast\ParserInterface;
+use Vasoft\Joke\Templator\Contracts\Ast\RendererInterface;
+use Vasoft\Joke\Templator\Contracts\Ast\TagHandlerInterface;
+use Vasoft\Joke\Templator\Contracts\Compiler\CompilerInterface;
+use Vasoft\Joke\Templator\Contracts\LexerInterface;
+use Vasoft\Joke\Templator\Contracts\TemplateEngineInterface;
 use Vasoft\Joke\Templator\Exceptions\TemplatorException;
 use Vasoft\Joke\Templator\Lexer\DefaultLexer;
 use Vasoft\Joke\Templator\Render\DefaultRenderer;
@@ -25,9 +26,10 @@ class TemplateEngine implements TemplateEngineInterface
 
     public function __construct(ServiceContainer $serviceContainer)
     {
+        $container = new TemplateContainer();
         $this->lexer = $serviceContainer->get(LexerInterface::class);
         if ($this->lexer === null) {
-            $this->lexer = new DefaultLexer();
+            $this->lexer = new DefaultLexer($container);
         }
         $this->parser = $serviceContainer->get(ParserInterface::class);
         if ($this->parser === null) {
@@ -59,6 +61,7 @@ class TemplateEngine implements TemplateEngineInterface
         try {
             $tokens = $this->lexer->tokenize($template);
             $ast = $this->parser->parse($tokens);
+            print_r([$ast]);
             $optimizedAst = $this->renderer->optimizeStaticNodes($ast, $context);
             return $this->compiler->compile($optimizedAst);
         } catch (\Throwable $e) {

@@ -2,7 +2,7 @@
 
 namespace Vasoft\Joke\Templator\Ast;
 
-use Vasoft\Joke\Templator\Contracts\Core\Ast\ParserInterface;
+use Vasoft\Joke\Templator\Contracts\Ast\ParserInterface;
 use Vasoft\Joke\Templator\Exceptions\ParserException;
 use Vasoft\Joke\Templator\Lexer\TextToken;
 use Vasoft\Joke\Templator\Tokens\CloseTagToken;

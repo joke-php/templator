@@ -3,25 +3,23 @@
 namespace Vasoft\Joke\Templator\Tests\Unit;
 
 use phpmock\phpunit\PHPMock;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Vasoft\Joke\Container\ServiceContainer;
 use Vasoft\Joke\Templator\Ast\DefaultParser;
 use Vasoft\Joke\Templator\Ast\TagNode;
 use Vasoft\Joke\Templator\Compiler\DefaultCompiler;
-use Vasoft\Joke\Templator\Contracts\Core\Ast\ParserInterface;
-use Vasoft\Joke\Templator\Contracts\Core\Ast\RendererInterface;
-use Vasoft\Joke\Templator\Contracts\Core\Ast\TagHandlerInterface;
-use Vasoft\Joke\Templator\Contracts\Core\Compiler\CompilerInterface;
-use Vasoft\Joke\Templator\Contracts\Core\LexerInterface;
+use Vasoft\Joke\Templator\Contracts\Ast\ParserInterface;
+use Vasoft\Joke\Templator\Contracts\Ast\RendererInterface;
+use Vasoft\Joke\Templator\Contracts\Ast\TagHandlerInterface;
+use Vasoft\Joke\Templator\Contracts\Compiler\CompilerInterface;
+use Vasoft\Joke\Templator\Contracts\LexerInterface;
 use Vasoft\Joke\Templator\Exceptions\TemplatorException;
 use Vasoft\Joke\Templator\Lexer\DefaultLexer;
 use Vasoft\Joke\Templator\Render\DefaultRenderer;
 use Vasoft\Joke\Templator\Render\Handlers\EchoHandler;
 use Vasoft\Joke\Templator\TemplateEngine;
 
-#[Group("skip")]
 class TemplateEngineTest extends TestCase
 {
     use PHPMock;
@@ -36,7 +34,7 @@ class TemplateEngineTest extends TestCase
 
     public function testRenderStringWithEcho(): void
     {
-        $template = 'Hello (<j-echo value="name" j-static/>) <j-echo value="name"/>!';
+        $template = 'Hello ({{name}}) {%echo name%}!';
         $context = ['name' => '<b>Alice</b>'];
 
         $result = $this->engine->renderString($template, $context);

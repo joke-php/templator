@@ -3,7 +3,7 @@
 namespace Vasoft\Joke\Templator\Lexer;
 
 use Vasoft\Joke\Templator\Container\TemplateContainer;
-use Vasoft\Joke\Templator\Contracts\Core\LexerInterface;
+use Vasoft\Joke\Templator\Contracts\LexerInterface;
 
 class DefaultLexer implements LexerInterface
 {
@@ -14,9 +14,7 @@ class DefaultLexer implements LexerInterface
 
     public function __construct(TemplateContainer $container)
     {
-        $this->tokenDescriptors = $container->tokenDescriptors->list();
-//        $this->tokenDescriptors[] = new TokenDescriptor('{{', '}}', PrintToken::class);
-//        $this->tokenDescriptors[] = new TokenDescriptor('{%', '%}', StatementToken::class);
+        $this->tokenDescriptors = $container->getTokenCollection()->list();
     }
 
     public function tokenize(string $template): array

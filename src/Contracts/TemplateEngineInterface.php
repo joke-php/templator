@@ -1,8 +1,8 @@
 <?php
 
-namespace Vasoft\Joke\Templator\Contracts\Core;
+namespace Vasoft\Joke\Templator\Contracts;
 
-use Vasoft\Joke\Templator\Contracts\Core\Ast\TagHandlerInterface;
+use Vasoft\Joke\Templator\Contracts\Ast\TagHandlerInterface;
 use Vasoft\Joke\Templator\Exceptions\TemplatorException;
 
 /**

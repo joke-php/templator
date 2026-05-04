@@ -1,6 +1,6 @@
 <?php
 
-namespace Vasoft\Joke\Templator\Contracts\Core;
+namespace Vasoft\Joke\Templator\Contracts;
 
 /**
  * Токены AST

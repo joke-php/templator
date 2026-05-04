@@ -4,9 +4,9 @@ namespace Vasoft\Joke\Templator\Render;
 
 use Vasoft\Joke\Templator\Ast\TagNode;
 use Vasoft\Joke\Templator\Ast\TextNode;
-use Vasoft\Joke\Templator\Contracts\Core\Ast\NodeInterface;
-use Vasoft\Joke\Templator\Contracts\Core\Ast\RendererInterface;
-use Vasoft\Joke\Templator\Contracts\Core\Ast\TagHandlerInterface;
+use Vasoft\Joke\Templator\Contracts\Ast\NodeInterface;
+use Vasoft\Joke\Templator\Contracts\Ast\RendererInterface;
+use Vasoft\Joke\Templator\Contracts\Ast\TagHandlerInterface;
 use Vasoft\Joke\Templator\Exceptions\RenderingException;
 
 class DefaultRenderer implements RendererInterface

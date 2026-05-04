@@ -2,7 +2,7 @@
 
 namespace Vasoft\Joke\Templator\Ast;
 
-use Vasoft\Joke\Templator\Contracts\Core\Ast\NodeInterface;
+use Vasoft\Joke\Templator\Contracts\Ast\NodeInterface;
 
 /**
  * Узел тега AST дерева

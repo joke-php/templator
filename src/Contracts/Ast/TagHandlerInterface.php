@@ -1,6 +1,6 @@
 <?php
 
-namespace Vasoft\Joke\Templator\Contracts\Core\Ast;
+namespace Vasoft\Joke\Templator\Contracts\Ast;
 
 use Vasoft\Joke\Templator\Ast\TagNode;
 use Vasoft\Joke\Templator\Exceptions\RenderingException;

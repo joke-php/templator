@@ -1,6 +1,6 @@
 <?php
 
-namespace Vasoft\Joke\Templator\Contracts\Core\Ast;
+namespace Vasoft\Joke\Templator\Contracts\Ast;
 
 /**
  * Узел AST дерева

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Vasoft\Joke\Templator\Lexer;
 
-use Vasoft\Joke\Templator\Contracts\Core\TokenInterface;
+use Vasoft\Joke\Templator\Contracts\TokenInterface;
 
 /**
  * Описание токена.

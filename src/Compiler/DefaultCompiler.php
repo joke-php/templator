@@ -6,10 +6,10 @@ use Vasoft\Joke\Templator\Ast\TagNode;
 use Vasoft\Joke\Templator\Ast\TextNode;
 use Vasoft\Joke\Templator\Compiler\Tag\EchoCompiler;
 use Vasoft\Joke\Templator\Compiler\Tag\IfCompiler;
-use Vasoft\Joke\Templator\Contracts\Core\Ast\NodeInterface;
-use Vasoft\Joke\Templator\Contracts\Core\Compiler\CompilerInterface;
-use Vasoft\Joke\Templator\Contracts\Core\Compiler\NodeCompilerInterface;
-use Vasoft\Joke\Templator\Contracts\Core\Compiler\TagCompilerInterface;
+use Vasoft\Joke\Templator\Contracts\Ast\NodeInterface;
+use Vasoft\Joke\Templator\Contracts\Compiler\CompilerInterface;
+use Vasoft\Joke\Templator\Contracts\Compiler\NodeCompilerInterface;
+use Vasoft\Joke\Templator\Contracts\Compiler\TagCompilerInterface;
 
 class DefaultCompiler implements CompilerInterface
 {
