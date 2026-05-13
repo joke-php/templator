@@ -8,3 +8,4 @@
 Thumbs.db
 /reports
 .phpunit.result.cache
+/var
