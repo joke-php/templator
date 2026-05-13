@@ -47,13 +47,10 @@ class TemplatorConfig extends AbstractConfig
         $this->addNodeHandler(BlockNode::class, BlockNodeHandler::class);
         $this->addNodeHandler(StatementNode::class, StatementNodeHandler::class);
 
-        $this->directiveCollection->upsert(StatementToken::class, 'if', '/if');
-        $this->directiveCollection->upsert(StatementToken::class, 'else');
-        $this->directiveCollection->upsert(StatementToken::class, 'static', '/static');
+        $this->directiveCollection->upsert(StatementToken::class, 'if', '/if',['else','elseif']);
         $this->directiveCollection->upsert(StatementToken::class, 'foreach', '/foreach');
 
         $this->addDirectiveHandler('if', IfHandler::class);
-        $this->addDirectiveHandler('static', StaticHandler::class);
         $this->addDirectiveHandler('foreach', EachHandler::class);
     }
 

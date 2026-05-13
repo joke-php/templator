@@ -7,6 +7,7 @@ use Vasoft\Joke\Templator\Container\DirectiveType;
 use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
 use Vasoft\Joke\Templator\Contracts\Parser\ParserInterface;
 use Vasoft\Joke\Templator\Exceptions\ParserException;
+use Vasoft\Joke\Templator\Exceptions\TemplatorException;
 use Vasoft\Joke\Templator\Lexer\PrintToken;
 use Vasoft\Joke\Templator\Lexer\StatementToken;
 use Vasoft\Joke\Templator\Lexer\TextToken;
@@ -55,32 +56,7 @@ class DefaultParser implements ParserInterface
                 $node = new PrintNode($token->raw);
                 $this->attachNode($node, $stack, $rootNodes);
             } elseif ($token instanceof StatementToken) {
-                $directive = $token->getDirective();
-                $type = $this->directiveCollection->getType($token::class, $directive);
-
-                if ($type === DirectiveType::BEGIN) {
-                    $node = new BlockNode($directive, $token->getArguments());
-                    $this->attachNode($node, $stack, $rootNodes);
-                    $stack[] = $node;
-                } elseif ($type === DirectiveType::END) {
-                    if (empty($stack)) {
-                        throw new ParserException("Unexpected end directive: $directive");
-                    }
-                    $openDirective = $this->directiveCollection->getOpenDirective($token::class, $directive);
-                    $last = array_pop($stack);
-                    if ($last->directive !== $openDirective) {
-                        throw new ParserException(
-                            "Mismatched block: expected end of {$last->directive}, got $directive"
-                        );
-                    }
-                } elseif ($type === DirectiveType::SINGLE) {
-                    $node = new StatementNode($directive, $token->getArguments());
-                    $this->attachNode($node, $stack, $rootNodes);
-                } else {
-                    throw new ParserException(
-                        "Unknown directive '{$directive}' for " . $token::class . "."
-                    );
-                }
+                $this->prepareStatementToken($token, $stack, $rootNodes);
             }
         }
 
@@ -92,10 +68,54 @@ class DefaultParser implements ParserInterface
         return $rootNodes;
     }
 
+    private function prepareStatementToken(StatementToken $token, array &$stack, array &$rootNodes): void
+    {
+        $directive = $token->getDirective();
+        $type = $this->directiveCollection->getType($token::class, $directive);
+
+        switch ($type) {
+            case DirectiveType::BEGIN:
+                $node = new BlockNode($directive, $token->getArguments());
+                $this->attachNode($node, $stack, $rootNodes);
+                $stack[] = $node;
+                break;
+
+            case DirectiveType::END:
+                if (empty($stack)) {
+                    throw new ParserException("Unexpected end directive: $directive");
+                }
+                $openDirective = $this->directiveCollection->getOpenDirective($token::class, $directive);
+                $last = array_pop($stack);
+                if ($last->directive !== $openDirective) {
+                    throw new ParserException(
+                        "Mismatched block: expected end of {$last->directive}, got $directive"
+                    );
+                }
+                break;
+
+            case DirectiveType::BRANCH:
+                $currentNode = array_last($stack);
+                $openDirective = $this->directiveCollection->getOpenDirective($token::class, $directive);
+                if ($openDirective !== $currentNode->directive) {
+                    throw new TemplatorException("Unexpected branch '$directive'");
+                }
+                $currentNode->openBranch($directive, $token->getArguments());
+                break;
+
+            case DirectiveType::SINGLE:
+                $node = new StatementNode($directive, $token->getArguments());
+                $this->attachNode($node, $stack, $rootNodes);
+                break;
+
+            default:
+                throw new ParserException("Unknown directive: $directive");
+        }
+    }
+
     private function attachNode(NodeInterface $node, array &$stack, array &$rootNodes): void
     {
-        if ($stack) {
-            $stack[count($stack) - 1]->children[] = $node;
+        if ($stack && $stack[count($stack) - 1] instanceof BlockNode) {
+            $stack[count($stack) - 1]->addChild($node);
         } else {
             $rootNodes[] = $node;
         }

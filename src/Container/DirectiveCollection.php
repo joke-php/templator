@@ -17,6 +17,7 @@ class DirectiveCollection
      * @var array<class-string<TokenInterface>,array<string,string>>
      */
     private array $directivesInverse = [];
+    private array $directivesBranches = [];
 
     /**
      * @param class-string<TokenInterface> $tokenClass
@@ -25,12 +26,16 @@ class DirectiveCollection
      * @return $this
      * @throws TemplatorException
      */
-    public function add(string $tokenClass, string $directiveBegin, string $directiveEnd = ''): static
-    {
+    public function add(
+        string $tokenClass,
+        string $directiveBegin,
+        string $directiveEnd = '',
+        array $directiveBranch = []
+    ): static {
         if (isset($this->directives[$tokenClass][$directiveBegin])) {
             throw new TemplatorException("Directive '$directiveBegin' already defined");
         }
-        $this->upsert($tokenClass, $directiveBegin, $directiveEnd);
+        $this->upsert($tokenClass, $directiveBegin, $directiveEnd, $directiveBranch);
         return $this;
     }
 
@@ -40,21 +45,29 @@ class DirectiveCollection
      * @param string $directiveEnd
      * @return $this
      */
-    public function upsert(string $tokenClass, string $directiveBegin, string $directiveEnd = ''): static
-    {
+    public function upsert(
+        string $tokenClass,
+        string $directiveBegin,
+        string $directiveEnd = '',
+        array $directiveBranch = []
+    ): static {
         if (!array_key_exists($tokenClass, $this->directives)) {
             $this->directives[$tokenClass] = [$directiveBegin => $directiveEnd];
             $this->directivesInverse[$tokenClass] = [$directiveEnd => $directiveBegin];
+            $this->directivesBranches[$tokenClass] = [];
         } else {
             $this->directives[$tokenClass][$directiveBegin] = $directiveEnd;
             $this->directivesInverse[$tokenClass][$directiveEnd] = $directiveBegin;
+        }
+        foreach ($directiveBranch as $directive) {
+            $this->directivesBranches[$tokenClass][$directive] = $directiveBegin;
         }
         return $this;
     }
 
     public function getOpenDirective(string $tokenClass, string $directive): string
     {
-        return $this->directivesInverse[$tokenClass][$directive] ?? '';
+        return $this->directivesInverse[$tokenClass][$directive] ?? $this->directivesBranches[$tokenClass][$directive] ?? '';
     }
 
     public function getType(string $tokenClass, string $directive): DirectiveType
@@ -66,6 +79,9 @@ class DirectiveCollection
         }
         if (isset($this->directivesInverse[$tokenClass][$directive])) {
             return DirectiveType::END;
+        }
+        if (isset($this->directivesBranches[$tokenClass][$directive])) {
+            return DirectiveType::BRANCH;
         }
         return DirectiveType::UNKNOWN;
     }

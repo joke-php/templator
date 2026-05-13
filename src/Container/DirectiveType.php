@@ -8,4 +8,5 @@ enum DirectiveType: int
     case BEGIN = 1;
     case END = 2;
     case SINGLE = 3;
+    case BRANCH = 4;
 }

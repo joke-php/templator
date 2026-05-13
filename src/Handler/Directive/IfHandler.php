@@ -17,9 +17,37 @@ class IfHandler extends NodeHandler
     ): string {
         assert($node instanceof BlockNode);
         $result = "<?php if(" . $this->generateCondition($node->arguments) . "): ?>";
-        $result .= $processor->process($node->children, $context);
+        $result .= $processor->process($node->children, $context, $localVars);
+        foreach ($node->branches as $branch) {
+            if ($branch->name === 'else') {
+                $result .= $this->compileElse($processor, $branch->children, $context, $localVars);
+            } elseif ($branch->name === 'elseif') {
+                $result .= $this->compileElseIf($processor, $branch->arguments, $branch->children, $context, $localVars);
+            }
+        }
         $result .= '<?php endif; ?>';
         return $result;
+    }
+
+    private function compileElse(
+        NodeProcessorInterface $processor,
+        array $children,
+        array $context,
+        array $localVars
+    ): string {
+        $result = '<?php else: ?>';
+        return $result . $processor->process($children, $context, $localVars);
+    }
+
+    private function compileElseIf(
+        NodeProcessorInterface $processor,
+        string $arguments,
+        array $children,
+        array $context,
+        array $localVars
+    ): string {
+        $result = "<?php elseif(" . $this->generateCondition($arguments) . "): ?>";
+        return $result . $processor->process($children, $context, $localVars);
     }
 
     private function generateCondition(string $path): string
@@ -38,6 +66,17 @@ class IfHandler extends NodeHandler
         $value = $this->resolveValue($context, $node->arguments, false);
         if ($value) {
             return $processor->process($node->children, $context, $localVars);
+        }
+        foreach ($node->branches as $branch) {
+            if ($branch->name === 'else') {
+                return $processor->process($branch->children, $context, $localVars);
+            }
+            if ($branch->name === 'elseif') {
+                $value = $this->resolveValue($context, $branch->arguments, false);
+                if ($value) {
+                    return $processor->process($branch->children, $context, $localVars);
+                }
+            }
         }
         return '';
     }
