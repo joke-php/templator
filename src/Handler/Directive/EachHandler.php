@@ -2,8 +2,8 @@
 
 namespace Vasoft\Joke\Templator\Handler\Directive;
 
+use Vasoft\Joke\Templator\Contracts\NodeProcessorInterface;
 use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
-use Vasoft\Joke\Templator\Contracts\Compiler\CompilerInterface;
 use Vasoft\Joke\Templator\Exceptions\CompileException;
 use Vasoft\Joke\Templator\Handler\NodeHandler;
 use Vasoft\Joke\Templator\Parser\Node\BlockNode;
@@ -12,9 +12,9 @@ class EachHandler extends NodeHandler
 {
     public function compile(
         NodeInterface $node,
-        CompilerInterface $compiler,
+        NodeProcessorInterface $processor,
         array $context,
-        array $localVars = []
+        array $localVars = [],
     ): string {
         assert($node instanceof BlockNode);
 
@@ -31,7 +31,7 @@ class EachHandler extends NodeHandler
             $result = "<?php foreach ({$arrayAccess} as \${$valueVar}): ?>";
         }
 
-        $result .= $compiler->compile($node->children, $context, $localVars);
+        $result .= $processor->process($node->children, $context, $localVars);
         $result .= '<?php endforeach; ?>';
         return $result;
     }
@@ -52,8 +52,12 @@ class EachHandler extends NodeHandler
         return [$valueVar, $keyVar, $path];
     }
 
-    public function render(NodeInterface $node, CompilerInterface $compiler, array $context): string
-    {
+    public function render(
+        NodeInterface $node,
+        NodeProcessorInterface $processor,
+        array $context,
+        array $localVars = [],
+    ): string {
         assert($node instanceof BlockNode);
         [$valueVar, $keyVar, $path] = $this->parseArguments($node->arguments);
 
@@ -65,7 +69,7 @@ class EachHandler extends NodeHandler
             if ($keyVar !== '') {
                 $iterationContext[$keyVar] = $index;
             }
-            $output .= $compiler->compile($node->children, $iterationContext);
+            $output .= $processor->process($node->children, $iterationContext, $localVars);
         }
         return $output;
     }

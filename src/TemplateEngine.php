@@ -3,9 +3,9 @@
 namespace Vasoft\Joke\Templator;
 
 use Vasoft\Joke\Container\ServiceContainer;
-use Vasoft\Joke\Templator\Contracts\Parser\ParserInterface;
-use Vasoft\Joke\Templator\Contracts\Compiler\CompilerInterface;
+use Vasoft\Joke\Templator\Contracts\NodeProcessorInterface;
 use Vasoft\Joke\Templator\Contracts\LexerInterface;
+use Vasoft\Joke\Templator\Contracts\Parser\ParserInterface;
 use Vasoft\Joke\Templator\Contracts\TemplateEngineInterface;
 use Vasoft\Joke\Templator\Exceptions\TemplatorException;
 
@@ -27,8 +27,8 @@ class TemplateEngine implements TemplateEngineInterface
             $parser = $this->container->get(ParserInterface::class);
             $ast = $parser->parse($tokens);
 
-            $compiler = $this->container->get(CompilerInterface::class);
-            return $compiler->compile($ast, $context);
+            $compiler = $this->container->get(NodeProcessorInterface::class);
+            return $compiler->process($ast, $context);
         } catch (\Throwable $e) {
             if ($e instanceof TemplatorException) {
                 throw $e;

@@ -2,17 +2,12 @@
 
 namespace Vasoft\Joke\Templator\Handler;
 
-use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
-use Vasoft\Joke\Templator\Contracts\Compiler\CompilerInterface;
+use Vasoft\Joke\Templator\Contracts\NodeProcessorInterface;
 use Vasoft\Joke\Templator\Contracts\Handler\NodeHandlerInterface;
+use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
 
 abstract class NodeHandler implements NodeHandlerInterface
 {
-
-    abstract public function compile(NodeInterface $node, CompilerInterface $compiler, array $context, array $localVars = []): string;
-
-    abstract public function render(NodeInterface $node, CompilerInterface $compiler, array $context): string;
-
     protected function toPhpArrayAccess(string $path): string
     {
         $keys = explode('.', $path);
