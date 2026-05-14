@@ -12,6 +12,11 @@ use Vasoft\Joke\Templator\Parser\Node\BlockNode;
 
 class EachHandler extends NodeHandler
 {
+    /**
+     * @inherit
+     *
+     * @throws CompileException
+     */
     public function compile(
         NodeInterface $node,
         NodeProcessorInterface $processor,
@@ -34,28 +39,39 @@ class EachHandler extends NodeHandler
         }
 
         $result .= $processor->process($node->children, $context, $localVars);
-        $result .= '<?php endforeach; ?>';
 
-        return $result;
+        return $result . '<?php endforeach; ?>';
     }
 
+    /**
+     * @return array{non-empty-string,string, non-empty-string}
+     *
+     * @throws CompileException
+     */
     private function parseArguments(string $value): array
     {
         if (!preg_match('#^\s*(\w+)(?:\s*,\s*(\w+))?\s+in\s+(.+)$#', $value, $matches)) {
             throw new CompileException('Invalid foreach syntax: {$value}');
         }
         $keyVar = $matches[1];
-        $valueVar = $matches[2] ?? '';
+        $valueVar = $matches[2];
         $path = trim($matches[3]);
-
+        if ('' === $path) {
+            throw new CompileException('Invalid foreach syntax: {$value}');
+        }
         if ('' === $valueVar) {
             $valueVar = $keyVar;
-            $keyVar = null;
+            $keyVar = '';
         }
 
         return [$valueVar, $keyVar, $path];
     }
 
+    /**
+     * @inherit
+     *
+     * @throws CompileException
+     */
     public function render(
         NodeInterface $node,
         NodeProcessorInterface $processor,

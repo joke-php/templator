@@ -17,10 +17,12 @@ class DirectiveCollection
      * @var array<class-string<TokenInterface>,array<string,string>>
      */
     private array $directivesInverse = [];
+    /** @var array<class-string<TokenInterface>,array<string,string>> */
     private array $directivesBranches = [];
 
     /**
      * @param class-string<TokenInterface> $tokenClass
+     * @param list<string>                 $directiveBranch
      *
      * @return $this
      *
@@ -41,7 +43,8 @@ class DirectiveCollection
     }
 
     /**
-     * @param class-string $tokenClass
+     * @param class-string<TokenInterface> $tokenClass
+     * @param list<string>                 $directiveBranch
      *
      * @return $this
      */

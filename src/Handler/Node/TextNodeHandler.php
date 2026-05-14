@@ -11,6 +11,9 @@ use Vasoft\Joke\Templator\Parser\Node\TextNode;
 
 class TextNodeHandler implements NodeHandlerInterface
 {
+    /**
+     * @inherit
+     */
     public function compile(
         NodeInterface $node,
         NodeProcessorInterface $processor,
@@ -22,6 +25,9 @@ class TextNodeHandler implements NodeHandlerInterface
         return $node->content;
     }
 
+    /**
+     * @inherit
+     */
     public function render(
         NodeInterface $node,
         NodeProcessorInterface $processor,

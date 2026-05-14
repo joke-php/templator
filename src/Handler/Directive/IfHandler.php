@@ -6,11 +6,16 @@ namespace Vasoft\Joke\Templator\Handler\Directive;
 
 use Vasoft\Joke\Templator\Contracts\NodeProcessorInterface;
 use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
+use Vasoft\Joke\Templator\Exceptions\CompileException;
+use Vasoft\Joke\Templator\Exceptions\RenderingException;
 use Vasoft\Joke\Templator\Handler\NodeHandler;
 use Vasoft\Joke\Templator\Parser\Node\BlockNode;
 
 class IfHandler extends NodeHandler
 {
+    /**
+     * @inherit
+     */
     public function compile(
         NodeInterface $node,
         NodeProcessorInterface $processor,
@@ -24,6 +29,9 @@ class IfHandler extends NodeHandler
             if ('else' === $branch->name) {
                 $result .= $this->compileElse($processor, $branch->children, $context, $localVars);
             } elseif ('elseif' === $branch->name) {
+                if (null === $branch->arguments || '' === trim($branch->arguments)) {
+                    throw new CompileException('elseif with no arguments');
+                }
                 $result .= $this->compileElseIf(
                     $processor,
                     $branch->arguments,
@@ -38,6 +46,11 @@ class IfHandler extends NodeHandler
         return $result;
     }
 
+    /**
+     * @param list<NodeInterface> $children
+     * @param array<string,mixed> $context
+     * @param list<string>        $localVars
+     */
     private function compileElse(
         NodeProcessorInterface $processor,
         array $children,
@@ -49,6 +62,11 @@ class IfHandler extends NodeHandler
         return $result . $processor->process($children, $context, $localVars);
     }
 
+    /**
+     * @param list<NodeInterface> $children
+     * @param array<string,mixed> $context
+     * @param list<string>        $localVars
+     */
     private function compileElseIf(
         NodeProcessorInterface $processor,
         string $arguments,
@@ -66,6 +84,9 @@ class IfHandler extends NodeHandler
         return '(bool)(' . $this->toPhpArrayAccess($path) . ')';
     }
 
+    /**
+     * @inherit
+     */
     public function render(
         NodeInterface $node,
         NodeProcessorInterface $processor,
@@ -83,6 +104,9 @@ class IfHandler extends NodeHandler
                 return $processor->process($branch->children, $context, $localVars);
             }
             if ('elseif' === $branch->name) {
+                if (null === $branch->arguments || '' === trim($branch->arguments)) {
+                    throw new RenderingException('elseif with no arguments');
+                }
                 $value = $this->resolveValue($context, $branch->arguments, false);
                 if ($value) {
                     return $processor->process($branch->children, $context, $localVars);

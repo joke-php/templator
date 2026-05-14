@@ -9,6 +9,10 @@ use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
 
 interface NodeHandlerInterface
 {
+    /**
+     * @param array<string,mixed> $context
+     * @param list<string>        $localVars
+     */
     public function compile(
         NodeInterface $node,
         NodeProcessorInterface $processor,
@@ -16,6 +20,10 @@ interface NodeHandlerInterface
         array $localVars = [],
     ): string;
 
+    /**
+     * @param array<string,mixed> $context
+     * @param list<string>        $localVars
+     */
     public function render(
         NodeInterface $node,
         NodeProcessorInterface $processor,

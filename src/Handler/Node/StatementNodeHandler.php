@@ -11,6 +11,9 @@ use Vasoft\Joke\Templator\Parser\Node\BlockNode;
 
 class StatementNodeHandler implements NodeHandlerInterface
 {
+    /**
+     * @inherit
+     */
     public function compile(
         NodeInterface $node,
         NodeProcessorInterface $processor,
@@ -22,6 +25,9 @@ class StatementNodeHandler implements NodeHandlerInterface
         return 'Compile';
     }
 
+    /**
+     * @inherit
+     */
     public function render(
         NodeInterface $node,
         NodeProcessorInterface $processor,
@@ -29,7 +35,6 @@ class StatementNodeHandler implements NodeHandlerInterface
         array $localVars = [],
     ): string {
         assert($node instanceof BlockNode);
-        echo __METHOD__, PHP_EOL;
 
         return 'Render';
     }

@@ -14,7 +14,7 @@ interface LexerInterface
      *
      * @param string $template исходный текст
      *
-     * @return array<TokenInterface> список токенов
+     * @return list<TokenInterface> список токенов
      */
     public function tokenize(string $template): array;
 }

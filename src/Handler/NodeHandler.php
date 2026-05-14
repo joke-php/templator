@@ -19,6 +19,9 @@ abstract class NodeHandler implements NodeHandlerInterface
         return $code;
     }
 
+    /**
+     * @param array<string,mixed> $context
+     */
     protected function resolveValue(array $context, string $path, mixed $defaultValue): mixed
     {
         $value = $context;

@@ -7,6 +7,8 @@ namespace Vasoft\Joke\Templator;
 use Vasoft\Joke\Config\AbstractConfig;
 use Vasoft\Joke\Templator\Container\DirectiveCollection;
 use Vasoft\Joke\Templator\Container\TokenCollection;
+use Vasoft\Joke\Templator\Contracts\Handler\NodeHandlerInterface;
+use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
 use Vasoft\Joke\Templator\Exceptions\TemplatorException;
 use Vasoft\Joke\Templator\Handler\Directive\EachHandler;
 use Vasoft\Joke\Templator\Handler\Directive\IfHandler;
@@ -26,8 +28,13 @@ class TemplatorConfig extends AbstractConfig
 {
     public private(set) readonly TokenCollection $tokenCollection;
     public private(set) readonly DirectiveCollection $directiveCollection;
-
+    /**
+     * @var array<string,class-string<NodeHandlerInterface>>
+     */
     private array $directiveHandler = [];
+    /**
+     * @var array<class-string<NodeInterface>,class-string<NodeHandlerInterface>>
+     */
     private array $nodeHandler = [];
 
     public function __construct()
@@ -54,6 +61,12 @@ class TemplatorConfig extends AbstractConfig
         $this->addDirectiveHandler('foreach', EachHandler::class);
     }
 
+    /**
+     * @param string                             $directive Директива
+     * @param class-string<NodeHandlerInterface> $handler
+     *
+     * @return $this
+     */
     public function addDirectiveHandler(string $directive, string $handler): static
     {
         $this->directiveHandler[$directive] = $handler;
@@ -61,6 +74,12 @@ class TemplatorConfig extends AbstractConfig
         return $this;
     }
 
+    /**
+     * @param class-string<NodeInterface>        $nodeClass
+     * @param class-string<NodeHandlerInterface> $handler
+     *
+     * @return $this
+     */
     public function addNodeHandler(string $nodeClass, string $handler): static
     {
         $this->nodeHandler[$nodeClass] = $handler;
@@ -68,6 +87,13 @@ class TemplatorConfig extends AbstractConfig
         return $this;
     }
 
+    /**
+     * @param class-string<NodeInterface> $nodeClass
+     *
+     * @return class-string<NodeHandlerInterface>
+     *
+     * @throws TemplatorException
+     */
     public function getNodeHandler(string $nodeClass): string
     {
         if (!isset($this->nodeHandler[$nodeClass])) {
@@ -77,6 +103,13 @@ class TemplatorConfig extends AbstractConfig
         return $this->nodeHandler[$nodeClass];
     }
 
+    /**
+     * @param string $directive Директива
+     *
+     * @return class-string<NodeHandlerInterface>
+     *
+     * @throws TemplatorException
+     */
     public function getDirectiveHandler(string $directive): string
     {
         if (!isset($this->directiveHandler[$directive])) {

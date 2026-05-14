@@ -12,7 +12,9 @@ use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
 interface NodeProcessorInterface
 {
     /**
-     * @param $ast array<NodeInterface> AST дерево
+     * @param list<NodeInterface> $ast       AST дерево
+     * @param array<string,mixed> $context
+     * @param list<string>        $localVars
      */
     public function process(array $ast, array $context, array $localVars = []): string;
 }

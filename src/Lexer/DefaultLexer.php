@@ -10,7 +10,7 @@ use Vasoft\Joke\Templator\TemplatorConfig;
 class DefaultLexer implements LexerInterface
 {
     /**
-     * @var list<TokenDescriptor>
+     * @var array<string,TokenDescriptor>
      */
     private array $tokenDescriptors = [];
 
@@ -26,13 +26,13 @@ class DefaultLexer implements LexerInterface
         $pos = 0;
         while ($pos < $templateLength) {
             /**
-             * @var TokenDescriptor $firstDescriptor
-             * @var int             $nextMarker
+             * @var ?TokenDescriptor $firstDescriptor
+             * @var int              $nextMarker
              */
             [$firstDescriptor, $nextMarker] = $this->findNext($template, $pos);
 
             if ($pos !== $nextMarker) {
-                if (INF === $nextMarker) {
+                if (PHP_INT_MAX === $nextMarker) {
                     $tokens[] = new TextToken(substr($template, $pos));
                     break;
                 }
@@ -58,13 +58,15 @@ class DefaultLexer implements LexerInterface
     }
 
     /**
+     * @return array{?TokenDescriptor, int}
+     *
      * @todo оценить производительность: многократный strpos против посимвольного чтения со сравнением
      */
     private function findNext(
         string $template,
-        $pos,
+        int $pos,
     ): array {
-        $minimal = INF;
+        $minimal = PHP_INT_MAX;
         $firstDescriptor = null;
         foreach ($this->tokenDescriptors as $descriptor) {
             $position = strpos($template, $descriptor->open, $pos);

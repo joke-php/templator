@@ -6,6 +6,7 @@ namespace Vasoft\Joke\Templator;
 
 use Vasoft\Joke\Container\ServiceContainer;
 use Vasoft\Joke\Templator\Contracts\LexerInterface;
+use Vasoft\Joke\Templator\Contracts\NodeProcessorInterface;
 use Vasoft\Joke\Templator\Contracts\Parser\ParserInterface;
 use Vasoft\Joke\Templator\Contracts\TemplateEngineInterface;
 use Vasoft\Joke\Templator\Exceptions\TemplatorException;
@@ -17,12 +18,13 @@ class TemplateEngine implements TemplateEngineInterface
     public function renderString(string $template, array $context): string
     {
         try {
+            /** @var LexerInterface $lexer */
             $lexer = $this->container->get(LexerInterface::class);
             $tokens = $lexer->tokenize($template);
-
+            /** @var ParserInterface $parser */
             $parser = $this->container->get(ParserInterface::class);
             $ast = $parser->parse($tokens);
-
+            /** @var NodeProcessorInterface $compiler */
             $compiler = $this->container->get('templator.compiler');
 
             return $compiler->process($ast, $context);

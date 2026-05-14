@@ -12,9 +12,9 @@ interface ParserInterface
     /**
      * Строит AST из списка токенов.
      *
-     * @param array<TokenInterface> $tokens список токенов
+     * @param list<TokenInterface> $tokens список токенов
      *
-     * @return array<NodeInterface> Корневые узлы
+     * @return list<NodeInterface> Корневые узлы
      *
      * @throws ParserException При синтаксической ошибке
      */

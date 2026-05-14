@@ -13,6 +13,7 @@ use Vasoft\Joke\Templator\TemplatorConfig;
 
 class BlockNodeHandler implements NodeHandlerInterface
 {
+    /** @var array<string,NodeHandlerInterface> */
     private array $instantiatedHandler = [];
 
     public function __construct(
@@ -20,6 +21,10 @@ class BlockNodeHandler implements NodeHandlerInterface
         protected readonly TemplatorConfig $config,
     ) {}
 
+    /**
+     * @param array<string,mixed> $context
+     * @param list<string>        $localVars
+     */
     public function compile(
         NodeInterface $node,
         NodeProcessorInterface $processor,
@@ -40,12 +45,17 @@ class BlockNodeHandler implements NodeHandlerInterface
             if (!$this->container->has($index)) {
                 $this->container->registerSingleton($index, $this->config->getDirectiveHandler($directive));
             }
-            $this->instantiatedHandler[$directive] = $this->container->get($index);
+            $handler = $this->container->get($index);
+            assert($handler instanceof NodeHandlerInterface);
+            $this->instantiatedHandler[$directive] = $handler;
         }
 
         return $this->instantiatedHandler[$directive];
     }
 
+    /**
+     * @inherit
+     */
     public function render(
         NodeInterface $node,
         NodeProcessorInterface $processor,

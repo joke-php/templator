@@ -11,6 +11,10 @@ use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
 
 class DefaultRenderer extends AbstractNodeProcessor implements NodeProcessorInterface
 {
+    /**
+     * @param array<string,mixed> $context
+     * @param list<string>        $localVars
+     */
     protected function executeNodeHandler(
         NodeInterface $node,
         NodeHandlerInterface $handler,

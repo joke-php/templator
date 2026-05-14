@@ -41,6 +41,9 @@ class DefaultParser implements ParserInterface
         $this->directiveCollection = $config->directiveCollection;
     }
 
+    /**
+     * @inherit
+     */
     public function parse(array $tokens): array
     {
         $rootNodes = [];
@@ -59,7 +62,7 @@ class DefaultParser implements ParserInterface
         }
 
         if (!empty($stack)) {
-            $unclosed = implode(', ', array_map(static fn($n) => $n->fullTagName, $stack));
+            $unclosed = implode(', ', array_map(static fn($n) => $n->directive ?? 'unknown', $stack));
 
             throw new ParserException("Unclosed tag(s): {$unclosed}");
         }
@@ -67,6 +70,13 @@ class DefaultParser implements ParserInterface
         return $rootNodes;
     }
 
+    /**
+     * @param list<NodeInterface> $stack
+     * @param list<NodeInterface> $rootNodes
+     *
+     * @throws ParserException
+     * @throws TemplatorException
+     */
     private function prepareStatementToken(StatementToken $token, array &$stack, array &$rootNodes): void
     {
         $directive = $token->getDirective();
@@ -85,6 +95,7 @@ class DefaultParser implements ParserInterface
                 }
                 $openDirective = $this->directiveCollection->getOpenDirective($token::class, $directive);
                 $last = array_pop($stack);
+                assert($last instanceof BlockNode);
                 if ($last->directive !== $openDirective) {
                     throw new ParserException(
                         "Mismatched block: expected end of {$last->directive}, got {$directive}",
@@ -94,6 +105,7 @@ class DefaultParser implements ParserInterface
 
             case DirectiveType::BRANCH:
                 $currentNode = array_last($stack);
+                assert($currentNode instanceof BlockNode);
                 $openDirective = $this->directiveCollection->getOpenDirective($token::class, $directive);
                 if ($openDirective !== $currentNode->directive) {
                     throw new TemplatorException("Unexpected branch '{$directive}'");
@@ -111,6 +123,10 @@ class DefaultParser implements ParserInterface
         }
     }
 
+    /**
+     * @param list<NodeInterface> $stack
+     * @param list<NodeInterface> $rootNodes
+     */
     private function attachNode(NodeInterface $node, array &$stack, array &$rootNodes): void
     {
         if ($stack && $stack[count($stack) - 1] instanceof BlockNode) {

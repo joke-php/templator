@@ -8,6 +8,8 @@ use Vasoft\Joke\Container\ServiceContainer;
 use Vasoft\Joke\Templator\Contracts\Handler\NodeHandlerInterface;
 use Vasoft\Joke\Templator\Contracts\NodeProcessorInterface;
 use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
+use Vasoft\Joke\Container\Exceptions\ContainerException;
+use Vasoft\Joke\Container\Exceptions\ParameterResolveException;
 
 abstract class AbstractNodeProcessor implements NodeProcessorInterface
 {
@@ -19,6 +21,10 @@ abstract class AbstractNodeProcessor implements NodeProcessorInterface
         private readonly TemplatorConfig $config,
     ) {}
 
+    /**
+     * @param array<string,mixed> $context
+     * @param list<string>        $localVars
+     */
     public function process(array $ast, array $context, array $localVars = []): string
     {
         $code = '';
@@ -29,6 +35,10 @@ abstract class AbstractNodeProcessor implements NodeProcessorInterface
         return $code;
     }
 
+    /**
+     * @param array<string,mixed> $context
+     * @param list<string>        $localVars
+     */
     protected function processNode(NodeInterface $node, array $context, array $localVars = []): string
     {
         $handler = $this->getNodeHandler($node::class);
@@ -36,6 +46,10 @@ abstract class AbstractNodeProcessor implements NodeProcessorInterface
         return $this->executeNodeHandler($node, $handler, $context, $localVars);
     }
 
+    /**
+     * @param array<string,mixed> $context
+     * @param list<string>        $localVars
+     */
     abstract protected function executeNodeHandler(
         NodeInterface $node,
         NodeHandlerInterface $handler,
@@ -43,6 +57,13 @@ abstract class AbstractNodeProcessor implements NodeProcessorInterface
         array $localVars = [],
     ): string;
 
+    /**
+     * @param class-string<NodeInterface> $nodeClass
+     *
+     * @throws Exceptions\TemplatorException
+     * @throws ContainerException
+     * @throws ParameterResolveException
+     */
     private function getNodeHandler(string $nodeClass): NodeHandlerInterface
     {
         if (!isset($this->instantiatedNodeHandler[$nodeClass])) {
@@ -50,7 +71,9 @@ abstract class AbstractNodeProcessor implements NodeProcessorInterface
             if (!$this->container->has($index)) {
                 $this->container->registerSingleton($index, $this->config->getNodeHandler($nodeClass));
             }
-            $this->instantiatedNodeHandler[$nodeClass] = $this->container->get($index);
+            $handler = $this->container->get($index);
+            assert($handler instanceof NodeHandlerInterface);
+            $this->instantiatedNodeHandler[$nodeClass] = $handler;
         }
 
         return $this->instantiatedNodeHandler[$nodeClass];
