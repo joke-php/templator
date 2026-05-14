@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vasoft\Joke\Templator;
 
 use Vasoft\Joke\Config\AbstractConfig;
@@ -8,7 +10,6 @@ use Vasoft\Joke\Templator\Container\TokenCollection;
 use Vasoft\Joke\Templator\Exceptions\TemplatorException;
 use Vasoft\Joke\Templator\Handler\Directive\EachHandler;
 use Vasoft\Joke\Templator\Handler\Directive\IfHandler;
-use Vasoft\Joke\Templator\Handler\Directive\StaticHandler;
 use Vasoft\Joke\Templator\Handler\Node\BlockNodeHandler;
 use Vasoft\Joke\Templator\Handler\Node\PrintNodeHandler;
 use Vasoft\Joke\Templator\Handler\Node\StatementNodeHandler;
@@ -20,7 +21,6 @@ use Vasoft\Joke\Templator\Parser\Node\BlockNode;
 use Vasoft\Joke\Templator\Parser\Node\PrintNode;
 use Vasoft\Joke\Templator\Parser\Node\StatementNode;
 use Vasoft\Joke\Templator\Parser\Node\TextNode;
-
 
 class TemplatorConfig extends AbstractConfig
 {
@@ -47,7 +47,7 @@ class TemplatorConfig extends AbstractConfig
         $this->addNodeHandler(BlockNode::class, BlockNodeHandler::class);
         $this->addNodeHandler(StatementNode::class, StatementNodeHandler::class);
 
-        $this->directiveCollection->upsert(StatementToken::class, 'if', '/if',['else','elseif']);
+        $this->directiveCollection->upsert(StatementToken::class, 'if', '/if', ['else', 'elseif']);
         $this->directiveCollection->upsert(StatementToken::class, 'foreach', '/foreach');
 
         $this->addDirectiveHandler('if', IfHandler::class);
@@ -57,12 +57,14 @@ class TemplatorConfig extends AbstractConfig
     public function addDirectiveHandler(string $directive, string $handler): static
     {
         $this->directiveHandler[$directive] = $handler;
+
         return $this;
     }
 
     public function addNodeHandler(string $nodeClass, string $handler): static
     {
         $this->nodeHandler[$nodeClass] = $handler;
+
         return $this;
     }
 
@@ -71,6 +73,7 @@ class TemplatorConfig extends AbstractConfig
         if (!isset($this->nodeHandler[$nodeClass])) {
             throw new TemplatorException("Handler for '{$nodeClass}' not found");
         }
+
         return $this->nodeHandler[$nodeClass];
     }
 
@@ -79,6 +82,7 @@ class TemplatorConfig extends AbstractConfig
         if (!isset($this->directiveHandler[$directive])) {
             throw new TemplatorException("Handler for directive '{$directive}' not found");
         }
+
         return $this->directiveHandler[$directive];
     }
 }

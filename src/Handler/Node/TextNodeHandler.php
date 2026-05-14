@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vasoft\Joke\Templator\Handler\Node;
 
 use Vasoft\Joke\Templator\Contracts\NodeProcessorInterface;
@@ -9,9 +11,14 @@ use Vasoft\Joke\Templator\Parser\Node\TextNode;
 
 class TextNodeHandler implements NodeHandlerInterface
 {
-    public function compile(NodeInterface $node, NodeProcessorInterface $processor, array $context, array $localVars = []): string
-    {
+    public function compile(
+        NodeInterface $node,
+        NodeProcessorInterface $processor,
+        array $context,
+        array $localVars = [],
+    ): string {
         assert($node instanceof TextNode);
+
         return $node->content;
     }
 
@@ -19,10 +26,10 @@ class TextNodeHandler implements NodeHandlerInterface
         NodeInterface $node,
         NodeProcessorInterface $processor,
         array $context,
-        array $localVars = []
-    ): string
-    {
+        array $localVars = [],
+    ): string {
         assert($node instanceof TextNode);
+
         return $node->content;
     }
 }

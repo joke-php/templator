@@ -1,10 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vasoft\Joke\Templator\Handler;
 
-use Vasoft\Joke\Templator\Contracts\NodeProcessorInterface;
 use Vasoft\Joke\Templator\Contracts\Handler\NodeHandlerInterface;
-use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
 
 abstract class NodeHandler implements NodeHandlerInterface
 {
@@ -15,6 +15,7 @@ abstract class NodeHandler implements NodeHandlerInterface
         foreach ($keys as $key) {
             $code .= "['" . addslashes($key) . "']";
         }
+
         return $code;
     }
 
@@ -28,6 +29,7 @@ abstract class NodeHandler implements NodeHandlerInterface
                 return $defaultValue;
             }
         }
+
         return $value;
     }
 }

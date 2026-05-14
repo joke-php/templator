@@ -15,9 +15,12 @@ class TokenCollection
     private array $descriptors = [];
 
     /**
-     * Добавляет описание токена с проверкой на существование
+     * Добавляет описание токена с проверкой на существование.
+     *
      * @param TokenDescriptor $descriptor Описание токена
+     *
      * @return $this
+     *
      * @throws TemplatorException Если токен с таким открывающим маркером уже существует
      */
     public function add(TokenDescriptor $descriptor): static
@@ -26,24 +29,29 @@ class TokenCollection
             throw new TemplatorException('Token already exists');
         }
         $this->descriptors[$descriptor->open] = $descriptor;
+
         return $this;
     }
 
     /**
-     * Безусловное добавляет описание токена. Если токен с таким же открывающим маркером был уже зарегистрирован, то перезаписывается
+     * Безусловное добавляет описание токена. Если токен с таким же открывающим маркером был уже зарегистрирован, то перезаписывается.
+     *
      * @param TokenDescriptor $descriptor Описание токена
+     *
      * @return $this
      */
     public function upsert(TokenDescriptor $descriptor): static
     {
         $this->descriptors[$descriptor->open] = $descriptor;
+
         return $this;
     }
 
-
     /**
-     * Полная замена списка
+     * Полная замена списка.
+     *
      * @param list<TokenDescriptor> $items
+     *
      * @return $this
      */
     public function reset(array $items): static
@@ -57,7 +65,8 @@ class TokenCollection
     }
 
     /**
-     * Возвращает список описаний токенов
+     * Возвращает список описаний токенов.
+     *
      * @return array<string,TokenDescriptor>
      */
     public function list(): array

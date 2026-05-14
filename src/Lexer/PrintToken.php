@@ -1,8 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vasoft\Joke\Templator\Lexer;
 
-class PrintToken extends Token
-{
-
-}
+class PrintToken extends Token {}

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vasoft\Joke\Templator\Handler\Directive;
 
 use Vasoft\Joke\Templator\Contracts\NodeProcessorInterface;
@@ -22,10 +24,10 @@ class EachHandler extends NodeHandler
 
         $arrayAccess = $this->toPhpArrayAccess($path);
         $localVars = [$valueVar];
-        if ($keyVar !== '') {
+        if ('' !== $keyVar) {
             $localVars[] = $keyVar;
         }
-        if ($keyVar !== '') {
+        if ('' !== $keyVar) {
             $result = "<?php foreach ({$arrayAccess} as \${$keyVar} => \${$valueVar}): ?>";
         } else {
             $result = "<?php foreach ({$arrayAccess} as \${$valueVar}): ?>";
@@ -33,6 +35,7 @@ class EachHandler extends NodeHandler
 
         $result .= $processor->process($node->children, $context, $localVars);
         $result .= '<?php endforeach; ?>';
+
         return $result;
     }
 
@@ -45,10 +48,11 @@ class EachHandler extends NodeHandler
         $valueVar = $matches[2] ?? '';
         $path = trim($matches[3]);
 
-        if ($valueVar === '') {
+        if ('' === $valueVar) {
             $valueVar = $keyVar;
             $keyVar = null;
         }
+
         return [$valueVar, $keyVar, $path];
     }
 
@@ -66,11 +70,12 @@ class EachHandler extends NodeHandler
         foreach ($items as $index => $item) {
             $iterationContext = $context;
             $iterationContext[$valueVar] = $item;
-            if ($keyVar !== '') {
+            if ('' !== $keyVar) {
                 $iterationContext[$keyVar] = $index;
             }
             $output .= $processor->process($node->children, $iterationContext, $localVars);
         }
+
         return $output;
     }
 }

@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vasoft\Joke\Templator\Parser\Node;
 
 use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
 
 /**
- * Блочный узел дерева
+ * Блочный узел дерева.
  */
 class BlockNode extends StatementNode implements NodeInterface
 {
@@ -13,7 +15,6 @@ class BlockNode extends StatementNode implements NodeInterface
 
     public private(set) array $branches = [];
     private ?array $currentBuffer = null;
-
 
     public function __construct(string $directive, string $arguments)
     {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vasoft\Joke\Templator\Parser;
 
 use Vasoft\Joke\Templator\Container\DirectiveCollection;
@@ -28,21 +30,17 @@ use Vasoft\Joke\Templator\TemplatorConfig;
  * - контроль соответствия открывающих и закрывающих тегов
  * - обнаружение незакрытых тегов
  * - генерацию понятных сообщений об ошибках с указанием полных имён тегов (включая префикс 'j-').
- *
  */
 class DefaultParser implements ParserInterface
 {
     private DirectiveCollection $directiveCollection;
 
     public function __construct(
-        TemplatorConfig $config
+        TemplatorConfig $config,
     ) {
         $this->directiveCollection = $config->directiveCollection;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function parse(array $tokens): array
     {
         $rootNodes = [];
@@ -61,8 +59,9 @@ class DefaultParser implements ParserInterface
         }
 
         if (!empty($stack)) {
-            $unclosed = implode(', ', array_map(fn($n) => $n->fullTagName, $stack));
-            throw new ParserException("Unclosed tag(s): $unclosed");
+            $unclosed = implode(', ', array_map(static fn($n) => $n->fullTagName, $stack));
+
+            throw new ParserException("Unclosed tag(s): {$unclosed}");
         }
 
         return $rootNodes;
@@ -82,13 +81,13 @@ class DefaultParser implements ParserInterface
 
             case DirectiveType::END:
                 if (empty($stack)) {
-                    throw new ParserException("Unexpected end directive: $directive");
+                    throw new ParserException("Unexpected end directive: {$directive}");
                 }
                 $openDirective = $this->directiveCollection->getOpenDirective($token::class, $directive);
                 $last = array_pop($stack);
                 if ($last->directive !== $openDirective) {
                     throw new ParserException(
-                        "Mismatched block: expected end of {$last->directive}, got $directive"
+                        "Mismatched block: expected end of {$last->directive}, got {$directive}",
                     );
                 }
                 break;
@@ -97,7 +96,7 @@ class DefaultParser implements ParserInterface
                 $currentNode = array_last($stack);
                 $openDirective = $this->directiveCollection->getOpenDirective($token::class, $directive);
                 if ($openDirective !== $currentNode->directive) {
-                    throw new TemplatorException("Unexpected branch '$directive'");
+                    throw new TemplatorException("Unexpected branch '{$directive}'");
                 }
                 $currentNode->openBranch($directive, $token->getArguments());
                 break;
@@ -108,7 +107,7 @@ class DefaultParser implements ParserInterface
                 break;
 
             default:
-                throw new ParserException("Unknown directive: $directive");
+                throw new ParserException("Unknown directive: {$directive}");
         }
     }
 

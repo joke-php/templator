@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vasoft\Joke\Templator;
 
 use Vasoft\Joke\Container\ServiceContainer;
@@ -9,14 +11,13 @@ use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
 
 abstract class AbstractNodeProcessor implements NodeProcessorInterface
 {
-    /** @var array<string, NodeHandlerInterface> $instantiatedNodeCompilers */
+    /** @var array<string, NodeHandlerInterface> */
     private array $instantiatedNodeHandler = [];
 
     public function __construct(
         private readonly ServiceContainer $container,
         private readonly TemplatorConfig $config,
-    ) {
-    }
+    ) {}
 
     public function process(array $ast, array $context, array $localVars = []): string
     {
@@ -24,12 +25,14 @@ abstract class AbstractNodeProcessor implements NodeProcessorInterface
         foreach ($ast as $node) {
             $code .= $this->processNode($node, $context, $localVars);
         }
+
         return $code;
     }
 
     protected function processNode(NodeInterface $node, array $context, array $localVars = []): string
     {
         $handler = $this->getNodeHandler($node::class);
+
         return $this->executeNodeHandler($node, $handler, $context, $localVars);
     }
 
@@ -37,7 +40,7 @@ abstract class AbstractNodeProcessor implements NodeProcessorInterface
         NodeInterface $node,
         NodeHandlerInterface $handler,
         array $context,
-        array $localVars = []
+        array $localVars = [],
     ): string;
 
     private function getNodeHandler(string $nodeClass): NodeHandlerInterface
@@ -49,6 +52,7 @@ abstract class AbstractNodeProcessor implements NodeProcessorInterface
             }
             $this->instantiatedNodeHandler[$nodeClass] = $this->container->get($index);
         }
+
         return $this->instantiatedNodeHandler[$nodeClass];
     }
 }

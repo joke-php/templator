@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vasoft\Joke\Templator\Handler\Directive;
 
 use Vasoft\Joke\Templator\Contracts\NodeProcessorInterface;
@@ -13,19 +15,26 @@ class IfHandler extends NodeHandler
         NodeInterface $node,
         NodeProcessorInterface $processor,
         array $context,
-        array $localVars = []
+        array $localVars = [],
     ): string {
         assert($node instanceof BlockNode);
-        $result = "<?php if(" . $this->generateCondition($node->arguments) . "): ?>";
+        $result = '<?php if(' . $this->generateCondition($node->arguments) . '): ?>';
         $result .= $processor->process($node->children, $context, $localVars);
         foreach ($node->branches as $branch) {
-            if ($branch->name === 'else') {
+            if ('else' === $branch->name) {
                 $result .= $this->compileElse($processor, $branch->children, $context, $localVars);
-            } elseif ($branch->name === 'elseif') {
-                $result .= $this->compileElseIf($processor, $branch->arguments, $branch->children, $context, $localVars);
+            } elseif ('elseif' === $branch->name) {
+                $result .= $this->compileElseIf(
+                    $processor,
+                    $branch->arguments,
+                    $branch->children,
+                    $context,
+                    $localVars,
+                );
             }
         }
         $result .= '<?php endif; ?>';
+
         return $result;
     }
 
@@ -33,9 +42,10 @@ class IfHandler extends NodeHandler
         NodeProcessorInterface $processor,
         array $children,
         array $context,
-        array $localVars
+        array $localVars,
     ): string {
         $result = '<?php else: ?>';
+
         return $result . $processor->process($children, $context, $localVars);
     }
 
@@ -44,22 +54,23 @@ class IfHandler extends NodeHandler
         string $arguments,
         array $children,
         array $context,
-        array $localVars
+        array $localVars,
     ): string {
-        $result = "<?php elseif(" . $this->generateCondition($arguments) . "): ?>";
+        $result = '<?php elseif(' . $this->generateCondition($arguments) . '): ?>';
+
         return $result . $processor->process($children, $context, $localVars);
     }
 
     private function generateCondition(string $path): string
     {
-        return "(bool)(" . $this->toPhpArrayAccess($path) . ")";
+        return '(bool)(' . $this->toPhpArrayAccess($path) . ')';
     }
 
     public function render(
         NodeInterface $node,
         NodeProcessorInterface $processor,
         array $context,
-        array $localVars = []
+        array $localVars = [],
     ): string {
         assert($node instanceof BlockNode);
 
@@ -68,16 +79,17 @@ class IfHandler extends NodeHandler
             return $processor->process($node->children, $context, $localVars);
         }
         foreach ($node->branches as $branch) {
-            if ($branch->name === 'else') {
+            if ('else' === $branch->name) {
                 return $processor->process($branch->children, $context, $localVars);
             }
-            if ($branch->name === 'elseif') {
+            if ('elseif' === $branch->name) {
                 $value = $this->resolveValue($context, $branch->arguments, false);
                 if ($value) {
                     return $processor->process($branch->children, $context, $localVars);
                 }
             }
         }
+
         return '';
     }
 }

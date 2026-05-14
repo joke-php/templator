@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vasoft\Joke\Templator\Handler\Node;
 
 use Vasoft\Joke\Container\ServiceContainer;
@@ -15,19 +17,19 @@ class BlockNodeHandler implements NodeHandlerInterface
 
     public function __construct(
         protected readonly ServiceContainer $container,
-        protected readonly TemplatorConfig $config
-    ) {
-    }
+        protected readonly TemplatorConfig $config,
+    ) {}
 
     public function compile(
         NodeInterface $node,
         NodeProcessorInterface $processor,
         array $context,
-        array $localVars = []
+        array $localVars = [],
     ): string {
         assert($node instanceof BlockNode);
 
         $handler = $this->getDirectiveHandler($node->directive);
+
         return $handler->compile($node, $processor, $context);
     }
 
@@ -40,6 +42,7 @@ class BlockNodeHandler implements NodeHandlerInterface
             }
             $this->instantiatedHandler[$directive] = $this->container->get($index);
         }
+
         return $this->instantiatedHandler[$directive];
     }
 
@@ -47,10 +50,11 @@ class BlockNodeHandler implements NodeHandlerInterface
         NodeInterface $node,
         NodeProcessorInterface $processor,
         array $context,
-        array $localVars = []
+        array $localVars = [],
     ): string {
         assert($node instanceof BlockNode);
         $handler = $this->getDirectiveHandler($node->directive);
+
         return $handler->render($node, $processor, $context, $localVars);
     }
 }

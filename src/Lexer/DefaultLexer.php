@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vasoft\Joke\Templator\Lexer;
 
 use Vasoft\Joke\Templator\Contracts\LexerInterface;
@@ -25,54 +27,53 @@ class DefaultLexer implements LexerInterface
         while ($pos < $templateLength) {
             /**
              * @var TokenDescriptor $firstDescriptor
-             * @var int $nextMarker
+             * @var int             $nextMarker
              */
             [$firstDescriptor, $nextMarker] = $this->findNext($template, $pos);
 
             if ($pos !== $nextMarker) {
-                if ($nextMarker === INF) {
+                if (INF === $nextMarker) {
                     $tokens[] = new TextToken(substr($template, $pos));
                     break;
                 }
                 $tokens[] = new TextToken(substr($template, $pos, $nextMarker - $pos));
             }
             $pos = $nextMarker;
-            if ($firstDescriptor !== null) {
+            if (null !== $firstDescriptor) {
                 $end = strpos($template, $firstDescriptor->close, $pos + $firstDescriptor->openLength);
-                if ($end === false) {
+                if (false === $end) {
                     throw new \Exception();
                 }
                 $content = substr(
                     $template,
                     $pos + $firstDescriptor->openLength,
-                    $end - $pos - $firstDescriptor->closeLength
+                    $end - $pos - $firstDescriptor->closeLength,
                 );
                 $pos = $end + $firstDescriptor->closeLength;
                 $tokens[] = new ($firstDescriptor->tokenClass)($content);
             }
         }
+
         return $tokens;
     }
 
     /**
-     * @param string $template
-     * @param $pos
-     * @return array
      * @todo оценить производительность: многократный strpos против посимвольного чтения со сравнением
      */
     private function findNext(
         string $template,
-        $pos
+        $pos,
     ): array {
         $minimal = INF;
         $firstDescriptor = null;
         foreach ($this->tokenDescriptors as $descriptor) {
             $position = strpos($template, $descriptor->open, $pos);
-            if ($position !== false && $position < $minimal) {
+            if (false !== $position && $position < $minimal) {
                 $minimal = $position;
                 $firstDescriptor = $descriptor;
             }
         }
+
         return [$firstDescriptor, $minimal];
     }
 }

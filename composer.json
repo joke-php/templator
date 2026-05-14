@@ -12,7 +12,8 @@
   "require-dev": {
     "voral/version-increment": "^3.2",
     "phpunit/phpunit": "^13.1",
-    "php-mock/php-mock-phpunit": "^2.14"
+    "php-mock/php-mock-phpunit": "^2.14",
+    "friendsofphp/php-cs-fixer": "^3.95"
   },
   "license": "MIT",
   "autoload": {
@@ -33,7 +34,8 @@
     "vi:patch": "php ./vendor/bin/vs-version-increment patch",
     "vi": "php ./vendor/bin/vs-version-increment",
     "vi:list": "php ./vendor/bin/vs-version-increment --list",
-    "vi:debug": "php ./vendor/bin/vs-version-increment --debug"
+    "vi:debug": "php ./vendor/bin/vs-version-increment --debug",
+    "fixer": "vendor/bin/php-cs-fixer fix --dry-run --diff"
   },
   "scripts-descriptions": {
     "dev": "Start development server on http://localhost:8000",
@@ -43,7 +45,8 @@
     "vi:patch": "Increment patch version and update CHANGELOG.md",
     "vi": "Auto-detect version increment based on commit analysis",
     "vi:list": "Display registered commit types and scopes",
-    "vi:debug": "Preview auto-detected changes without applying them"
+    "vi:debug": "Preview auto-detected changes without applying them",
+    "fixer": "Check coding standards using PHP-CS-Fixer (dry-run mode)."
   },
   "authors": [
     {

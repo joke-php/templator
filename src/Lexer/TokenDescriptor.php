@@ -16,10 +16,9 @@ final readonly class TokenDescriptor
     /** @var int Длина закрывающего тега */
     public int $closeLength;
 
-
     /**
-     * @param string $open Открывающий тег
-     * @param string $close Закрывающий тег
+     * @param string                       $open       Открывающий тег
+     * @param string                       $close      Закрывающий тег
      * @param class-string<TokenInterface> $tokenClass Класс токена
      */
     public function __construct(

@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vasoft\Joke\Templator\Parser\Node;
 
 use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
 
 /**
- * Блочный узел дерева
+ * Блочный узел дерева.
  */
 class StatementNode implements NodeInterface
 {
@@ -16,7 +18,6 @@ class StatementNode implements NodeInterface
     public function __construct(
         public string $directive,
         public string $arguments,
-    ) {
-    }
+    ) {}
 
 }

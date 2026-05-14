@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vasoft\Joke\Templator\Parser\Node;
 
 class Branch
@@ -8,7 +10,6 @@ class Branch
 
     public function __construct(
         public readonly string $name,
-        public readonly ?string $arguments = null
-    ) {
-    }
+        public readonly ?string $arguments = null,
+    ) {}
 }

@@ -1,10 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vasoft\Joke\Templator\Exceptions;
 
-use Vasoft\Joke\Templator\Exceptions\TemplatorException;
-
-class CompileException extends TemplatorException
-{
-
-}
+class CompileException extends TemplatorException {}

@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vasoft\Joke\Templator\Parser\Node;
 
 use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
 
 /**
- * Узел AST дерева для вывода значения
+ * Узел AST дерева для вывода значения.
  */
 class PrintNode implements NodeInterface
 {
     /**
      * @param string $content Переменная для вывода
      */
-    public function __construct(public string $content) { }
+    public function __construct(public string $content) {}
 }

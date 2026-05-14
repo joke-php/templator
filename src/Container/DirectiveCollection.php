@@ -21,35 +21,35 @@ class DirectiveCollection
 
     /**
      * @param class-string<TokenInterface> $tokenClass
-     * @param string $directiveBegin
-     * @param string $directiveEnd
+     *
      * @return $this
+     *
      * @throws TemplatorException
      */
     public function add(
         string $tokenClass,
         string $directiveBegin,
         string $directiveEnd = '',
-        array $directiveBranch = []
+        array $directiveBranch = [],
     ): static {
         if (isset($this->directives[$tokenClass][$directiveBegin])) {
-            throw new TemplatorException("Directive '$directiveBegin' already defined");
+            throw new TemplatorException("Directive '{$directiveBegin}' already defined");
         }
         $this->upsert($tokenClass, $directiveBegin, $directiveEnd, $directiveBranch);
+
         return $this;
     }
 
     /**
      * @param class-string $tokenClass
-     * @param string $directiveBegin
-     * @param string $directiveEnd
+     *
      * @return $this
      */
     public function upsert(
         string $tokenClass,
         string $directiveBegin,
         string $directiveEnd = '',
-        array $directiveBranch = []
+        array $directiveBranch = [],
     ): static {
         if (!array_key_exists($tokenClass, $this->directives)) {
             $this->directives[$tokenClass] = [$directiveBegin => $directiveEnd];
@@ -62,6 +62,7 @@ class DirectiveCollection
         foreach ($directiveBranch as $directive) {
             $this->directivesBranches[$tokenClass][$directive] = $directiveBegin;
         }
+
         return $this;
     }
 
@@ -73,7 +74,7 @@ class DirectiveCollection
     public function getType(string $tokenClass, string $directive): DirectiveType
     {
         if (isset($this->directives[$tokenClass][$directive])) {
-            return $this->directives[$tokenClass][$directive] === ''
+            return '' === $this->directives[$tokenClass][$directive]
                 ? DirectiveType::SINGLE
                 : DirectiveType::BEGIN;
         }
@@ -83,6 +84,7 @@ class DirectiveCollection
         if (isset($this->directivesBranches[$tokenClass][$directive])) {
             return DirectiveType::BRANCH;
         }
+
         return DirectiveType::UNKNOWN;
     }
 }

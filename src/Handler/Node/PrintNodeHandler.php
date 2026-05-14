@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Vasoft\Joke\Templator\Handler\Node;
 
 use Vasoft\Joke\Templator\Contracts\NodeProcessorInterface;
@@ -17,24 +19,24 @@ class PrintNodeHandler extends NodeHandler
         NodeInterface $node,
         NodeProcessorInterface $processor,
         array $context,
-        array $localVars = []
+        array $localVars = [],
     ): string {
         assert($node instanceof PrintNode);
         if (in_array($node->content, $localVars, true)) {
             $code = '$' . $node->content;
         } else {
             $path = $this->toPhpArrayAccess($node->content);
-            $code = "htmlspecialchars((string)$path, ENT_QUOTES, 'UTF-8')";
+            $code = "htmlspecialchars((string){$path}, ENT_QUOTES, 'UTF-8')";
         }
 
-        return "<?= " . $code . "?>";
+        return '<?= ' . $code . '?>';
     }
 
     public function render(
         NodeInterface $node,
         NodeProcessorInterface $processor,
         array $context,
-        array $localVars = []
+        array $localVars = [],
     ): string {
         assert($node instanceof PrintNode);
 
