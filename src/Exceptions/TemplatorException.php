@@ -6,4 +6,7 @@ namespace Vasoft\Joke\Templator\Exceptions;
 
 use Vasoft\Joke\Exceptions\JokeException;
 
+/**
+ * Базовое исключение для компонента шаблонизатора.
+ */
 class TemplatorException extends JokeException {}
