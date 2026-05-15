@@ -25,7 +25,7 @@ final class TokenCollectionTest extends TestCase
         $list = $collection->list();
         self::assertSame($descriptor, $list['<<']);
         self::expectException(TemplatorException::class);
-        self::expectExceptionMessage('Token with marker "<<" already exists.');
+        self::expectExceptionMessage("Token with marker '<<' already exists.");
         $collection->add($descriptor);
     }
 

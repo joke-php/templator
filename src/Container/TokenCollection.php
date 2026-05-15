@@ -38,7 +38,7 @@ class TokenCollection
     public function add(TokenDescriptor $descriptor): static
     {
         if (array_key_exists($descriptor->open, $this->descriptors)) {
-            throw new TemplatorException('Token with marker "' . $descriptor->open . '" already exists.');
+            throw new TemplatorException("Token with marker '{$descriptor->open}' already exists.");
         }
         $this->descriptors[$descriptor->open] = $descriptor;
 
