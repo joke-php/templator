@@ -16,8 +16,7 @@ use Vasoft\Joke\Templator\Parser\Node\PrintNode;
 class PrintNodeHandler extends NodeHandler
 {
     /**
-     * @param array<string,mixed> $context
-     * @param list<string>        $localVars
+     * @inherit
      */
     public function compile(
         NodeInterface $node,
@@ -37,8 +36,7 @@ class PrintNodeHandler extends NodeHandler
     }
 
     /**
-     * @param array<string,mixed> $context
-     * @param list<string>        $localVars
+     * @inherit
      */
     public function render(
         NodeInterface $node,

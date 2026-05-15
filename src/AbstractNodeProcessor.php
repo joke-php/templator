@@ -22,8 +22,7 @@ abstract class AbstractNodeProcessor implements NodeProcessorInterface
     ) {}
 
     /**
-     * @param array<string,mixed> $context
-     * @param list<string>        $localVars
+     * @inherit
      */
     public function process(array $ast, array $context, array $localVars = []): string
     {

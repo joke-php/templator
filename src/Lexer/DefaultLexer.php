@@ -19,6 +19,9 @@ class DefaultLexer implements LexerInterface
         $this->tokenDescriptors = $config->tokenCollection->list();
     }
 
+    /**
+     * @inherit
+     */
     public function tokenize(string $template): array
     {
         $tokens = [];

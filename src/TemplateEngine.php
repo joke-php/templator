@@ -15,6 +15,9 @@ class TemplateEngine implements TemplateEngineInterface
 {
     public function __construct(private readonly ServiceContainer $container) {}
 
+    /**
+     * @inherit
+     */
     public function renderString(string $template, array $context): string
     {
         try {

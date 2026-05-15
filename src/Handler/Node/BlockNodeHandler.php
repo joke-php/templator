@@ -22,8 +22,7 @@ class BlockNodeHandler implements NodeHandlerInterface
     ) {}
 
     /**
-     * @param array<string,mixed> $context
-     * @param list<string>        $localVars
+     * @inherit
      */
     public function compile(
         NodeInterface $node,
