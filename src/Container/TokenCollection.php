@@ -7,26 +7,38 @@ namespace Vasoft\Joke\Templator\Container;
 use Vasoft\Joke\Templator\Exceptions\TemplatorException;
 use Vasoft\Joke\Templator\Lexer\TokenDescriptor;
 
+/**
+ * Коллекция дескрипторов токенов.
+ *
+ * Хранит реестр правил лексического анализа, сопоставляя открывающие разделители
+ * с их закрывающими аналогами и соответствующими классами токенов.
+ * Используется лексером для поиска и классификации конструкций в шаблоне.
+ */
 class TokenCollection
 {
     /**
-     * @var array<string,TokenDescriptor> Реестр описаний токенов
+     * Реестр дескрипторов токенов, индексированный по открывающему разделителю.
+     *
+     * @var array<string, TokenDescriptor>
      */
     private array $descriptors = [];
 
     /**
-     * Добавляет описание токена с проверкой на существование.
+     * Добавляет новый дескриптор токена.
      *
-     * @param TokenDescriptor $descriptor Описание токена
+     * Проверяет уникальность открывающего разделителя. Если токен с таким же
+     * открывающим маркером уже зарегистрирован, выбрасывается исключение.
+     *
+     * @param TokenDescriptor $descriptor объект, описывающий правила токена
      *
      * @return $this
      *
-     * @throws TemplatorException Если токен с таким открывающим маркером уже существует
+     * @throws TemplatorException если токен с указанным открывающим маркером уже существует
      */
     public function add(TokenDescriptor $descriptor): static
     {
         if (array_key_exists($descriptor->open, $this->descriptors)) {
-            throw new TemplatorException('Token already exists');
+            throw new TemplatorException('Token with marker "' . $descriptor->open . '" already exists.');
         }
         $this->descriptors[$descriptor->open] = $descriptor;
 
@@ -34,9 +46,12 @@ class TokenCollection
     }
 
     /**
-     * Безусловное добавляет описание токена. Если токен с таким же открывающим маркером был уже зарегистрирован, то перезаписывается.
+     * Добавляет или обновляет дескриптор токена.
      *
-     * @param TokenDescriptor $descriptor Описание токена
+     * Если токен с таким открывающим маркером уже существует, он будет заменен новым.
+     * Полезно для переопределения стандартных токенов или настройки конфигурации "на лету".
+     *
+     * @param TokenDescriptor $descriptor объект, описывающий правила токена
      *
      * @return $this
      */
@@ -48,9 +63,11 @@ class TokenCollection
     }
 
     /**
-     * Полная замена списка.
+     * Полностью заменяет текущий список дескрипторов новым.
      *
-     * @param list<TokenDescriptor> $items
+     * Очищает существующий реестр и заполняет его переданными элементами.
+     *
+     * @param list<TokenDescriptor> $items массив новых дескрипторов
      *
      * @return $this
      */
@@ -65,9 +82,9 @@ class TokenCollection
     }
 
     /**
-     * Возвращает список описаний токенов.
+     * Возвращает полный список зарегистрированных дескрипторов.
      *
-     * @return array<string,TokenDescriptor>
+     * @return array<string, TokenDescriptor> ассоциативный массив, где ключ — открывающий разделитель
      */
     public function list(): array
     {
