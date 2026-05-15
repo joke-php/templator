@@ -8,6 +8,12 @@ use Vasoft\Joke\Templator\Contracts\TokenInterface;
 
 /**
  * Описание токена.
+ *
+ * Конфигурационный объект, описывающий правила распознавания конкретного типа токена.
+ * Содержит открывающий и закрывающий разделители, а также класс токена, который должен
+ * быть создан при обнаружении соответствия в шаблоне.
+ *
+ * Используется лексером для эффективного поиска и классификации конструкций в исходном коде.
  */
 final readonly class TokenDescriptor
 {
@@ -17,9 +23,11 @@ final readonly class TokenDescriptor
     public int $closeLength;
 
     /**
-     * @param string                       $open       Открывающий тег
-     * @param string                       $close      Закрывающий тег
-     * @param class-string<TokenInterface> $tokenClass Класс токена
+     * Создает новый дескриптор токена.
+     *
+     * @param string                       $open       открывающий разделитель (например, '{{' или '{%')
+     * @param string                       $close      закрывающий разделитель (например, '}}' или '%}')
+     * @param class-string<TokenInterface> $tokenClass полное имя класса, реализующего TokenInterface, для создания экземпляра токена
      */
     public function __construct(
         public string $open,
