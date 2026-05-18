@@ -7,12 +7,26 @@ namespace Vasoft\Joke\Templator\Handler\Node;
 use Vasoft\Joke\Templator\Contracts\NodeProcessorInterface;
 use Vasoft\Joke\Templator\Contracts\Handler\NodeHandlerInterface;
 use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
+use Vasoft\Joke\Templator\Exceptions\CompileException;
+use Vasoft\Joke\Templator\Exceptions\RenderingException;
 use Vasoft\Joke\Templator\Parser\Node\TextNode;
 
+/**
+ * Обработчик узла текстового контента (TextNode).
+ *
+ * Отвечает за обработку статического текста в шаблоне.
+ * Поскольку текст не требует вычислений или экранирования, обработчик
+ * просто возвращает исходное содержимое узла как в режиме компиляции,
+ * так и в режиме рендеринга.
+ */
 class TextNodeHandler implements NodeHandlerInterface
 {
     /**
-     * @inherit
+     * {@inheritDoc}
+     *
+     * Возвращает текстовое содержимое без изменений.
+     *
+     * @throws CompileException если передан узел неверного типа
      */
     public function compile(
         NodeInterface $node,
@@ -20,13 +34,19 @@ class TextNodeHandler implements NodeHandlerInterface
         array $context,
         array $localVars = [],
     ): string {
-        assert($node instanceof TextNode);
+        if (!$node instanceof TextNode) {
+            throw new CompileException($this->getErrorMessage($node));
+        }
 
         return $node->content;
     }
 
     /**
-     * @inherit
+     * {@inheritDoc}
+     *
+     * Возвращает текстовое содержимое без изменений.
+     *
+     * @throws RenderingException если передан узел неверного типа
      */
     public function render(
         NodeInterface $node,
@@ -34,8 +54,15 @@ class TextNodeHandler implements NodeHandlerInterface
         array $context,
         array $localVars = [],
     ): string {
-        assert($node instanceof TextNode);
+        if (!$node instanceof TextNode) {
+            throw new RenderingException($this->getErrorMessage($node));
+        }
 
         return $node->content;
+    }
+
+    private function getErrorMessage(NodeInterface $node): string
+    {
+        return sprintf('Expected instance of TextNode, got %s.', $node::class);
     }
 }

@@ -6,6 +6,8 @@ namespace Vasoft\Joke\Templator\Contracts\Handler;
 
 use Vasoft\Joke\Templator\Contracts\NodeProcessorInterface;
 use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
+use Vasoft\Joke\Templator\Exceptions\CompileException;
+use Vasoft\Joke\Templator\Exceptions\RenderingException;
 
 /**
  * Интерфейс обработчика узла AST.
@@ -31,6 +33,8 @@ interface NodeHandlerInterface
      * @param list<string>           $localVars список локальных переменных (например, переменные цикла), доступных в текущей области
      *
      * @return string фрагмент PHP-кода
+     *
+     * @throws CompileException При ошибках компиляции
      */
     public function compile(
         NodeInterface $node,
@@ -50,6 +54,8 @@ interface NodeHandlerInterface
      * @param list<string>           $localVars список локальных переменных
      *
      * @return string готовый HTML-фрагмент
+     *
+     * @throws RenderingException При ошибках рендера
      */
     public function render(
         NodeInterface $node,
