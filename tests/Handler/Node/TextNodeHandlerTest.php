@@ -17,7 +17,7 @@ use Vasoft\Joke\Templator\Render\DefaultRenderer;
 /**
  * @internal
  *
- * @coversNothing
+ * @coversDefaultClass \Vasoft\Joke\Templator\Handler\Node\TextNodeHandler;
  */
 final class TextNodeHandlerTest extends TestCase
 {
@@ -40,10 +40,9 @@ final class TextNodeHandlerTest extends TestCase
     public function testHandler(string $content): void
     {
         $node = new TextNode($content);
-        $handler = new TextNodeHandler();
         $context = ['test' => 1];
-        self::assertSame($content, $handler->render($node, self::$renderer, $context, ['test']));
-        self::assertSame($content, $handler->compile($node, self::$compiler, $context, ['test']));
+        self::assertSame($content, self::$handler->render($node, self::$renderer, $context, ['test']));
+        self::assertSame($content, self::$handler->compile($node, self::$compiler, $context, ['test']));
     }
 
     public static function provideHandlerCases(): iterable
@@ -55,18 +54,16 @@ final class TextNodeHandlerTest extends TestCase
     public function testRenderException(): void
     {
         $node = new BlockNode('test', '');
-        $handler = new TextNodeHandler();
         self::expectException(RenderingException::class);
         self::expectExceptionMessage('Expected instance of TextNode, got Vasoft\Joke\Templator\Parser\Node\BlockNode.');
-        $handler->render($node, self::$renderer, []);
+        self::$handler->render($node, self::$renderer, []);
     }
 
     public function testCompileException(): void
     {
         $node = new BlockNode('test', '');
-        $handler = new TextNodeHandler();
         self::expectException(CompileException::class);
         self::expectExceptionMessage('Expected instance of TextNode, got Vasoft\Joke\Templator\Parser\Node\BlockNode.');
-        $handler->compile($node, self::$renderer, []);
+        self::$handler->compile($node, self::$renderer, []);
     }
 }
