@@ -52,7 +52,6 @@ class TextNodeHandler implements NodeHandlerInterface
         NodeInterface $node,
         NodeProcessorInterface $processor,
         array $context,
-        array $localVars = [],
     ): string {
         if (!$node instanceof TextNode) {
             throw new RenderingException($this->getErrorMessage($node));

@@ -59,11 +59,10 @@ class BlockNodeHandler implements NodeHandlerInterface
         NodeInterface $node,
         NodeProcessorInterface $processor,
         array $context,
-        array $localVars = [],
     ): string {
         assert($node instanceof BlockNode);
         $handler = $this->getDirectiveHandler($node->directive);
 
-        return $handler->render($node, $processor, $context, $localVars);
+        return $handler->render($node, $processor, $context);
     }
 }

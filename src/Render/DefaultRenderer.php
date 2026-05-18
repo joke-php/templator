@@ -21,6 +21,6 @@ class DefaultRenderer extends AbstractNodeProcessor implements NodeProcessorInte
         array $context,
         array $localVars = [],
     ): string {
-        return $handler->render($node, $this, $context, $localVars);
+        return $handler->render($node, $this, $context);
     }
 }

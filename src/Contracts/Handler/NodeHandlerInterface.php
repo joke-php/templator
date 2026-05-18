@@ -51,7 +51,6 @@ interface NodeHandlerInterface
      * @param NodeInterface          $node      узел AST для рендеринга
      * @param NodeProcessorInterface $processor процессор для рекурсивной обработки дочерних элементов
      * @param array<string, mixed>   $context   ассоциативный массив данных шаблона
-     * @param list<string>           $localVars список локальных переменных
      *
      * @return string готовый HTML-фрагмент
      *
@@ -61,6 +60,5 @@ interface NodeHandlerInterface
         NodeInterface $node,
         NodeProcessorInterface $processor,
         array $context,
-        array $localVars = [],
     ): string;
 }
