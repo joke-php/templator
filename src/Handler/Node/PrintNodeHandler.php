@@ -10,6 +10,7 @@ use Vasoft\Joke\Templator\Exceptions\CompileException;
 use Vasoft\Joke\Templator\Exceptions\RenderingException;
 use Vasoft\Joke\Templator\Handler\NodeHandler;
 use Vasoft\Joke\Templator\Parser\Node\PrintNode;
+use Vasoft\Joke\Templator\TemplatorConfig;
 
 /**
  * Обработчик узла вывода выражений.
@@ -20,6 +21,15 @@ use Vasoft\Joke\Templator\Parser\Node\PrintNode;
  */
 class PrintNodeHandler extends NodeHandler
 {
+    /**
+     * Создает новый обработчик вывода.
+     *
+     * @param TemplatorConfig $config конфигурация шаблонизатора, содержащая настройки кодировки
+     */
+    public function __construct(
+        protected readonly TemplatorConfig $config,
+    ) {}
+
     /**
      * {@inheritDoc}
      *
@@ -45,7 +55,7 @@ class PrintNodeHandler extends NodeHandler
             $code = $this->toPhpArrayAccess($node->content);
         }
 
-        return "<?= htmlspecialchars((string){$code}, ENT_QUOTES, 'UTF-8');?>";
+        return "<?= htmlspecialchars((string){$code}, ENT_QUOTES, '{$this->config->encoding}');?>";
     }
 
     /**
@@ -65,7 +75,7 @@ class PrintNodeHandler extends NodeHandler
         }
         $value = $this->resolveValue($context, $node->content, '');
 
-        return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+        return htmlspecialchars((string) $value, ENT_QUOTES, $this->config->encoding);
     }
 
     private function getErrorMessage(NodeInterface $node): string

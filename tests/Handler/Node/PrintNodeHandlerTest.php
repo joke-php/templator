@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Vasoft\Joke\Templator\Tests\Handler\Node;
 
 use PHPUnit\Framework\TestCase;
-use Vasoft\Joke\Templator\Compiler\DefaultCompiler;
 use Vasoft\Joke\Templator\Exceptions\CompileException;
 use Vasoft\Joke\Templator\Exceptions\RenderingException;
 use Vasoft\Joke\Templator\Handler\Node\PrintNodeHandler;
 use Vasoft\Joke\Templator\Parser\Node\BlockNode;
 use Vasoft\Joke\Templator\Parser\Node\PrintNode;
 use Vasoft\Joke\Templator\Render\DefaultRenderer;
+use Vasoft\Joke\Templator\TemplatorConfig;
 
 /**
  * @internal
@@ -20,16 +20,10 @@ use Vasoft\Joke\Templator\Render\DefaultRenderer;
  */
 final class PrintNodeHandlerTest extends TestCase
 {
-    private static PrintNodeHandler $handler;
-    private static DefaultCompiler $compiler;
     private static DefaultRenderer $renderer;
 
     public static function setUpBeforeClass(): void
     {
-        self::$handler = new PrintNodeHandler();
-        self::$compiler = self::getStubBuilder(DefaultCompiler::class)
-            ->disableOriginalConstructor()
-            ->getStub();
         self::$renderer = self::getStubBuilder(DefaultRenderer::class)
             ->disableOriginalConstructor()
             ->getStub();
@@ -37,51 +31,80 @@ final class PrintNodeHandlerTest extends TestCase
 
     public function testCompileFromContext(): void
     {
+        $handler = new PrintNodeHandler(new TemplatorConfig());
         $node = new PrintNode('test');
         $context = ['test' => 1];
         self::assertSame(
             "<?= htmlspecialchars((string)\$context['test'], ENT_QUOTES, 'UTF-8');?>",
-            self::$handler->compile($node, self::$renderer, $context),
+            $handler->compile($node, self::$renderer, $context),
+        );
+    }
+
+    public function testCompileFromContextEncoding(): void
+    {
+        $config = new TemplatorConfig()->setEncoding('windows-1251');
+        $handler = new PrintNodeHandler($config);
+        $node = new PrintNode('test');
+        $context = ['test' => 1];
+        self::assertSame(
+            "<?= htmlspecialchars((string)\$context['test'], ENT_QUOTES, 'windows-1251');?>",
+            $handler->compile($node, self::$renderer, $context),
         );
     }
 
     public function testRender(): void
     {
+        $handler = new PrintNodeHandler(new TemplatorConfig());
         $node = new PrintNode('test');
-        $context = ['test' => 1];
+        $context = ['test' => '<script>'];
         self::assertSame(
-            '1',
-            self::$handler->render($node, self::$renderer, $context),
+            '&lt;script&gt;',
+            $handler->render($node, self::$renderer, $context),
         );
     }
 
     public function testCompileFromLocal(): void
     {
+        $handler = new PrintNodeHandler(new TemplatorConfig());
         $node = new PrintNode('test');
         $context = ['test' => 1];
         self::assertSame(
             "<?= htmlspecialchars((string)\$test, ENT_QUOTES, 'UTF-8');?>",
-            self::$handler->compile($node, self::$renderer, $context, ['test']),
+            $handler->compile($node, self::$renderer, $context, ['test']),
+        );
+    }
+
+    public function testCompileFromLocalEncoding(): void
+    {
+        $config = new TemplatorConfig()->setEncoding('windows-1251');
+        $handler = new PrintNodeHandler($config);
+        $node = new PrintNode('test');
+        $context = ['test' => 1];
+        self::assertSame(
+            "<?= htmlspecialchars((string)\$test, ENT_QUOTES, 'windows-1251');?>",
+            $handler->compile($node, self::$renderer, $context, ['test']),
         );
     }
 
     public function testRenderException(): void
     {
+        $handler = new PrintNodeHandler(new TemplatorConfig());
         $node = new BlockNode('test', '');
         self::expectException(RenderingException::class);
         self::expectExceptionMessage(
             'Expected instance of PrintNode, got Vasoft\Joke\Templator\Parser\Node\BlockNode.',
         );
-        self::$handler->render($node, self::$renderer, []);
+        $handler->render($node, self::$renderer, []);
     }
 
     public function testCompileException(): void
     {
+        $handler = new PrintNodeHandler(new TemplatorConfig());
         $node = new BlockNode('test', '');
         self::expectException(CompileException::class);
         self::expectExceptionMessage(
             'Expected instance of PrintNode, got Vasoft\Joke\Templator\Parser\Node\BlockNode.',
         );
-        self::$handler->compile($node, self::$renderer, []);
+        $handler->compile($node, self::$renderer, []);
     }
 }

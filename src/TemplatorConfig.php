@@ -28,6 +28,9 @@ class TemplatorConfig extends AbstractConfig
 {
     public private(set) readonly TokenCollection $tokenCollection;
     public private(set) readonly DirectiveCollection $directiveCollection;
+    public private(set) string $encoding {
+        get => $this->encoding ??= 'UTF-8';
+    }
     /**
      * @var array<string,class-string<NodeHandlerInterface>>
      */
@@ -117,5 +120,13 @@ class TemplatorConfig extends AbstractConfig
         }
 
         return $this->directiveHandler[$directive];
+    }
+
+    public function setEncoding(string $encoding): static
+    {
+        $this->guard();
+        $this->encoding = $encoding;
+
+        return $this;
     }
 }
