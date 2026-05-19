@@ -86,9 +86,11 @@ class DirectiveCollection
             $this->directivesInverse[$tokenClass] = [$directiveEnd => $directiveBegin];
             $this->directivesBranches[$tokenClass] = [];
         } else {
-            $oldEnd = $this->directives[$tokenClass][$directiveBegin];
-            unset($this->directivesInverse[$tokenClass][$oldEnd]);
-            $this->cleanOldBranches($tokenClass, $directiveBegin);
+            if (array_key_exists($directiveBegin, $this->directives[$tokenClass])) {
+                $oldEnd = $this->directives[$tokenClass][$directiveBegin];
+                unset($this->directivesInverse[$tokenClass][$oldEnd]);
+                $this->cleanOldBranches($tokenClass, $directiveBegin);
+            }
 
             $this->directives[$tokenClass][$directiveBegin] = $directiveEnd;
             $this->directivesInverse[$tokenClass][$directiveEnd] = $directiveBegin;
