@@ -41,7 +41,7 @@ final class TextNodeHandlerTest extends TestCase
     {
         $node = new TextNode($content);
         $context = ['test' => 1];
-        self::assertSame($content, self::$handler->render($node, self::$renderer, $context, ['test']));
+        self::assertSame($content, self::$handler->render($node, self::$renderer, $context));
         self::assertSame($content, self::$handler->compile($node, self::$compiler, $context, ['test']));
     }
 

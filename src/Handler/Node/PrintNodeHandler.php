@@ -6,17 +6,28 @@ namespace Vasoft\Joke\Templator\Handler\Node;
 
 use Vasoft\Joke\Templator\Contracts\NodeProcessorInterface;
 use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
+use Vasoft\Joke\Templator\Exceptions\CompileException;
+use Vasoft\Joke\Templator\Exceptions\RenderingException;
 use Vasoft\Joke\Templator\Handler\NodeHandler;
 use Vasoft\Joke\Templator\Parser\Node\PrintNode;
 
 /**
- * @todo работа с localvars
- * @todo экранирование при рендере
+ * Обработчик узла вывода выражений.
+ *
+ * Отвечает за обработку конструкций вида {{expression}}.
+ * Автоматически применяет экранирование htmlspecialchars (ENT_QUOTES, UTF-8)
+ * ко всем выводимым данным для предотвращения XSS-атак.
  */
 class PrintNodeHandler extends NodeHandler
 {
     /**
-     * @inherit
+     * {@inheritDoc}
+     *
+     * Генерирует PHP-код для вывода значения.
+     * Если переменная является локальной (находится в $localVars), генерируется
+     * прямой доступ к переменной. В противном случае — доступ через массив контекста.
+     *
+     * @throws CompileException если передан узел неверного типа
      */
     public function compile(
         NodeInterface $node,
@@ -24,28 +35,41 @@ class PrintNodeHandler extends NodeHandler
         array $context,
         array $localVars = [],
     ): string {
-        assert($node instanceof PrintNode);
+        if (!$node instanceof PrintNode) {
+            throw new CompileException($this->getErrorMessage($node));
+        }
+
         if (in_array($node->content, $localVars, true)) {
             $code = '$' . $node->content;
         } else {
-            $path = $this->toPhpArrayAccess($node->content);
-            $code = "htmlspecialchars((string){$path}, ENT_QUOTES, 'UTF-8')";
+            $code = $this->toPhpArrayAccess($node->content);
         }
 
-        return '<?= ' . $code . '?>';
+        return "<?= htmlspecialchars((string){$code}, ENT_QUOTES, 'UTF-8');?>";
     }
 
     /**
-     * @inherit
+     * {@inheritDoc}
+     *
+     * Извлекает значение из контекста и возвращает его, предварительно экранировав.
+     *
+     * @throws RenderingException если передан узел неверного типа
      */
     public function render(
         NodeInterface $node,
         NodeProcessorInterface $processor,
         array $context,
-        array $localVars = [],
     ): string {
-        assert($node instanceof PrintNode);
+        if (!$node instanceof PrintNode) {
+            throw new RenderingException($this->getErrorMessage($node));
+        }
+        $value = $this->resolveValue($context, $node->content, '');
 
-        return $this->resolveValue($context, $node->content, '');
+        return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+    }
+
+    private function getErrorMessage(NodeInterface $node): string
+    {
+        return sprintf('Expected instance of PrintNode, got %s.', $node::class);
     }
 }
