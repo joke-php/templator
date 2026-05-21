@@ -37,7 +37,7 @@ class BlockNode extends StatementNode implements NodeInterface
         }
     }
 
-    public function openBranch(string $branchName, ?string $argument = null): void
+    public function openBranch(string $branchName, string $argument = ''): void
     {
         $branch = new Branch($branchName, $argument);
         $this->branches[] = $branch;

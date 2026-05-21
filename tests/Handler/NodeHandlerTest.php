@@ -41,7 +41,7 @@ final class NodeHandlerTest extends TestCase
         $handler = new class extends NodeHandler {
             public function getVal(array $c, string $p, mixed $d): mixed
             {
-                return $this->resolveValue($c, $p, $d);
+                return $this->resolveValue($c, $p, $d, 'test');
             }
 
             public function compile(...$args): string

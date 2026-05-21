@@ -73,7 +73,7 @@ class PrintNodeHandler extends NodeHandler
         if (!$node instanceof PrintNode) {
             throw new RenderingException($this->getErrorMessage($node));
         }
-        $value = $this->resolveValue($context, $node->content, '');
+        $value = $this->resolveValue($context, $node->content, '', 'PrintNode');
 
         return htmlspecialchars((string) $value, ENT_QUOTES, $this->config->encoding);
     }

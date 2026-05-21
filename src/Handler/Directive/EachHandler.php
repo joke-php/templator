@@ -81,7 +81,7 @@ class EachHandler extends NodeHandler
         assert($node instanceof BlockNode);
         [$valueVar, $keyVar, $path] = $this->parseArguments($node->arguments);
 
-        $items = $this->resolveValue($context, $path, []);
+        $items = $this->resolveValue($context, $path, [], $node->directive);
         $output = '';
         foreach ($items as $index => $item) {
             $iterationContext = $context;

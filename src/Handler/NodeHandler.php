@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Vasoft\Joke\Templator\Handler;
 
 use Vasoft\Joke\Templator\Contracts\Handler\NodeHandlerInterface;
+use Vasoft\Joke\Templator\Exceptions\RenderingException;
 
 /**
  * Абстрактный базовый класс для обработчиков узлов.
@@ -49,9 +50,15 @@ abstract class NodeHandler implements NodeHandlerInterface
      * @param mixed                $defaultValue значение, возвращаемое в случае, если путь не найден
      *
      * @return mixed найденное значение или $defaultValue
+     *
+     * @throws RenderingException Если не передано имя переменной
      */
-    protected function resolveValue(array $context, string $path, mixed $defaultValue): mixed
+    protected function resolveValue(array $context, string $path, mixed $defaultValue, string $directive): mixed
     {
+        if ('' === trim($path)) {
+            throw new RenderingException("Directive {$directive} with no arguments.");
+        }
+
         $value = $context;
         foreach (explode('.', $path) as $key) {
             if (is_array($value) && array_key_exists($key, $value)) {

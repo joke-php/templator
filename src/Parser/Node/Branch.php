@@ -15,6 +15,6 @@ class Branch
 
     public function __construct(
         public readonly string $name,
-        public readonly ?string $arguments = null,
+        public readonly string $arguments = '',
     ) {}
 }
