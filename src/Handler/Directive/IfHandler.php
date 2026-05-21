@@ -11,10 +11,23 @@ use Vasoft\Joke\Templator\Exceptions\RenderingException;
 use Vasoft\Joke\Templator\Handler\NodeHandler;
 use Vasoft\Joke\Templator\Parser\Node\BlockNode;
 
+/**
+ * Обработчик условной директивы (If Handler).
+ *
+ * Отвечает за логику выполнения конструкций вида:
+ * {% if condition %} ... {% elseif condition %} ... {% else %} ... {% /if %}
+ *
+ * Поддерживает компиляцию в PHP-код и интерпретацию условия.
+ */
 class IfHandler extends NodeHandler
 {
     /**
-     * @inherit
+     * {@inheritDoc}
+     *
+     * Генерирует PHP-код для условной конструкции.
+     * Рекурсивно компилирует дочерние узлы основной ветки и всех ветвлений (elseif/else).
+     *
+     * @throws CompileException если передан узел неверного типа или условие пустое
      */
     public function compile(
         NodeInterface $node,
@@ -22,16 +35,16 @@ class IfHandler extends NodeHandler
         array $context,
         array $localVars = [],
     ): string {
-        assert($node instanceof BlockNode);
-        $result = '<?php if(' . $this->generateCondition($node->arguments) . '): ?>';
+        if (!$node instanceof BlockNode) {
+            throw new CompileException($this->getErrorMessage($node));
+        }
+
+        $result = '<?php if(' . $this->generateCondition($node->arguments, $localVars, 'if') . '): ?>';
         $result .= $processor->process($node->children, $context, $localVars);
         foreach ($node->branches as $branch) {
             if ('else' === $branch->name) {
                 $result .= $this->compileElse($processor, $branch->children, $context, $localVars);
             } elseif ('elseif' === $branch->name) {
-                if (null === $branch->arguments || '' === trim($branch->arguments)) {
-                    throw new CompileException('elseif with no arguments');
-                }
                 $result .= $this->compileElseIf(
                     $processor,
                     $branch->arguments,
@@ -47,9 +60,14 @@ class IfHandler extends NodeHandler
     }
 
     /**
-     * @param list<NodeInterface> $children
-     * @param array<string,mixed> $context
-     * @param list<string>        $localVars
+     * Компилирует ветку `else`.
+     *
+     * @param NodeProcessorInterface $processor процессор для рекурсивной обработки детей
+     * @param list<NodeInterface>    $children  дочерние узлы ветки else
+     * @param array<string, mixed>   $context   данные контекста
+     * @param list<string>           $localVars список локальных переменных
+     *
+     * @return string скомпилированный PHP-код для ветки else
      */
     private function compileElse(
         NodeProcessorInterface $processor,
@@ -63,9 +81,17 @@ class IfHandler extends NodeHandler
     }
 
     /**
-     * @param list<NodeInterface> $children
-     * @param array<string,mixed> $context
-     * @param list<string>        $localVars
+     * Компилирует ветку `elseif`.
+     *
+     * @param NodeProcessorInterface $processor процессор для рекурсивной обработки детей
+     * @param string                 $arguments строка условия для elseif
+     * @param list<NodeInterface>    $children  дочерние узлы ветки elseif
+     * @param array<string, mixed>   $context   данные контекста
+     * @param list<string>           $localVars список локальных переменных
+     *
+     * @return string скомпилированный PHP-код для ветки elseif
+     *
+     * @throws CompileException если условие пустое
      */
     private function compileElseIf(
         NodeProcessorInterface $processor,
@@ -74,46 +100,73 @@ class IfHandler extends NodeHandler
         array $context,
         array $localVars,
     ): string {
-        $result = '<?php elseif(' . $this->generateCondition($arguments) . '): ?>';
+        $result = '<?php elseif(' . $this->generateCondition($arguments, $localVars, 'elseif') . '): ?>';
 
         return $result . $processor->process($children, $context, $localVars);
     }
 
-    private function generateCondition(string $path): string
+    /**
+     * Генерирует безопасное PHP-выражение для условия.
+     *
+     * Преобразует путь к переменной в код доступа (прямой или через массив контекста)
+     * и оборачивает его в приведение к типу bool.
+     *
+     * @param string       $path      путь к переменной или выражение
+     * @param list<string> $localVars список локальных переменных
+     * @param string       $directive имя директивы (для сообщения об ошибке)
+     *
+     * @return string PHP-код условия, готовый для вставки в конструкцию if/elseif
+     *
+     * @throws CompileException если передан пустой аргумент условия
+     */
+    private function generateCondition(string $path, array $localVars, string $directive): string
     {
-        return '(bool)(' . $this->toPhpArrayAccess($path) . ')';
+        if ('' === trim($path)) {
+            throw new CompileException("Directive '{$directive}' with no arguments.");
+        }
+        $expression = in_array($path, $localVars, true) ? '$' . $path : $this->toPhpArrayAccess($path);
+
+        return '(bool)(' . $expression . ')';
     }
 
     /**
-     * @inherit
+     * {@inheritDoc}
+     *
+     * Выполняет условную логику в режиме интерпретации.
+     * Последовательно проверяет условия if/elseif и возвращает результат рендеринга
+     * первой подходящей ветки. Если ни одно условие не выполнено, возвращает результат ветки else или пустую строку.
+     *
+     * @throws RenderingException если передан узел неверного типа
      */
     public function render(
         NodeInterface $node,
         NodeProcessorInterface $processor,
         array $context,
-        array $localVars = [],
     ): string {
-        assert($node instanceof BlockNode);
-
-        $value = $this->resolveValue($context, $node->arguments, false);
+        if (!$node instanceof BlockNode) {
+            throw new RenderingException($this->getErrorMessage($node));
+        }
+        $value = $this->resolveValue($context, $node->arguments, false, $node->directive);
         if ($value) {
-            return $processor->process($node->children, $context, $localVars);
+            return $processor->process($node->children, $context);
         }
         foreach ($node->branches as $branch) {
             if ('else' === $branch->name) {
-                return $processor->process($branch->children, $context, $localVars);
+                return $processor->process($branch->children, $context);
             }
             if ('elseif' === $branch->name) {
-                if (null === $branch->arguments || '' === trim($branch->arguments)) {
-                    throw new RenderingException('elseif with no arguments');
-                }
-                $value = $this->resolveValue($context, $branch->arguments, false);
+                $value = $this->resolveValue($context, $branch->arguments, false, $branch->name);
                 if ($value) {
-                    return $processor->process($branch->children, $context, $localVars);
+                    return $processor->process($branch->children, $context);
                 }
             }
         }
 
         return '';
+    }
+
+    private function getErrorMessage(NodeInterface $node): string
+    {
+        return sprintf('Expected instance of BlockNode, got %s.', $node::class);
     }
 }

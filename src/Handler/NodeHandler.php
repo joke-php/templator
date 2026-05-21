@@ -56,7 +56,7 @@ abstract class NodeHandler implements NodeHandlerInterface
     protected function resolveValue(array $context, string $path, mixed $defaultValue, string $directive): mixed
     {
         if ('' === trim($path)) {
-            throw new RenderingException("Directive {$directive} with no arguments.");
+            throw new RenderingException("Directive '{$directive}' with no arguments.");
         }
 
         $value = $context;
