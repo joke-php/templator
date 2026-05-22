@@ -46,7 +46,7 @@ class PrintNodeHandler extends NodeHandler
         array $localVars = [],
     ): string {
         if (!$node instanceof PrintNode) {
-            throw new CompileException($this->getErrorMessage($node));
+            throw new CompileException($this->getErrorMessage('PrintNode', $node));
         }
 
         if (in_array($node->content, $localVars, true)) {
@@ -71,15 +71,10 @@ class PrintNodeHandler extends NodeHandler
         array $context,
     ): string {
         if (!$node instanceof PrintNode) {
-            throw new RenderingException($this->getErrorMessage($node));
+            throw new RenderingException($this->getErrorMessage('PrintNode', $node));
         }
         $value = $this->resolveValue($context, $node->content, '', 'PrintNode');
 
         return htmlspecialchars((string) $value, ENT_QUOTES, $this->config->encoding);
-    }
-
-    private function getErrorMessage(NodeInterface $node): string
-    {
-        return sprintf('Expected instance of PrintNode, got %s.', $node::class);
     }
 }

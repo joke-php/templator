@@ -36,7 +36,7 @@ class IfHandler extends NodeHandler
         array $localVars = [],
     ): string {
         if (!$node instanceof BlockNode) {
-            throw new CompileException($this->getErrorMessage($node));
+            throw new CompileException($this->getErrorMessage('BlockNode', $node));
         }
 
         $result = '<?php if(' . $this->generateCondition($node->arguments, $localVars, 'if') . '): ?>';
@@ -144,7 +144,7 @@ class IfHandler extends NodeHandler
         array $context,
     ): string {
         if (!$node instanceof BlockNode) {
-            throw new RenderingException($this->getErrorMessage($node));
+            throw new RenderingException($this->getErrorMessage('BlockNode', $node));
         }
         $value = $this->resolveValue($context, $node->arguments, false, $node->directive);
         if ($value) {
@@ -163,10 +163,5 @@ class IfHandler extends NodeHandler
         }
 
         return '';
-    }
-
-    private function getErrorMessage(NodeInterface $node): string
-    {
-        return sprintf('Expected instance of BlockNode, got %s.', $node::class);
     }
 }

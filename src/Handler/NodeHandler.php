@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Vasoft\Joke\Templator\Handler;
 
 use Vasoft\Joke\Templator\Contracts\Handler\NodeHandlerInterface;
+use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
 use Vasoft\Joke\Templator\Exceptions\RenderingException;
 
 /**
@@ -69,5 +70,18 @@ abstract class NodeHandler implements NodeHandlerInterface
         }
 
         return $value;
+    }
+
+    /**
+     * Формирует текст ошибки о несоответствующем типе ноды.
+     *
+     * @param string        $expected Ожидаемый тип
+     * @param NodeInterface $node     Полученный тип
+     *
+     * @return string текст ошибки
+     */
+    protected function getErrorMessage(string $expected, NodeInterface $node): string
+    {
+        return sprintf('Expected instance of %s, got %s.', $expected, $node::class);
     }
 }
