@@ -49,11 +49,7 @@ class PrintNodeHandler extends NodeHandler
             throw new CompileException($this->getErrorMessage('PrintNode', $node));
         }
 
-        if (in_array($node->content, $localVars, true)) {
-            $code = '$' . $node->content;
-        } else {
-            $code = $this->toPhpArrayAccess($node->content);
-        }
+        $code = $this->compileVarAccess($node->content, $localVars);
 
         return "<?= htmlspecialchars((string){$code}, ENT_QUOTES, '{$this->config->encoding}');?>";
     }

@@ -19,7 +19,7 @@ final class NodeHandlerTest extends TestCase
         $handler = new class extends NodeHandler {
             public function testAccess(string $path): string
             {
-                return $this->toPhpArrayAccess($path);
+                return $this->compileVarAccess($path, []);
             }
 
             public function compile(...$args): string
@@ -60,5 +60,28 @@ final class NodeHandlerTest extends TestCase
         self::assertNull($handler->getVal($context, 'user.age', null));
         self::assertSame('N/A', $handler->getVal($context, 'missing.key', 'N/A'));
         self::assertSame('Alex', $handler->getVal($context, 'user.name', 'N/A'));
+    }
+
+    public function testLocal(): void
+    {
+        $handler = new class extends NodeHandler {
+            public function testAccess(string $path, array $localVars): string
+            {
+                return $this->compileVarAccess($path, $localVars);
+            }
+
+            public function compile(...$args): string
+            {
+                return '';
+            }
+
+            public function render(...$args): string
+            {
+                return '';
+            }
+        };
+
+        self::assertSame("\$context['example']", $handler->testAccess('example', []));
+        self::assertSame('$example', $handler->testAccess('example', ['example']));
     }
 }

@@ -19,17 +19,23 @@ use Vasoft\Joke\Templator\Exceptions\RenderingException;
 abstract class NodeHandler implements NodeHandlerInterface
 {
     /**
-     * Преобразует путь к переменной в синтаксис доступа к элементам массива PHP.
+     * Генерирует PHP-код для доступа к переменной.
      *
-     * Используется при компиляции шаблонов для генерации PHP-кода, обращающегося
-     * к массиву $context. Например, путь 'user.name' превращается в "$context['user']['name']".
+     * Если переменная является локальной (находится в $localVars), возвращает
+     * прямое обращение к переменной (например, '$item').
+     * В противном случае генерирует обращение через массив контекста
+     * (например, "$context['user']['name']").
      *
-     * @param string $path Точечный путь к данным (например, 'config.settings.debug').
+     * @param string       $path      Точечный путь к данным (например, 'config.settings.debug').
+     * @param list<string> $localVars список локальных переменных текущей области видимости
      *
      * @return string строка кода PHP для доступа к значению в массиве $context
      */
-    protected function toPhpArrayAccess(string $path): string
+    protected function compileVarAccess(string $path, array $localVars): string
     {
+        if (in_array($path, $localVars, true)) {
+            return '$' . $path;
+        }
         $keys = explode('.', $path);
         $code = '$context';
         foreach ($keys as $key) {

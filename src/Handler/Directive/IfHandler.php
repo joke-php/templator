@@ -124,9 +124,8 @@ class IfHandler extends NodeHandler
         if ('' === trim($path)) {
             throw new CompileException("Directive '{$directive}' with no arguments.");
         }
-        $expression = in_array($path, $localVars, true) ? '$' . $path : $this->toPhpArrayAccess($path);
 
-        return '(bool)(' . $expression . ')';
+        return '(bool)(' . $this->compileVarAccess($path, $localVars) . ')';
     }
 
     /**
