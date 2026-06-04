@@ -7,15 +7,31 @@ namespace Vasoft\Joke\Templator\Handler\Directive;
 use Vasoft\Joke\Templator\Contracts\NodeProcessorInterface;
 use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
 use Vasoft\Joke\Templator\Exceptions\CompileException;
+use Vasoft\Joke\Templator\Exceptions\RenderingException;
 use Vasoft\Joke\Templator\Handler\NodeHandler;
 use Vasoft\Joke\Templator\Parser\Node\BlockNode;
 
+/**
+ * Обработчик директивы цикла (Each Handler).
+ *
+ * Отвечает за логику выполнения конструкций вида:
+ * {% foreach item in list %} ... {% /foreach %}
+ * или
+ * {% foreach key, value in list %} ... {% /foreach %}
+ *
+ * Поддерживает компиляцию в PHP-код (с оптимизацией через локальные переменные)
+ * и интерпретацию (рендеринг) цикла.
+ */
 class EachHandler extends NodeHandler
 {
     /**
-     * @inherit
+     * {@inheritDoc}
      *
-     * @throws CompileException
+     * Генерирует PHP-код для конструкции foreach.
+     * Определяет переменные цикла как локальные для оптимизированного доступа к ним
+     * внутри тела цикла.
+     *
+     * @throws CompileException если синтаксис аргументов неверен или передан узел неверного типа
      */
     public function compile(
         NodeInterface $node,
@@ -23,11 +39,13 @@ class EachHandler extends NodeHandler
         array $context,
         array $localVars = [],
     ): string {
-        assert($node instanceof BlockNode);
+        if (!$node instanceof BlockNode) {
+            throw new CompileException($this->getErrorMessage('BlockNode', $node));
+        }
 
-        [$valueVar, $keyVar, $path] = $this->parseArguments($node->arguments);
+        [$valueVar, $keyVar, $path] = $this->parseArguments($node->arguments, CompileException::class);
 
-        $arrayAccess = $this->toPhpArrayAccess($path);
+        $arrayAccess = $this->compileVarAccess($path, $localVars);
         $localVars = [$valueVar];
         if ('' !== $keyVar) {
             $localVars[] = $keyVar;
@@ -44,42 +62,57 @@ class EachHandler extends NodeHandler
     }
 
     /**
-     * @return array{non-empty-string,string, non-empty-string}
+     * Парсит аргументы директивы foreach.
      *
-     * @throws CompileException
+     * Ожидает формат: "variable in expression" или "key, variable in expression".
+     *
+     * @param string       $value          строка аргументов из узла AST
+     * @param class-string $exceptionClass Класс исключения
+     *
+     * @return array{0: non-empty-string, 1: string, 2: non-empty-string} массив, содержащий:
+     *                                                                    [0] - имя переменной значения ($valueVar),
+     *                                                                    [1] - имя переменной ключа ($keyVar, может быть пустым),
+     *                                                                    [2] - путь к итерируемому выражению ($path)
+     *
+     * @throws CompileException|RenderingException если синтаксис не соответствует ожидаемому формату
      */
-    private function parseArguments(string $value): array
+    private function parseArguments(string $value, string $exceptionClass): array
     {
-        if (!preg_match('#^\s*(\w+)(?:\s*,\s*(\w+))?\s+in\s+(.+)$#', $value, $matches)) {
-            throw new CompileException('Invalid foreach syntax: {$value}');
+        $cleanValue = trim($value);
+        if (!preg_match('#^(\w+)(?:\s*,\s*(\w+))?\s+in\s+(.+)$#', $cleanValue, $matches)) {
+            /** @var CompileException|RenderingException $exception */
+            $exception = new $exceptionClass("Invalid foreach syntax: '{$value}'.");
+
+            throw $exception;
         }
         $keyVar = $matches[1];
         $valueVar = $matches[2];
-        $path = trim($matches[3]);
-        if ('' === $path) {
-            throw new CompileException('Invalid foreach syntax: {$value}');
-        }
         if ('' === $valueVar) {
             $valueVar = $keyVar;
             $keyVar = '';
         }
 
-        return [$valueVar, $keyVar, $path];
+        return [$valueVar, $keyVar, $matches[3]];
     }
 
     /**
-     * @inherit
+     * {@inheritDoc}
      *
-     * @throws CompileException
+     * Выполняет цикл в режиме интерпретации.
+     * Для каждой итерации создает обновленный контекст с локальными переменными цикла
+     * и рекурсивно рендерит дочерние узлы.
+     *
+     * @throws RenderingException если передан узел неверного типа или ошибка при доступе к данным
      */
     public function render(
         NodeInterface $node,
         NodeProcessorInterface $processor,
         array $context,
-        array $localVars = [],
     ): string {
-        assert($node instanceof BlockNode);
-        [$valueVar, $keyVar, $path] = $this->parseArguments($node->arguments);
+        if (!$node instanceof BlockNode) {
+            throw new RenderingException($this->getErrorMessage('BlockNode', $node));
+        }
+        [$valueVar, $keyVar, $path] = $this->parseArguments($node->arguments, RenderingException::class);
 
         $items = $this->resolveValue($context, $path, [], $node->directive);
         $output = '';
@@ -89,7 +122,7 @@ class EachHandler extends NodeHandler
             if ('' !== $keyVar) {
                 $iterationContext[$keyVar] = $index;
             }
-            $output .= $processor->process($node->children, $iterationContext, $localVars);
+            $output .= $processor->process($node->children, $iterationContext);
         }
 
         return $output;
