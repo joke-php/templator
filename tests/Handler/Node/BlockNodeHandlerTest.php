@@ -108,7 +108,7 @@ final class BlockNodeHandlerTest extends TestCase
 
         self::expectException(RenderingException::class);
         self::expectExceptionMessage(
-            'Expected instance of BlockNode, got Vasoft\Joke\Templator\Parser\Node\TextNode.',
+            'Expected instance of Vasoft\Joke\Templator\Parser\Node\BlockNode, got Vasoft\Joke\Templator\Parser\Node\TextNode.',
         );
         $handler->render(new TextNode('test'), self::$processor, []);
     }
@@ -127,7 +127,7 @@ final class BlockNodeHandlerTest extends TestCase
 
         self::expectException(CompileException::class);
         self::expectExceptionMessage(
-            'Expected instance of BlockNode, got Vasoft\Joke\Templator\Parser\Node\TextNode.',
+            'Expected instance of Vasoft\Joke\Templator\Parser\Node\BlockNode, got Vasoft\Joke\Templator\Parser\Node\TextNode.',
         );
         $handler->compile(new TextNode('test'), self::$processor, []);
     }

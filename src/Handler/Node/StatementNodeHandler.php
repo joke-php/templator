@@ -42,9 +42,15 @@ class StatementNodeHandler implements NodeHandlerInterface
     ) {}
 
     /**
-     * {@inheritDoc}
+     * Компилирует узел в строку PHP-кода.
      *
-     * Делегирует компиляцию узла специализированному хендлеру директивы.
+     * Генерирует код, который будет выполнен при последующем подключении скомпилированного шаблона.
+     * Для рекурсивной обработки дочерних узлов следует использовать метод $processor->process().
+     *
+     * @param StatementNode          $node      узел AST для компиляции
+     * @param NodeProcessorInterface $processor процессор для рекурсивной обработки дочерних элементов
+     * @param array<string, mixed>   $context   данные контекста
+     * @param list<string>           $localVars список локальных переменных (например, переменные цикла), доступных в текущей области
      *
      * @throws CompileException если передан узел неверного типа или хендлер директивы не найден
      * @throws JokeException    если хендлер не зарегистрирован в конфигурации
@@ -58,8 +64,6 @@ class StatementNodeHandler implements NodeHandlerInterface
         if (!$node instanceof $this->nodeClass) {
             throw new CompileException($this->getErrorMessage($node));
         }
-
-
         $handler = $this->getDirectiveHandler($node->directive);
 
         return $handler->compile($node, $processor, $context, $localVars);
@@ -93,9 +97,13 @@ class StatementNodeHandler implements NodeHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * Рендерит узел в HTML-строку (режим интерпретации).
      *
-     * Делегирует рендеринг узла специализированному хендлеру директивы.
+     * Выполняет логику узла "на лету" без генерации промежуточного PHP-файла.
+     *
+     * @param StatementNode          $node      узел AST для рендеринга
+     * @param NodeProcessorInterface $processor процессор для рекурсивной обработки дочерних элементов
+     * @param array<string, mixed>   $context   ассоциативный массив данных шаблона
      *
      * @throws RenderingException если передан узел неверного типа или хендлер директивы не найден
      * @throws JokeException      если хендлер не зарегистрирован в конфигурации
