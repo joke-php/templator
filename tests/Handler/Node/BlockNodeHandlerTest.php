@@ -5,6 +5,16 @@ declare(strict_types=1);
 namespace Vasoft\Joke\Templator\Tests\Handler\Node;
 
 use PHPUnit\Framework\TestCase;
+use Vasoft\Joke\Container\ServiceContainer;
+use Vasoft\Joke\Templator\Contracts\NodeProcessorInterface;
+use Vasoft\Joke\Templator\Exceptions\CompileException;
+use Vasoft\Joke\Templator\Exceptions\RenderingException;
+use Vasoft\Joke\Templator\Handler\Node\BlockNodeHandler;
+use Vasoft\Joke\Templator\Handler\NodeHandler;
+use Vasoft\Joke\Templator\Parser\Node\BlockNode;
+use Vasoft\Joke\Templator\Parser\Node\TextNode;
+use Vasoft\Joke\Templator\TemplatorConfig;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * @internal
@@ -13,10 +23,112 @@ use PHPUnit\Framework\TestCase;
  */
 final class BlockNodeHandlerTest extends TestCase
 {
-    public static function setUpBeforeClass(): void {}
+    private static NodeProcessorInterface|Stub $processor;
+    private static NodeHandler|Stub $handler;
 
-    public function testIsValid(): void
+    public static function setUpBeforeClass(): void
     {
-        self::assertTrue(true);
+        self::$handler = self::getStubBuilder(NodeHandler::class)->getStub();
+        self::$handler->method('compile')->willReturn('compiled');
+        self::$handler->method('render')->willReturn('rendered');
+
+        self::$processor = self::getStubBuilder(NodeProcessorInterface::class)->getStub();
+    }
+
+    public function testCompile(): void
+    {
+        $config = new TemplatorConfig();
+        /** @var ServiceContainer $container */
+        $container = self::getMockBuilder(ServiceContainer::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $container->expects(self::once())
+            ->method('has')
+            ->willReturn(true);
+        $container->expects(self::once())
+            ->method('get')
+            ->willReturn(self::$handler);
+
+        $handler = new BlockNodeHandler($container, $config);
+        $result = $handler->compile(new BlockNode('test', ''), self::$processor, []);
+        self::assertSame('compiled', $result);
+    }
+
+    public function testRender(): void
+    {
+        $config = new TemplatorConfig();
+        /** @var ServiceContainer $container */
+        $container = self::getMockBuilder(ServiceContainer::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $container->expects(self::once())
+            ->method('has')
+            ->willReturn(true);
+        $container->expects(self::once())
+            ->method('get')
+            ->willReturn(self::$handler);
+
+        $handler = new BlockNodeHandler($container, $config);
+        $result = $handler->render(new BlockNode('test', ''), self::$processor, []);
+        self::assertSame('rendered', $result);
+    }
+
+    public function testInitHandlerOnce(): void
+    {
+        $config = new TemplatorConfig();
+        /** @var ServiceContainer $container */
+        $container = self::getMockBuilder(ServiceContainer::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $container->expects(self::once())
+            ->method('has')
+            ->willReturn(false);
+        $container->expects(self::once())
+            ->method('get')
+            ->willReturn(self::$handler);
+
+        $handler = new BlockNodeHandler($container, $config);
+        $config->addDirectiveHandler('test', BlockNodeHandler::class);
+        $handler->compile(new BlockNode('test', ''), self::$processor, []);
+        $result = $handler->compile(new BlockNode('test', ''), self::$processor, []);
+        self::assertSame('compiled', $result);
+    }
+
+    public function testRenderExceptionNodeType(): void
+    {
+        $config = new TemplatorConfig();
+        /** @var ServiceContainer $container */
+        $container = self::getMockBuilder(ServiceContainer::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $container->expects(self::never())->method('has');
+        $container->expects(self::never())->method('get');
+
+        $handler = new BlockNodeHandler($container, $config);
+
+        self::expectException(RenderingException::class);
+        self::expectExceptionMessage(
+            'Expected instance of BlockNode, got Vasoft\Joke\Templator\Parser\Node\TextNode.',
+        );
+        $handler->render(new TextNode('test'), self::$processor, []);
+    }
+
+    public function testCompileExceptionNodeType(): void
+    {
+        $config = new TemplatorConfig();
+        /** @var ServiceContainer $container */
+        $container = self::getMockBuilder(ServiceContainer::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $container->expects(self::never())->method('has');
+        $container->expects(self::never())->method('get');
+
+        $handler = new BlockNodeHandler($container, $config);
+
+        self::expectException(CompileException::class);
+        self::expectExceptionMessage(
+            'Expected instance of BlockNode, got Vasoft\Joke\Templator\Parser\Node\TextNode.',
+        );
+        $handler->compile(new TextNode('test'), self::$processor, []);
     }
 }
