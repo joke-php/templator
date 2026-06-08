@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "voral/joke",
-            "version": "1.3.1",
+            "version": "1.3.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/Voral/joke.git",
-                "reference": "0706fad14cffcda727dbae8c70568d82d68857bc"
+                "url": "https://github.com/joke-php/joke.git",
+                "reference": "f975e254a675e1abce5e18e8490030c371c1c73a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Voral/joke/zipball/0706fad14cffcda727dbae8c70568d82d68857bc",
-                "reference": "0706fad14cffcda727dbae8c70568d82d68857bc",
+                "url": "https://api.github.com/repos/joke-php/joke/zipball/f975e254a675e1abce5e18e8490030c371c1c73a",
+                "reference": "f975e254a675e1abce5e18e8490030c371c1c73a",
                 "shasum": ""
             },
             "require": {
@@ -51,10 +51,10 @@
             ],
             "description": "A minimal PHP microframework with manual routing and dependency injection container.",
             "support": {
-                "issues": "https://github.com/Voral/joke/issues",
-                "source": "https://github.com/Voral/joke/tree/v1.3.1"
+                "issues": "https://github.com/joke-php/joke/issues",
+                "source": "https://github.com/joke-php/joke/tree/v1.3.2"
             },
-            "time": "2026-05-04T04:29:27+00:00"
+            "time": "2026-06-08T03:58:01+00:00"
         }
     ],
     "packages-dev": [
