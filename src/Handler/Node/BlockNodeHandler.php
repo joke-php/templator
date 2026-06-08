@@ -58,7 +58,7 @@ class BlockNodeHandler implements NodeHandlerInterface
 
         $handler = $this->getDirectiveHandler($node->directive);
 
-        return $handler->compile($node, $processor, $context);
+        return $handler->compile($node, $processor, $context, $localVars);
     }
 
     /**
