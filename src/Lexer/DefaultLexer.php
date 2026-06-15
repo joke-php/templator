@@ -5,12 +5,23 @@ declare(strict_types=1);
 namespace Vasoft\Joke\Templator\Lexer;
 
 use Vasoft\Joke\Templator\Contracts\LexerInterface;
+use Vasoft\Joke\Templator\Contracts\TokenInterface;
+use Vasoft\Joke\Templator\Exceptions\LexerException;
 use Vasoft\Joke\Templator\TemplatorConfig;
 
+/**
+ * Стандартный лексический анализатор шаблонов.
+ *
+ * Преобразует исходную строку шаблона в плоский список токенов (TextToken, PrintToken, StatementToken).
+ * Использует жадный алгоритм поиска ближайшего открывающего маркера среди всех зарегистрированных дескрипторов.
+ */
 class DefaultLexer implements LexerInterface
 {
     /**
-     * @var array<string,TokenDescriptor>
+     * Реестр дескрипторов токенов, используемых для поиска маркеров.
+     * Инициализируется из конфигурации шаблонизатора.
+     *
+     * @var array<string, TokenDescriptor>
      */
     private array $tokenDescriptors = [];
 
@@ -20,7 +31,15 @@ class DefaultLexer implements LexerInterface
     }
 
     /**
-     * @inherit
+     * {@inheritDoc}
+     *
+     * Выполняет лексический анализ переданного шаблона.
+     *
+     * @param string $template исходная строка шаблона
+     *
+     * @return list<TokenInterface> массив объектов токенов, представляющих структуру шаблона
+     *
+     * @throws LexerException если обнаружен незакрытый тег (отсутствует закрывающий маркер)
      */
     public function tokenize(string $template): array
     {
@@ -45,12 +64,14 @@ class DefaultLexer implements LexerInterface
             if (null !== $firstDescriptor) {
                 $end = strpos($template, $firstDescriptor->close, $pos + $firstDescriptor->openLength);
                 if (false === $end) {
-                    throw new \Exception();
+                    throw new LexerException(
+                        sprintf('Unclosed tag "%s" found at position %d.', $firstDescriptor->open, $pos),
+                    );
                 }
                 $content = substr(
                     $template,
                     $pos + $firstDescriptor->openLength,
-                    $end - $pos - $firstDescriptor->closeLength,
+                    $end - $pos - $firstDescriptor->openLength,
                 );
                 $pos = $end + $firstDescriptor->closeLength;
                 $tokens[] = new ($firstDescriptor->tokenClass)($content);
@@ -61,7 +82,17 @@ class DefaultLexer implements LexerInterface
     }
 
     /**
-     * @return array{?TokenDescriptor, int}
+     * Находит позицию ближайшего открывающего маркера любого типа.
+     *
+     * Перебирает все зарегистрированные дескрипторы и возвращает тот, чей открывающий тег
+     * встречается в шаблоне раньше остальных начиная с позиции $pos.
+     *
+     * @param string $template исходная строка шаблона
+     * @param int    $pos      позиция, с которой начинается поиск
+     *
+     * @return array{?TokenDescriptor, int} массив, содержащий:
+     *                                      [0] — объект TokenDescriptor найденного маркера (или null, если ничего не найдено),
+     *                                      [1] — позиция начала маркера (или PHP_INT_MAX, если маркеров нет)
      *
      * @todo оценить производительность: многократный strpos против посимвольного чтения со сравнением
      */
