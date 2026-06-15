@@ -109,8 +109,8 @@ class DirectiveCollection
      * открывающую директиву. Это необходимо для предотвращения конфликтов, когда
      * одна директива имеющая ветвления переопределяется.
      *
-     * @param string $tokenClass     класс токена, для которого производится очистка
-     * @param string $directiveBegin имя открывающей директивы, связи которой нужно удалить
+     * @param class-string<TokenInterface> $tokenClass     класс токена, для которого производится очистка
+     * @param string                       $directiveBegin имя открывающей директивы, связи которой нужно удалить
      */
     private function cleanOldBranches(string $tokenClass, string $directiveBegin): void
     {

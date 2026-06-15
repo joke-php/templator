@@ -16,6 +16,7 @@ use Vasoft\Joke\Templator\Handler\Node\BlockNodeHandler;
 use Vasoft\Joke\Templator\Handler\Node\PrintNodeHandler;
 use Vasoft\Joke\Templator\Handler\Node\StatementNodeHandler;
 use Vasoft\Joke\Templator\Handler\Node\TextNodeHandler;
+use Vasoft\Joke\Templator\Handler\Statement\CsrfHandler;
 use Vasoft\Joke\Templator\Lexer\PrintToken;
 use Vasoft\Joke\Templator\Lexer\StatementToken;
 use Vasoft\Joke\Templator\Lexer\TokenDescriptor;
@@ -59,9 +60,11 @@ class TemplatorConfig extends AbstractConfig
 
         $this->directiveCollection->upsert(StatementToken::class, 'if', '/if', ['else', 'elseif']);
         $this->directiveCollection->upsert(StatementToken::class, 'foreach', '/foreach');
+        $this->directiveCollection->upsert(StatementToken::class, 'csrf');
 
         $this->addDirectiveHandler('if', IfHandler::class);
         $this->addDirectiveHandler('foreach', EachHandler::class);
+        $this->addDirectiveHandler('csrf', CsrfHandler::class);
     }
 
     /**
