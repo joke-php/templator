@@ -8,6 +8,7 @@ use Vasoft\Joke\Templator\Container\DirectiveCollection;
 use Vasoft\Joke\Templator\Container\DirectiveType;
 use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
 use Vasoft\Joke\Templator\Contracts\Parser\ParserInterface;
+use Vasoft\Joke\Templator\Contracts\TokenInterface;
 use Vasoft\Joke\Templator\Exceptions\ParserException;
 use Vasoft\Joke\Templator\Exceptions\TemplatorException;
 use Vasoft\Joke\Templator\Lexer\PrintToken;
@@ -20,21 +21,30 @@ use Vasoft\Joke\Templator\Parser\Node\TextNode;
 use Vasoft\Joke\Templator\TemplatorConfig;
 
 /**
- * Парсер AST-дерева шаблонизатора Joke.
+ * Стандартный синтаксический анализатор.
  *
  * Преобразует последовательность токенов, полученных от лексера,
  * в древовидную структуру (AST), состоящую из узлов TextNode и TagNode.
- * Поддерживает вложенные теги, самозакрывающиеся теги и текстовый контент.
  *
- * Обеспечивает строгую проверку структуры шаблона:
- * - контроль соответствия открывающих и закрывающих тегов
- * - обнаружение незакрытых тегов
- * - генерацию понятных сообщений об ошибках с указанием полных имён тегов (включая префикс 'j-').
+ * Основные возможности:
+ * - Построение иерархии узлов (TextNode, PrintNode, StatementNode, BlockNode).
+ * - Валидация структуры: проверка парности открывающих/закрывающих тегов.
+ * - Обработка ветвлений (elseif, else) внутри блочных директив.
+ * - Генерация понятных исключений при обнаружении синтаксических ошибок.
  */
 class DefaultParser implements ParserInterface
 {
+    /**
+     * Коллекция правил синтаксиса директив.
+     * Используется для определения типа директивы (BEGIN, END, BRANCH, SINGLE).
+     */
     private DirectiveCollection $directiveCollection;
 
+    /**
+     * Создает новый экземпляр парсера.
+     *
+     * @param TemplatorConfig $config конфигурация шаблонизатора, содержащая правила грамматики
+     */
     public function __construct(
         TemplatorConfig $config,
     ) {
@@ -42,7 +52,15 @@ class DefaultParser implements ParserInterface
     }
 
     /**
-     * @inherit
+     * {@inheritDoc}
+     *
+     * Выполняет синтаксический анализ массива токенов и возвращает корневые узлы AST.
+     *
+     * @param list<TokenInterface> $tokens массив токенов, полученный от лексера
+     *
+     * @return list<NodeInterface> массив корневых узлов абстрактного синтаксического дерева
+     *
+     * @throws ParserException если обнаружены ошибки структуры (незакрытые теги, неверная вложенность)
      */
     public function parse(array $tokens): array
     {
@@ -64,18 +82,27 @@ class DefaultParser implements ParserInterface
         if (!empty($stack)) {
             $unclosed = implode(', ', array_map(static fn($n) => $n->directive ?? 'unknown', $stack));
 
-            throw new ParserException("Unclosed tag(s): {$unclosed}");
+            throw new ParserException("Unclosed tag(s): '{$unclosed}'.");
         }
 
         return $rootNodes;
     }
 
     /**
-     * @param list<NodeInterface> $stack
-     * @param list<NodeInterface> $rootNodes
+     * Обрабатывает токен инструкции (StatementToken) и выполняет соответствующее действие.
      *
-     * @throws ParserException
-     * @throws TemplatorException
+     * В зависимости от типа директивы (определенного через DirectiveCollection):
+     * - BEGIN: Создает новый BlockNode и помещает его в стек.
+     * - END: Извлекает узел из стека и проверяет соответствие закрывающего тега.
+     * - BRANCH: Добавляет новую ветвь (else/elseif) к текущему узлу из стека.
+     * - SINGLE: Создает одиночный StatementNode и добавляет его в дерево.
+     *
+     * @param StatementToken      $token     токен инструкции для обработки
+     * @param list<NodeInterface> $stack     стек открытых блочных узлов (передается по ссылке)
+     * @param list<NodeInterface> $rootNodes массив корневых узлов AST (передается по ссылке)
+     *
+     * @throws ParserException    при нарушении структуры шаблона (неожиданный закрывающий тег, mismatch)
+     * @throws TemplatorException если возникла ошибка при определении типа директивы
      */
     private function prepareStatementToken(StatementToken $token, array &$stack, array &$rootNodes): void
     {
@@ -91,24 +118,27 @@ class DefaultParser implements ParserInterface
 
             case DirectiveType::END:
                 if (empty($stack)) {
-                    throw new ParserException("Unexpected end directive: {$directive}");
+                    throw new ParserException("Unexpected end tag: '{$directive}'.");
                 }
                 $openDirective = $this->directiveCollection->getOpenDirective($token::class, $directive);
+                /** @var BlockNode $last */
                 $last = array_pop($stack);
-                assert($last instanceof BlockNode);
                 if ($last->directive !== $openDirective) {
                     throw new ParserException(
-                        "Mismatched block: expected end of {$last->directive}, got {$directive}",
+                        "Mismatched block: expected end of '{$last->directive}', got '{$directive}'.",
                     );
                 }
                 break;
 
             case DirectiveType::BRANCH:
+                if (empty($stack)) {
+                    throw new ParserException("Unexpected branch '{$directive}'.");
+                }
+                /** @var BlockNode $currentNode */
                 $currentNode = array_last($stack);
-                assert($currentNode instanceof BlockNode);
                 $openDirective = $this->directiveCollection->getOpenDirective($token::class, $directive);
                 if ($openDirective !== $currentNode->directive) {
-                    throw new TemplatorException("Unexpected branch '{$directive}'");
+                    throw new ParserException("Unexpected branch '{$directive}'.");
                 }
                 $currentNode->openBranch($directive, $token->getArguments());
                 break;
@@ -119,13 +149,19 @@ class DefaultParser implements ParserInterface
                 break;
 
             default:
-                throw new ParserException("Unknown directive: {$directive}");
+                throw new ParserException("Unknown directive: '{$directive}'.");
         }
     }
 
     /**
-     * @param list<NodeInterface> $stack
-     * @param list<NodeInterface> $rootNodes
+     * Присоединяет новый узел к дереву AST.
+     *
+     * Если стек открыт и последний элемент является BlockNode, узел добавляется как дочерний.
+     * В противном случае узел добавляется в список корневых элементов.
+     *
+     * @param NodeInterface       $node      узел для добавления
+     * @param list<NodeInterface> $stack     стек открытых блоков (передается по ссылке)
+     * @param list<NodeInterface> $rootNodes массив корневых узлов (передается по ссылке)
      */
     private function attachNode(NodeInterface $node, array &$stack, array &$rootNodes): void
     {

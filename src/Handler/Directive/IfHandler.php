@@ -42,9 +42,9 @@ class IfHandler extends NodeHandler
         $result = '<?php if(' . $this->generateCondition($node->arguments, $localVars, 'if') . '): ?>';
         $result .= $processor->process($node->children, $context, $localVars);
         foreach ($node->branches as $branch) {
-            if ('else' === $branch->name) {
+            if ('else' === $branch->directive) {
                 $result .= $this->compileElse($processor, $branch->children, $context, $localVars);
-            } elseif ('elseif' === $branch->name) {
+            } elseif ('elseif' === $branch->directive) {
                 $result .= $this->compileElseIf(
                     $processor,
                     $branch->arguments,
@@ -150,11 +150,11 @@ class IfHandler extends NodeHandler
             return $processor->process($node->children, $context);
         }
         foreach ($node->branches as $branch) {
-            if ('else' === $branch->name) {
+            if ('else' === $branch->directive) {
                 return $processor->process($branch->children, $context);
             }
-            if ('elseif' === $branch->name) {
-                $value = $this->resolveValue($context, $branch->arguments, false, $branch->name);
+            if ('elseif' === $branch->directive) {
+                $value = $this->resolveValue($context, $branch->arguments, false, $branch->directive);
                 if ($value) {
                     return $processor->process($branch->children, $context);
                 }

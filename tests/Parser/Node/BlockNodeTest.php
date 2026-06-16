@@ -32,12 +32,12 @@ final class BlockNodeTest extends TestCase
         self::assertCount(1, $node->children);
         self::assertSame('childMain', $node->children[0]->content);
 
-        self::assertSame('second', $node->branches[0]->name);
+        self::assertSame('second', $node->branches[0]->directive);
         self::assertCount(2, $node->branches[0]->children);
         self::assertSame('childSecond1', $node->branches[0]->children[0]->content);
         self::assertSame('childSecond2', $node->branches[0]->children[1]->content);
 
-        self::assertSame('last', $node->branches[1]->name);
+        self::assertSame('last', $node->branches[1]->directive);
         self::assertCount(1, $node->branches[1]->children);
         self::assertSame('childLast', $node->branches[1]->children[0]->content);
     }

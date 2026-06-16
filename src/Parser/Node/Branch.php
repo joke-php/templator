@@ -25,11 +25,11 @@ class Branch
     /**
      * Создает новую ветвь блока.
      *
-     * @param string $name      имя ветви (например, 'else', 'elseif')
+     * @param string $directive имя ветви (например, 'else', 'elseif')
      * @param string $arguments аргументы ветви (используется для условий в elseif)
      */
     public function __construct(
-        public readonly string $name,
+        public readonly string $directive,
         public readonly string $arguments = '',
     ) {}
 }
