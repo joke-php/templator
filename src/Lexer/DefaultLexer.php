@@ -96,15 +96,13 @@ class DefaultLexer implements LexerInterface
 
                 $fullTagEndPos = $end + $firstDescriptor->closeLength;
                 $fullTagContent = substr($template, $pos, $fullTagEndPos - $pos);
-                $posPrev = $pos;
 
-                $pos = $end + $firstDescriptor->closeLength;
                 $tokens[] = new ($firstDescriptor->tokenClass)($content, $tagLine, $tagCol);
 
                 $newLinesInTag = substr_count($fullTagContent, "\n");
                 if ($newLinesInTag > 0) {
                     $currentLine += $newLinesInTag;
-                    $lastNewLinePos = $posPrev + strrpos($fullTagContent, "\n");
+                    $lastNewLinePos = $pos + strrpos($fullTagContent, "\n");
                 }
 
                 $pos = $fullTagEndPos;
