@@ -27,14 +27,14 @@ final class DefaultParserTest extends TestCase
     public function testParse(): void
     {
         $tokens = [
-            new PrintToken('testVariable'),
-            new TextToken("\nSingle text\n"),
-            new StatementToken(' if expression1 '),
-            new TextToken('branch1'),
-            new StatementToken('elseif expression2'),
-            new TextToken('branch2'),
-            new StatementToken('/if'),
-            new StatementToken('csrf'),
+            new PrintToken('testVariable', 1, 1),
+            new TextToken("\nSingle text\n", 2, 2),
+            new StatementToken(' if expression1 ', 3, 1),
+            new TextToken('branch1', 3, 20),
+            new StatementToken('elseif expression2', 4, 5),
+            new TextToken('branch2', 6, 1),
+            new StatementToken('/if', 7, 1),
+            new StatementToken('csrf', 8, 1),
         ];
 
         $ast = new DefaultParser(new TemplatorConfig())->parse($tokens);
@@ -67,8 +67,8 @@ final class DefaultParserTest extends TestCase
     public function testParseUnclosed(): void
     {
         $tokens = [
-            new StatementToken(' if expression1 '),
-            new StatementToken(' if expression2 '),
+            new StatementToken(' if expression1 ', 1, 1),
+            new StatementToken(' if expression2 ', 2, 1),
         ];
         self::expectException(ParserException::class);
         self::expectExceptionMessage("Unclosed tag(s): 'if, if'.");
@@ -78,53 +78,53 @@ final class DefaultParserTest extends TestCase
     public function testUnexpectedEnd(): void
     {
         $tokens = [
-            new StatementToken('/if'),
+            new StatementToken('/if', 10, 11),
         ];
         self::expectException(ParserException::class);
-        self::expectExceptionMessage("Unexpected end tag: '/if'.");
+        self::expectExceptionMessage("Unexpected end tag: '/if' (10:11).");
         new DefaultParser(new TemplatorConfig())->parse($tokens);
     }
 
     public function testMismatchedTag(): void
     {
         $tokens = [
-            new StatementToken('if expression1'),
-            new StatementToken('/foreach'),
+            new StatementToken('if expression1', 1, 10),
+            new StatementToken('/foreach', 18, 4),
         ];
         self::expectException(ParserException::class);
-        self::expectExceptionMessage("Mismatched block: expected end of 'if', got '/foreach'");
+        self::expectExceptionMessage("Mismatched block: expected end of 'if', got '/foreach' (18:4)");
         new DefaultParser(new TemplatorConfig())->parse($tokens);
     }
 
     public function testUnexpectedBranch(): void
     {
         $tokens = [
-            new StatementToken('foreach items as item'),
-            new StatementToken('elseif expression2'),
-            new StatementToken('/foreach'),
+            new StatementToken('foreach items as item', 1, 1),
+            new StatementToken('elseif expression2', 1, 40),
+            new StatementToken('/foreach', 5, 7),
         ];
         self::expectException(ParserException::class);
-        self::expectExceptionMessage("Unexpected branch 'elseif'.");
+        self::expectExceptionMessage("Unexpected branch 'elseif' (1:40).");
         new DefaultParser(new TemplatorConfig())->parse($tokens);
     }
 
     public function testUnknownDirective(): void
     {
         $tokens = [
-            new StatementToken('dir-unknown'),
+            new StatementToken('dir-unknown', 5, 1),
         ];
         self::expectException(ParserException::class);
-        self::expectExceptionMessage("Unknown directive: 'dir-unknown'.");
+        self::expectExceptionMessage("Unknown directive: 'dir-unknown' (5:1).");
         new DefaultParser(new TemplatorConfig())->parse($tokens);
     }
 
     public function testUnexpectedBranchOutside(): void
     {
         $tokens = [
-            new StatementToken('elseif expression2'),
+            new StatementToken('elseif expression2', 7, 1),
         ];
         self::expectException(ParserException::class);
-        self::expectExceptionMessage("Unexpected branch 'elseif'.");
+        self::expectExceptionMessage("Unexpected branch 'elseif' (7:1).");
         new DefaultParser(new TemplatorConfig())->parse($tokens);
     }
 }

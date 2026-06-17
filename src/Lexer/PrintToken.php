@@ -15,7 +15,9 @@ use Vasoft\Joke\Templator\Contracts\TokenInterface;
 readonly class PrintToken implements TokenInterface
 {
     /**
-     * @param string $raw исходное содержимое выражения (без разделителей, таких как "{{" и "}}")
+     * @param string $raw    исходное содержимое выражения (без разделителей, таких как "{{" и "}}")
+     * @param int    $line   Строка в которой находится токен
+     * @param int    $column Колонка в которой находится токен
      */
-    public function __construct(public string $raw) {}
+    public function __construct(public string $raw, public int $line, public int $column) {}
 }

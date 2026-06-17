@@ -118,27 +118,27 @@ class DefaultParser implements ParserInterface
 
             case DirectiveType::END:
                 if (empty($stack)) {
-                    throw new ParserException("Unexpected end tag: '{$directive}'.");
+                    throw new ParserException("Unexpected end tag: '{$directive}' ({$token->line}:{$token->column}).");
                 }
                 $openDirective = $this->directiveCollection->getOpenDirective($token::class, $directive);
                 /** @var BlockNode $last */
                 $last = array_pop($stack);
                 if ($last->directive !== $openDirective) {
                     throw new ParserException(
-                        "Mismatched block: expected end of '{$last->directive}', got '{$directive}'.",
+                        "Mismatched block: expected end of '{$last->directive}', got '{$directive}' ({$token->line}:{$token->column}).",
                     );
                 }
                 break;
 
             case DirectiveType::BRANCH:
                 if (empty($stack)) {
-                    throw new ParserException("Unexpected branch '{$directive}'.");
+                    throw new ParserException("Unexpected branch '{$directive}' ({$token->line}:{$token->column}).");
                 }
                 /** @var BlockNode $currentNode */
                 $currentNode = array_last($stack);
                 $openDirective = $this->directiveCollection->getOpenDirective($token::class, $directive);
                 if ($openDirective !== $currentNode->directive) {
-                    throw new ParserException("Unexpected branch '{$directive}'.");
+                    throw new ParserException("Unexpected branch '{$directive}' ({$token->line}:{$token->column}).");
                 }
                 $currentNode->openBranch($directive, $token->getArguments());
                 break;
@@ -149,7 +149,7 @@ class DefaultParser implements ParserInterface
                 break;
 
             default:
-                throw new ParserException("Unknown directive: '{$directive}'.");
+                throw new ParserException("Unknown directive: '{$directive}' ({$token->line}:{$token->column}).");
         }
     }
 

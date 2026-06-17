@@ -26,26 +26,41 @@ final class DefaultLexerTest extends TestCase
             {{testVariable}}
             Single text
             {% each items as item %}
-                {{item}}
-            {%endeach%}
+                {{item}}{%endeach%}
             HTML;
         $lexer = new DefaultLexer(new TemplatorConfig());
         $list = $lexer->tokenize($template);
-        self::assertCount(7, $list);
+
+        self::assertCount(6, $list);
         self::assertInstanceOf(PrintToken::class, $list[0]);
-        self::assertInstanceOf(TextToken::class, $list[1]);
-        self::assertInstanceOf(StatementToken::class, $list[2]);
-        self::assertInstanceOf(TextToken::class, $list[3]);
-        self::assertInstanceOf(PrintToken::class, $list[4]);
-        self::assertInstanceOf(TextToken::class, $list[5]);
-        self::assertInstanceOf(StatementToken::class, $list[6]);
         self::assertSame('testVariable', $list[0]->raw);
+        self::assertSame(1, $list[0]->line);
+        self::assertSame(1, $list[0]->column);
+
+        self::assertInstanceOf(TextToken::class, $list[1]);
         self::assertSame("\nSingle text\n", $list[1]->raw);
+        self::assertSame(1, $list[1]->line);
+        self::assertSame(17, $list[1]->column);
+
+        self::assertInstanceOf(StatementToken::class, $list[2]);
         self::assertSame(' each items as item ', $list[2]->raw);
+        self::assertSame(3, $list[2]->line);
+        self::assertSame(1, $list[2]->column);
+
+        self::assertInstanceOf(TextToken::class, $list[3]);
         self::assertSame("\n    ", $list[3]->raw);
+        self::assertSame(3, $list[3]->line);
+        self::assertSame(25, $list[3]->column);
+
+        self::assertInstanceOf(PrintToken::class, $list[4]);
         self::assertSame('item', $list[4]->raw);
-        self::assertSame("\n", $list[5]->raw);
-        self::assertSame('endeach', $list[6]->raw);
+        self::assertSame(4, $list[4]->line);
+        self::assertSame(5, $list[4]->column);
+
+        self::assertInstanceOf(StatementToken::class, $list[5]);
+        self::assertSame('endeach', $list[5]->raw);
+        self::assertSame(4, $list[5]->line);
+        self::assertSame(13, $list[5]->column);
     }
 
     public function testUnclosedException(): void
@@ -53,7 +68,7 @@ final class DefaultLexerTest extends TestCase
         $template = '{{test';
         $lexer = new DefaultLexer(new TemplatorConfig());
         self::expectException(LexerException::class);
-        self::expectExceptionMessage('Unclosed tag "{{" found at position 0.');
+        self::expectExceptionMessage('Unclosed tag "{{" found at position 1:1.');
         $lexer->tokenize($template);
     }
 

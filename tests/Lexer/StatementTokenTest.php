@@ -18,7 +18,7 @@ final class StatementTokenTest extends TestCase
     #[DataProvider('provideGetDirectiveCases')]
     public function testGetDirective(string $raw, string $expected): void
     {
-        $token = new StatementToken($raw);
+        $token = new StatementToken($raw, 1, 1);
         self::assertSame($expected, $token->getDirective());
     }
 
@@ -31,7 +31,7 @@ final class StatementTokenTest extends TestCase
     #[DataProvider('provideGetArgumentsCases')]
     public function testGetArguments(string $raw, string $expected): void
     {
-        $token = new StatementToken($raw);
+        $token = new StatementToken($raw, 1, 1);
         self::assertSame($expected, $token->getArguments());
     }
 

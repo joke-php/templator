@@ -16,9 +16,11 @@ use Vasoft\Joke\Templator\Contracts\TokenInterface;
 readonly class StatementToken implements TokenInterface
 {
     /**
-     * @param string $raw исходное содержимое директивы (без разделителей {% и %})
+     * @param string $raw    исходное содержимое директивы (без разделителей {% и %})
+     * @param int    $line   Строка в которой находится токен
+     * @param int    $column Колонка в которой находится токен
      */
-    public function __construct(public string $raw) {}
+    public function __construct(public string $raw, public int $line, public int $column) {}
 
     /**
      * Извлекает имя директивы из содержимого токена.

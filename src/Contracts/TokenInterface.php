@@ -22,4 +22,16 @@ interface TokenInterface
     public string $raw {
         get;
     }
+    /**
+     * Строка в которой находится токен.
+     */
+    public int $line {
+        get;
+    }
+    /**
+     * Колонка в которой находится токен.
+     */
+    public int $column {
+        get;
+    }
 }

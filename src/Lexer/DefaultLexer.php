@@ -46,6 +46,8 @@ class DefaultLexer implements LexerInterface
         $tokens = [];
         $templateLength = strlen($template);
         $pos = 0;
+        $currentLine = 1;
+        $lastNewLinePos = -1;
         while ($pos < $templateLength) {
             /**
              * @var ?TokenDescriptor $firstDescriptor
@@ -54,18 +56,36 @@ class DefaultLexer implements LexerInterface
             [$firstDescriptor, $nextMarker] = $this->findNext($template, $pos);
 
             if ($pos !== $nextMarker) {
+                $tokenLine = $currentLine;
+                $tokenCol = $pos - $lastNewLinePos;
+
                 if (PHP_INT_MAX === $nextMarker) {
-                    $tokens[] = new TextToken(substr($template, $pos));
+                    $tokens[] = new TextToken(substr($template, $pos), $tokenLine, $tokenCol);
                     break;
                 }
-                $tokens[] = new TextToken(substr($template, $pos, $nextMarker - $pos));
+                $text = substr($template, $pos, $nextMarker - $pos);
+                $tokens[] = new TextToken($text, $tokenLine, $tokenCol);
+
+                $newLinesCount = substr_count($text, "\n");
+                if ($newLinesCount > 0) {
+                    $currentLine += $newLinesCount;
+                    $lastNewLinePos = $pos + strrpos($text, "\n");
+                }
             }
             $pos = $nextMarker;
             if (null !== $firstDescriptor) {
+                $tagLine = $currentLine;
+                $tagCol = $pos - $lastNewLinePos;
+
                 $end = strpos($template, $firstDescriptor->close, $pos + $firstDescriptor->openLength);
                 if (false === $end) {
                     throw new LexerException(
-                        sprintf('Unclosed tag "%s" found at position %d.', $firstDescriptor->open, $pos),
+                        sprintf(
+                            'Unclosed tag "%s" found at position %d:%d.',
+                            $firstDescriptor->open,
+                            $tagLine,
+                            $tagCol,
+                        ),
                     );
                 }
                 $content = substr(
@@ -74,7 +94,17 @@ class DefaultLexer implements LexerInterface
                     $end - $pos - $firstDescriptor->openLength,
                 );
                 $pos = $end + $firstDescriptor->closeLength;
-                $tokens[] = new ($firstDescriptor->tokenClass)($content);
+                $tokens[] = new ($firstDescriptor->tokenClass)($content, $tagLine, $tagCol);
+
+                $fullTagEndPos = $end + $firstDescriptor->closeLength;
+                $fullTagContent = substr($template, $pos, $fullTagEndPos - $pos);
+                $newLinesInTag = substr_count($fullTagContent, "\n");
+                if ($newLinesInTag > 0) {
+                    $currentLine += $newLinesInTag;
+                    $lastNewLinePos = $pos + strrpos($fullTagContent, "\n");
+                }
+
+                $pos = $fullTagEndPos;
             }
         }
 
