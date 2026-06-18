@@ -71,6 +71,7 @@ final class DefaultLexerTest extends TestCase
         self::expectExceptionMessage('Unclosed tag "{{" found at position 1:1.');
         $lexer->tokenize($template);
     }
+
     public function testNewLineInTag(): void
     {
         $template = "{%foreach lines\n as line %}\n{{test";
