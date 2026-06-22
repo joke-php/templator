@@ -69,10 +69,10 @@ class DefaultParser implements ParserInterface
 
         foreach ($tokens as $token) {
             if ($token instanceof TextToken) {
-                $node = new TextNode($token->raw);
+                $node = new TextNode(TextToken::class, $token->raw);
                 $this->attachNode($node, $stack, $rootNodes);
             } elseif ($token instanceof PrintToken) {
-                $node = new PrintNode($token->raw);
+                $node = new PrintNode(PrintNode::class, $token->raw);
                 $this->attachNode($node, $stack, $rootNodes);
             } elseif ($token instanceof StatementToken) {
                 $this->prepareStatementToken($token, $stack, $rootNodes);
@@ -111,7 +111,7 @@ class DefaultParser implements ParserInterface
 
         switch ($type) {
             case DirectiveType::BEGIN:
-                $node = new BlockNode($directive, $token->getArguments());
+                $node = new BlockNode(StatementToken::class, $directive, $token->getArguments());
                 $this->attachNode($node, $stack, $rootNodes);
                 $stack[] = $node;
                 break;
@@ -144,7 +144,7 @@ class DefaultParser implements ParserInterface
                 break;
 
             case DirectiveType::SINGLE:
-                $node = new StatementNode($directive, $token->getArguments());
+                $node = new StatementNode(StatementToken::class, $directive, $token->getArguments());
                 $this->attachNode($node, $stack, $rootNodes);
                 break;
 

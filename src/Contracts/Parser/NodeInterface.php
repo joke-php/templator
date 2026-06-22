@@ -14,4 +14,9 @@ namespace Vasoft\Joke\Templator\Contracts\Parser;
  * Реализации этого интерфейса используются парсером для построения дерева
  * и процессорами (компилятором/рендерером) для генерации итогового результата.
  */
-interface NodeInterface {}
+interface NodeInterface
+{
+    public string $tokenClass {
+        get;
+    }
+}

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Vasoft\Joke\Templator\Tests\Parser\Node;
 
+use Vasoft\Joke\Templator\Lexer\StatementToken;
+use Vasoft\Joke\Templator\Lexer\TextToken;
 use Vasoft\Joke\Templator\Parser\Node\BlockNode;
 use PHPUnit\Framework\TestCase;
 use Vasoft\Joke\Templator\Parser\Node\TextNode;
@@ -17,11 +19,11 @@ final class BlockNodeTest extends TestCase
 {
     public function testBranches(): void
     {
-        $childMain = new TextNode('childMain');
-        $childSecond1 = new TextNode('childSecond1');
-        $childSecond2 = new TextNode('childSecond2');
-        $childLast = new TextNode('childLast');
-        $node = new BlockNode('example', 'args');
+        $childMain = new TextNode(TextToken::class, 'childMain');
+        $childSecond1 = new TextNode(TextToken::class, 'childSecond1');
+        $childSecond2 = new TextNode(TextToken::class, 'childSecond2');
+        $childLast = new TextNode(TextToken::class, 'childLast');
+        $node = new BlockNode(StatementToken::class, 'example', 'args');
         $node->addChild($childMain);
         $node->openBranch('second', 'args2');
         $node->addChild($childSecond1);

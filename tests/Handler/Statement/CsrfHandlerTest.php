@@ -9,6 +9,7 @@ use Vasoft\Joke\Http\Csrf\CsrfTokenManager;
 use Vasoft\Joke\Http\HttpRequest;
 use Vasoft\Joke\Templator\Handler\Statement\CsrfHandler;
 use PHPUnit\Framework\TestCase;
+use Vasoft\Joke\Templator\Lexer\StatementToken;
 use Vasoft\Joke\Templator\Parser\Node\StatementNode;
 use Vasoft\Joke\Templator\Render\DefaultRenderer;
 
@@ -47,7 +48,7 @@ final class CsrfHandlerTest extends TestCase
     public function testCompile(): void
     {
         $handler = new CsrfHandler(self::$container);
-        $node = new StatementNode('csrf', '');
+        $node = new StatementNode(StatementToken::class, 'csrf', '');
         self::assertSame(
             <<<'PHP'
                     <?php
@@ -67,7 +68,7 @@ final class CsrfHandlerTest extends TestCase
     public function testRender(): void
     {
         $handler = new CsrfHandler(self::$container);
-        $node = new StatementNode('csrf', '');
+        $node = new StatementNode(StatementToken::class, 'csrf', '');
         self::assertSame(
             'token',
             $handler->render($node, self::$renderer, []),

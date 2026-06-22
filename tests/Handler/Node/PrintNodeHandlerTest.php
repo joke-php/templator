@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Vasoft\Joke\Templator\Exceptions\CompileException;
 use Vasoft\Joke\Templator\Exceptions\RenderingException;
 use Vasoft\Joke\Templator\Handler\Node\PrintNodeHandler;
+use Vasoft\Joke\Templator\Lexer\PrintToken;
 use Vasoft\Joke\Templator\Parser\Node\BlockNode;
 use Vasoft\Joke\Templator\Parser\Node\PrintNode;
 use Vasoft\Joke\Templator\Render\DefaultRenderer;
@@ -32,7 +33,7 @@ final class PrintNodeHandlerTest extends TestCase
     public function testCompileFromContext(): void
     {
         $handler = new PrintNodeHandler(new TemplatorConfig());
-        $node = new PrintNode('test');
+        $node = new PrintNode(PrintToken::class, 'test');
         $context = ['test' => 1];
         self::assertSame(
             "<?= htmlspecialchars((string)\$context['test'], ENT_QUOTES, 'UTF-8');?>",
@@ -44,7 +45,7 @@ final class PrintNodeHandlerTest extends TestCase
     {
         $config = new TemplatorConfig()->setEncoding('windows-1251');
         $handler = new PrintNodeHandler($config);
-        $node = new PrintNode('test');
+        $node = new PrintNode(PrintToken::class, 'test');
         $context = ['test' => 1];
         self::assertSame(
             "<?= htmlspecialchars((string)\$context['test'], ENT_QUOTES, 'windows-1251');?>",
@@ -55,7 +56,7 @@ final class PrintNodeHandlerTest extends TestCase
     public function testRender(): void
     {
         $handler = new PrintNodeHandler(new TemplatorConfig());
-        $node = new PrintNode('test');
+        $node = new PrintNode(PrintToken::class, 'test');
         $context = ['test' => '<script>'];
         self::assertSame(
             '&lt;script&gt;',
@@ -66,7 +67,7 @@ final class PrintNodeHandlerTest extends TestCase
     public function testCompileFromLocal(): void
     {
         $handler = new PrintNodeHandler(new TemplatorConfig());
-        $node = new PrintNode('test');
+        $node = new PrintNode(PrintToken::class, 'test');
         $context = ['test' => 1];
         self::assertSame(
             "<?= htmlspecialchars((string)\$test, ENT_QUOTES, 'UTF-8');?>",
@@ -78,7 +79,7 @@ final class PrintNodeHandlerTest extends TestCase
     {
         $config = new TemplatorConfig()->setEncoding('windows-1251');
         $handler = new PrintNodeHandler($config);
-        $node = new PrintNode('test');
+        $node = new PrintNode(PrintToken::class, 'test');
         $context = ['test' => 1];
         self::assertSame(
             "<?= htmlspecialchars((string)\$test, ENT_QUOTES, 'windows-1251');?>",
@@ -89,7 +90,7 @@ final class PrintNodeHandlerTest extends TestCase
     public function testRenderException(): void
     {
         $handler = new PrintNodeHandler(new TemplatorConfig());
-        $node = new BlockNode('test', '');
+        $node = new BlockNode(PrintToken::class, 'test', '');
         self::expectException(RenderingException::class);
         self::expectExceptionMessage(
             'Expected instance of PrintNode, got Vasoft\Joke\Templator\Parser\Node\BlockNode.',
@@ -100,7 +101,7 @@ final class PrintNodeHandlerTest extends TestCase
     public function testCompileException(): void
     {
         $handler = new PrintNodeHandler(new TemplatorConfig());
-        $node = new BlockNode('test', '');
+        $node = new BlockNode(PrintToken::class, 'test', '');
         self::expectException(CompileException::class);
         self::expectExceptionMessage(
             'Expected instance of PrintNode, got Vasoft\Joke\Templator\Parser\Node\BlockNode.',

@@ -32,17 +32,6 @@ class BlockNode extends StatementNode implements NodeInterface
     public private(set) array $branches = [];
 
     /**
-     * Создает новый узел блочной директивы.
-     *
-     * @param string $directive имя директивы (например, 'if', 'foreach')
-     * @param string $arguments аргументы директивы
-     */
-    public function __construct(string $directive, string $arguments)
-    {
-        parent::__construct($directive, $arguments);
-    }
-
-    /**
      * Добавляет дочерний узел в текущий контекст блока.
      *
      * Если активна ветвь (elseif/else), узел добавляется в неё.
@@ -71,7 +60,7 @@ class BlockNode extends StatementNode implements NodeInterface
      */
     public function openBranch(string $branchName, string $argument = ''): void
     {
-        $branch = new Branch($branchName, $argument);
+        $branch = new Branch($this->tokenClass, $branchName, $argument);
         $this->branches[] = $branch;
     }
 }

@@ -11,6 +11,9 @@ use Vasoft\Joke\Templator\Exceptions\CompileException;
 use Vasoft\Joke\Templator\Exceptions\RenderingException;
 use PHPUnit\Framework\TestCase;
 use Vasoft\Joke\Templator\Handler\Directive\EachHandler;
+use Vasoft\Joke\Templator\Lexer\PrintToken;
+use Vasoft\Joke\Templator\Lexer\StatementToken;
+use Vasoft\Joke\Templator\Lexer\TextToken;
 use Vasoft\Joke\Templator\Parser\Node\BlockNode;
 use Vasoft\Joke\Templator\Parser\Node\PrintNode;
 use Vasoft\Joke\Templator\Parser\Node\TextNode;
@@ -39,7 +42,7 @@ final class EachHandlerTest extends TestCase
     public function testCompileFromContext(): void
     {
         $handler = new EachHandler();
-        $node = new BlockNode('each', 'item in list');
+        $node = new BlockNode(StatementToken::class, 'each', 'item in list');
         $context = ['list' => [1, 2]];
         self::assertSame(
             "<?php foreach (\$context['list'] as \$item): ?><?php endforeach; ?>",
@@ -50,7 +53,7 @@ final class EachHandlerTest extends TestCase
     public function testCompileFromLocal(): void
     {
         $handler = new EachHandler();
-        $node = new BlockNode('each', 'item in list');
+        $node = new BlockNode(StatementToken::class, 'each', 'item in list');
         $context = ['list' => [1, 2]];
         self::assertSame(
             '<?php foreach ($list as $item): ?><?php endforeach; ?>',
@@ -74,8 +77,8 @@ final class EachHandlerTest extends TestCase
             );
 
         $handler = new EachHandler();
-        $node = new BlockNode('each', 'id, item in list');
-        $node->addChild(new PrintNode('test'));
+        $node = new BlockNode(StatementToken::class, 'each', 'id, item in list');
+        $node->addChild(new PrintNode(PrintToken::class, 'test'));
         $context = ['list' => [1, 2]];
         self::assertSame(
             '<?php foreach ($list as $id => $item): ?>item,id<?php endforeach; ?>',
@@ -86,7 +89,7 @@ final class EachHandlerTest extends TestCase
     public function testCompileExceptionNodeType(): void
     {
         $handler = new EachHandler();
-        $node = new TextNode('test');
+        $node = new TextNode(TextToken::class, 'test');
         self::expectException(CompileException::class);
         self::expectExceptionMessage(
             'Expected instance of BlockNode, got Vasoft\Joke\Templator\Parser\Node\TextNode.',
@@ -97,7 +100,7 @@ final class EachHandlerTest extends TestCase
     public function testCompileExceptionSyntax(): void
     {
         $handler = new EachHandler();
-        $node = new BlockNode('each', 'test');
+        $node = new BlockNode(StatementToken::class, 'each', 'test');
         self::expectException(CompileException::class);
         self::expectExceptionMessage('Invalid foreach syntax: \'test\'.');
         $handler->compile($node, self::$compiler, []);
@@ -106,7 +109,7 @@ final class EachHandlerTest extends TestCase
     public function testCompileExceptionSyntaxIn(): void
     {
         $handler = new EachHandler();
-        $node = new BlockNode('each', 'test in ');
+        $node = new BlockNode(StatementToken::class, 'each', 'test in ');
         self::expectException(CompileException::class);
         self::expectExceptionMessage('Invalid foreach syntax: \'test in \'.');
         $handler->compile($node, self::$compiler, []);
@@ -115,7 +118,7 @@ final class EachHandlerTest extends TestCase
     public function testRenderExceptionNodeType(): void
     {
         $handler = new EachHandler();
-        $node = new TextNode('test');
+        $node = new TextNode(PrintToken::class, 'test');
         self::expectException(RenderingException::class);
         self::expectExceptionMessage(
             'Expected instance of BlockNode, got Vasoft\Joke\Templator\Parser\Node\TextNode.',
@@ -131,7 +134,7 @@ final class EachHandlerTest extends TestCase
             ->getMock();
         $renderer->expects(self::never())->method('process');
         $handler = new EachHandler();
-        $node = new BlockNode('each', 'id, item in list');
+        $node = new BlockNode(StatementToken::class, 'each', 'id, item in list');
         $context = ['list' => []];
         self::assertSame('', $handler->render($node, $renderer, $context));
     }
@@ -151,11 +154,11 @@ final class EachHandlerTest extends TestCase
                 ),
             );
         $handler = new EachHandler();
-        $node = new BlockNode('each', 'id, item in list');
-        $node->addChild(new PrintNode('id'));
-        $node->addChild(new PrintNode('separator'));
-        $node->addChild(new PrintNode('item'));
-        $node->addChild(new PrintNode('separator'));
+        $node = new BlockNode(StatementToken::class, 'each', 'id, item in list');
+        $node->addChild(new PrintNode(PrintToken::class, 'id'));
+        $node->addChild(new PrintNode(PrintToken::class, 'separator'));
+        $node->addChild(new PrintNode(PrintToken::class, 'item'));
+        $node->addChild(new PrintNode(PrintToken::class, 'separator'));
         $context = ['list' => ['a', 'b'], 'separator' => ':'];
         self::assertSame('0:a:1:b:', $handler->render($node, $renderer, $context));
     }

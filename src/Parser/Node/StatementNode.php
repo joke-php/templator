@@ -20,10 +20,12 @@ class StatementNode implements NodeInterface
     /**
      * Создает новый узел инструкции.
      *
-     * @param string $directive имя директивы (например, 'if', 'foreach', 'include')
-     * @param string $arguments строка аргументов, переданных директиве
+     * @param class-string $tokenClass класс токена
+     * @param string       $directive  имя директивы (например, 'if', 'foreach', 'include')
+     * @param string       $arguments  строка аргументов, переданных директиве
      */
     public function __construct(
+        public readonly string $tokenClass,
         public string $directive,
         public string $arguments,
     ) {}

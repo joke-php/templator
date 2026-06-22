@@ -50,6 +50,9 @@ class TemplatorConfig extends AbstractConfig
 
     protected function initDefaults(): void
     {
+        /**
+         * @todo Добавить в ноду инфу о классе токена, а директивы (обработчики) связать с классом токена
+         */
         $this->tokenCollection->upsert(new TokenDescriptor('{{', '}}', PrintToken::class));
         $this->tokenCollection->upsert(new TokenDescriptor('{%', '%}', StatementToken::class));
 

@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Vasoft\Joke\Templator\Tests\Compiler;
 
 use Vasoft\Joke\Templator\Compiler\DefaultCompiler;
+use Vasoft\Joke\Templator\Lexer\PrintToken;
+use Vasoft\Joke\Templator\Lexer\TokenDescriptor;
+use Vasoft\Joke\Templator\TemplatorConfig;
 use Vasoft\Joke\Templator\Tests\ProcessorTestBase;
 
 /**
@@ -26,5 +29,11 @@ final class DefaultCompilerTest extends ProcessorTestBase
 
         $renderer = new DefaultCompiler($this->container, $this->config);
         self::assertSame($expected, $renderer->process($this->getDefaultAst(), $this->getDefaultContext()));
+    }
+
+    public function testSameTags(): void
+    {
+        $config = new TemplatorConfig();
+        $config->tokenCollection->upsert(new TokenDescriptor('{{', '}}', PrintToken::class));
     }
 }

@@ -25,10 +25,12 @@ class Branch
     /**
      * Создает новую ветвь блока.
      *
-     * @param string $directive имя ветви (например, 'else', 'elseif')
-     * @param string $arguments аргументы ветви (используется для условий в elseif)
+     * @param class-string $tokenClass класс токена
+     * @param string       $directive  имя ветви (например, 'else', 'elseif')
+     * @param string       $arguments  аргументы ветви (используется для условий в elseif)
      */
     public function __construct(
+        public readonly string $tokenClass,
         public readonly string $directive,
         public readonly string $arguments = '',
     ) {}

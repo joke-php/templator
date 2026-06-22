@@ -11,6 +11,8 @@ use Vasoft\Joke\Templator\Exceptions\CompileException;
 use Vasoft\Joke\Templator\Exceptions\RenderingException;
 use Vasoft\Joke\Templator\Handler\Node\BlockNodeHandler;
 use Vasoft\Joke\Templator\Handler\NodeHandler;
+use Vasoft\Joke\Templator\Lexer\StatementToken;
+use Vasoft\Joke\Templator\Lexer\TextToken;
 use Vasoft\Joke\Templator\Parser\Node\BlockNode;
 use Vasoft\Joke\Templator\Parser\Node\TextNode;
 use Vasoft\Joke\Templator\TemplatorConfig;
@@ -50,7 +52,7 @@ final class BlockNodeHandlerTest extends TestCase
             ->willReturn(self::$handler);
 
         $handler = new BlockNodeHandler($container, $config);
-        $result = $handler->compile(new BlockNode('test', ''), self::$processor, []);
+        $result = $handler->compile(new BlockNode(StatementToken::class, 'test', ''), self::$processor, []);
         self::assertSame('compiled', $result);
     }
 
@@ -69,7 +71,7 @@ final class BlockNodeHandlerTest extends TestCase
             ->willReturn(self::$handler);
 
         $handler = new BlockNodeHandler($container, $config);
-        $result = $handler->render(new BlockNode('test', ''), self::$processor, []);
+        $result = $handler->render(new BlockNode(StatementToken::class, 'test', ''), self::$processor, []);
         self::assertSame('rendered', $result);
     }
 
@@ -89,8 +91,8 @@ final class BlockNodeHandlerTest extends TestCase
 
         $handler = new BlockNodeHandler($container, $config);
         $config->addDirectiveHandler('test', BlockNodeHandler::class);
-        $handler->compile(new BlockNode('test', ''), self::$processor, []);
-        $result = $handler->compile(new BlockNode('test', ''), self::$processor, []);
+        $handler->compile(new BlockNode(StatementToken::class, 'test', ''), self::$processor, []);
+        $result = $handler->compile(new BlockNode(StatementToken::class, 'test', ''), self::$processor, []);
         self::assertSame('compiled', $result);
     }
 
@@ -110,7 +112,7 @@ final class BlockNodeHandlerTest extends TestCase
         self::expectExceptionMessage(
             'Expected instance of Vasoft\Joke\Templator\Parser\Node\BlockNode, got Vasoft\Joke\Templator\Parser\Node\TextNode.',
         );
-        $handler->render(new TextNode('test'), self::$processor, []);
+        $handler->render(new TextNode(TextToken::class, 'test'), self::$processor, []);
     }
 
     public function testCompileExceptionNodeType(): void
@@ -129,6 +131,6 @@ final class BlockNodeHandlerTest extends TestCase
         self::expectExceptionMessage(
             'Expected instance of Vasoft\Joke\Templator\Parser\Node\BlockNode, got Vasoft\Joke\Templator\Parser\Node\TextNode.',
         );
-        $handler->compile(new TextNode('test'), self::$processor, []);
+        $handler->compile(new TextNode(TextToken::class, 'test'), self::$processor, []);
     }
 }

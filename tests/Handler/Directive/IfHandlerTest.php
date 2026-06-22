@@ -12,6 +12,8 @@ use Vasoft\Joke\Templator\Contracts\NodeProcessorInterface;
 use Vasoft\Joke\Templator\Exceptions\CompileException;
 use Vasoft\Joke\Templator\Exceptions\RenderingException;
 use Vasoft\Joke\Templator\Handler\Directive\IfHandler;
+use Vasoft\Joke\Templator\Lexer\StatementToken;
+use Vasoft\Joke\Templator\Lexer\TextToken;
 use Vasoft\Joke\Templator\Parser\Node\BlockNode;
 use Vasoft\Joke\Templator\Parser\Node\TextNode;
 use Vasoft\Joke\Templator\Render\DefaultRenderer;
@@ -39,7 +41,7 @@ final class IfHandlerTest extends TestCase
     public function testCompileIfFromContext(): void
     {
         $handler = new IfHandler();
-        $node = new BlockNode('if', 'test');
+        $node = new BlockNode(StatementToken::class, 'if', 'test');
         $context = ['test' => true];
         self::assertSame(
             "<?php if((bool)(\$context['test'])): ?><?php endif; ?>",
@@ -50,7 +52,7 @@ final class IfHandlerTest extends TestCase
     public function testCompileIfFromLocal(): void
     {
         $handler = new IfHandler();
-        $node = new BlockNode('if', 'test');
+        $node = new BlockNode(StatementToken::class, 'if', 'test');
         $context = ['test' => true];
         self::assertSame(
             '<?php if((bool)($test)): ?><?php endif; ?>',
@@ -61,7 +63,7 @@ final class IfHandlerTest extends TestCase
     public function testCompileElseIfFromContext(): void
     {
         $handler = new IfHandler();
-        $node = new BlockNode('if', 'test');
+        $node = new BlockNode(StatementToken::class, 'if', 'test');
         $node->openBranch('elseif', 'test2');
         $context = [];
         self::assertSame(
@@ -73,7 +75,7 @@ final class IfHandlerTest extends TestCase
     public function testCompileElseIfFromLocal(): void
     {
         $handler = new IfHandler();
-        $node = new BlockNode('if', 'test');
+        $node = new BlockNode(StatementToken::class, 'if', 'test');
         $node->openBranch('elseif', 'test2');
         $context = [];
         self::assertSame(
@@ -94,14 +96,14 @@ final class IfHandlerTest extends TestCase
                 static fn(array $ast, array $context, array $localVars = []): string => $ast[0]->content,
             );
         $handler = new IfHandler();
-        $node = new BlockNode('if', 'test');
-        $node->addChild(new TextNode('if-branch'));
+        $node = new BlockNode(StatementToken::class, 'if', 'test');
+        $node->addChild(new TextNode(TextToken::class, 'if-branch'));
         $node->openBranch('elseif', 'test2');
-        $node->addChild(new TextNode('elseif-1-branch'));
+        $node->addChild(new TextNode(TextToken::class, 'elseif-1-branch'));
         $node->openBranch('elseif', 'test3');
-        $node->addChild(new TextNode('elseif-2-branch'));
+        $node->addChild(new TextNode(TextToken::class, 'elseif-2-branch'));
         $node->openBranch('else');
-        $node->addChild(new TextNode('else-branch'));
+        $node->addChild(new TextNode(TextToken::class, 'else-branch'));
         $context = [];
         self::assertSame(
             '<?php if((bool)($test)): ?>if-branch<?php elseif((bool)($test2)): ?>elseif-1-branch<?php elseif((bool)($context[\'test3\'])): ?>elseif-2-branch<?php else: ?>else-branch<?php endif; ?>',
@@ -112,7 +114,7 @@ final class IfHandlerTest extends TestCase
     public function testCompileException(): void
     {
         $handler = new IfHandler();
-        $node = new TextNode('test');
+        $node = new TextNode(TextToken::class, 'test');
         self::expectException(CompileException::class);
         self::expectExceptionMessage(
             'Expected instance of BlockNode, got Vasoft\Joke\Templator\Parser\Node\TextNode.',
@@ -123,7 +125,7 @@ final class IfHandlerTest extends TestCase
     public function testCompileIfWithoutExpressionException(): void
     {
         $handler = new IfHandler();
-        $node = new BlockNode('if', '');
+        $node = new BlockNode(StatementToken::class, 'if', '');
         self::expectException(CompileException::class);
         self::expectExceptionMessage('Directive \'if\' with no arguments.');
         $handler->compile($node, self::$compiler, []);
@@ -132,7 +134,7 @@ final class IfHandlerTest extends TestCase
     public function testCompileElseIfWithoutExpressionException(): void
     {
         $handler = new IfHandler();
-        $node = new BlockNode('if', 'test');
+        $node = new BlockNode(StatementToken::class, 'if', 'test');
         $node->openBranch('elseif');
         self::expectException(CompileException::class);
         self::expectExceptionMessage('Directive \'elseif\' with no arguments.');
@@ -147,7 +149,7 @@ final class IfHandlerTest extends TestCase
             ->getMock();
         $renderer->expects(self::never())->method('process');
         $handler = new IfHandler();
-        $node = new BlockNode('if', 'test1');
+        $node = new BlockNode(StatementToken::class, 'if', 'test1');
         $context = ['test1' => false];
         self::assertSame('', $handler->render($node, $renderer, $context));
     }
@@ -165,14 +167,14 @@ final class IfHandlerTest extends TestCase
                 static fn(array $ast, array $context, array $localVars = []): string => $ast[0]->content,
             );
         $handler = new IfHandler();
-        $node = new BlockNode('if', 'test1');
-        $node->addChild(new TextNode('if-branch'));
+        $node = new BlockNode(StatementToken::class, 'if', 'test1');
+        $node->addChild(new TextNode(TextToken::class, 'if-branch'));
         $node->openBranch('elseif', 'test2');
-        $node->addChild(new TextNode('elseif-1-branch'));
+        $node->addChild(new TextNode(TextToken::class, 'elseif-1-branch'));
         $node->openBranch('elseif', 'test3');
-        $node->addChild(new TextNode('elseif-2-branch'));
+        $node->addChild(new TextNode(TextToken::class, 'elseif-2-branch'));
         $node->openBranch('else');
-        $node->addChild(new TextNode('else-branch'));
+        $node->addChild(new TextNode(TextToken::class, 'else-branch'));
         $context = ['test1' => $test1, 'test2' => $test2, 'test3' => $test3];
         self::assertSame($expected, $handler->render($node, $renderer, $context));
     }
@@ -188,7 +190,7 @@ final class IfHandlerTest extends TestCase
     public function testRenderException(): void
     {
         $handler = new IfHandler();
-        $node = new TextNode('test');
+        $node = new TextNode(TextToken::class, 'test');
         self::expectException(RenderingException::class);
         self::expectExceptionMessage(
             'Expected instance of BlockNode, got Vasoft\Joke\Templator\Parser\Node\TextNode.',
@@ -199,7 +201,7 @@ final class IfHandlerTest extends TestCase
     public function testRenderIfWithoutExpressionException(): void
     {
         $handler = new IfHandler();
-        $node = new BlockNode('if', '');
+        $node = new BlockNode(StatementToken::class, 'if', '');
         self::expectException(RenderingException::class);
         self::expectExceptionMessage('Directive \'if\' with no arguments.');
         $handler->render($node, self::$compiler, []);
@@ -208,7 +210,7 @@ final class IfHandlerTest extends TestCase
     public function testRenderElseIfWithoutExpressionException(): void
     {
         $handler = new IfHandler();
-        $node = new BlockNode('if', 'test');
+        $node = new BlockNode(StatementToken::class, 'if', 'test');
         $node->openBranch('elseif');
         self::expectException(RenderingException::class);
         self::expectExceptionMessage('Directive \'elseif\' with no arguments.');

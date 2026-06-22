@@ -12,7 +12,8 @@ use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
 class PrintNode implements NodeInterface
 {
     /**
-     * @param string $content Переменная для вывода
+     * @param class-string $tokenClass класс токена
+     * @param string       $content    Переменная для вывода
      */
-    public function __construct(public string $content) {}
+    public function __construct(public readonly string $tokenClass, public string $content) {}
 }
