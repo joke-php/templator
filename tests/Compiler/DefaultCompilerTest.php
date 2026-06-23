@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Vasoft\Joke\Templator\Tests\Compiler;
 
 use Vasoft\Joke\Templator\Compiler\DefaultCompiler;
-use Vasoft\Joke\Templator\Lexer\PrintToken;
-use Vasoft\Joke\Templator\Lexer\TokenDescriptor;
-use Vasoft\Joke\Templator\TemplatorConfig;
 use Vasoft\Joke\Templator\Tests\ProcessorTestBase;
 
 /**

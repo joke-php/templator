@@ -16,6 +16,9 @@ namespace Vasoft\Joke\Templator\Contracts\Parser;
  */
 interface NodeInterface
 {
+    /**
+     * @var class-string
+     */
     public string $tokenClass {
         get;
     }
