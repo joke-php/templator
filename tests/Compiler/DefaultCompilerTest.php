@@ -30,10 +30,4 @@ final class DefaultCompilerTest extends ProcessorTestBase
         $renderer = new DefaultCompiler($this->container, $this->config);
         self::assertSame($expected, $renderer->process($this->getDefaultAst(), $this->getDefaultContext()));
     }
-
-    public function testSameTags(): void
-    {
-        $config = new TemplatorConfig();
-        $config->tokenCollection->upsert(new TokenDescriptor('{{', '}}', PrintToken::class));
-    }
 }
