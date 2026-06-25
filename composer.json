@@ -7,7 +7,7 @@
   "prefer-stable": true,
   "require": {
     "php": "^8.5",
-    "voral/joke": "^1.3"
+    "voral/joke": "^1.4"
   },
   "require-dev": {
     "voral/version-increment": "^3.2",
