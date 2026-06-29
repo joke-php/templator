@@ -14,7 +14,7 @@ $router->get(
         ob_start();
         $context =  ['name' => 'alex', 'extend' => false, 'status' => ['named' => 10]];
         $engine = new \Vasoft\Joke\Templator\TemplateEngine($container);
-        $content = $engine->renderString(
+        $content = $engine->compileString(
             "{{name}} - {%if extend%}test1{%else%}test2{%endif%} 
             {{status.named}}",
             $context

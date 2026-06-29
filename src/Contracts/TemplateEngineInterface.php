@@ -15,26 +15,36 @@ use Vasoft\Joke\Templator\Exceptions\TemplatorException;
 interface TemplateEngineInterface
 {
     /**
-     * Рендерит шаблон, переданный в виде строки.
+     * Компилирует шаблон, переданный в виде строки.
      *
      * @param string               $template исходный код шаблона
      * @param array<string, mixed> $context  ассоциативный массив данных, доступных в шаблоне
      *
-     * @return string готовый отрендеренный HTML-код
+     * @return string скомпилированный PHP код
      *
      * @throws TemplatorException если возникла ошибка рендеринга
      */
-    public function renderString(string $template, array $context): string;
+    public function compileString(string $template, array $context): string;
 
     /**
-     * Рендерит шаблон из указанного файла.
+     * Компилирует шаблон из указанного файла.
      *
      * @param string               $path    абсолютный или относительный путь к файлу шаблона
      * @param array<string, mixed> $context ассоциативный массив данных, доступных в шаблоне
      *
-     * @return string готовый отрендеренный HTML-код
+     * @return string скомпилированный PHP код
      *
      * @throws TemplatorException если файл не найден, недоступен для чтения или произошла ошибка рендеринга
      */
-    public function renderFile(string $path, array $context): string;
+    public function compileFile(string $path, array $context): string;
+
+    /**
+     * Подключает файл. Если нет скомпилированного - предварительно компилирует
+     *
+     * @param array<string, mixed> $context ассоциативный массив данных, доступных в шаблоне
+     * @param int                  $ttl     Время жизни кэша в секундах
+     *
+     * @throws TemplatorException если файл не найден, недоступен для чтения или произошла ошибка рендеринга
+     */
+    public function includeFile(string $file, array $context, int $ttl): void;
 }
