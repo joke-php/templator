@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Vasoft\Joke\Templator\Tests\Lexer;
 
+use Vasoft\Joke\Container\ServiceContainer;
 use Vasoft\Joke\Templator\Exceptions\LexerException;
 use Vasoft\Joke\Templator\Lexer\DefaultLexer;
 use PHPUnit\Framework\TestCase;
@@ -12,6 +13,7 @@ use Vasoft\Joke\Templator\Lexer\StatementToken;
 use Vasoft\Joke\Templator\Lexer\TextToken;
 use Vasoft\Joke\Templator\Lexer\TokenDescriptor;
 use Vasoft\Joke\Templator\TemplatorConfig;
+use Vasoft\Joke\Templator\TemplatorProvider;
 
 /**
  * @internal
@@ -20,6 +22,17 @@ use Vasoft\Joke\Templator\TemplatorConfig;
  */
 final class DefaultLexerTest extends TestCase
 {
+    private static TemplatorConfig $config;
+
+    public static function setUpBeforeClass(): void
+    {
+        $container = new ServiceContainer();
+        self::$config = new TemplatorConfig();
+        $container->registerSingleton(TemplatorConfig::class, self::$config);
+        $provider = new TemplatorProvider($container);
+        $provider->boot();
+    }
+
     public function testLexer(): void
     {
         $template = <<<'HTML'
@@ -28,7 +41,7 @@ final class DefaultLexerTest extends TestCase
             {% each items as item %}
                 {{item}}{%endeach%}
             HTML;
-        $lexer = new DefaultLexer(new TemplatorConfig());
+        $lexer = new DefaultLexer(self::$config);
         $list = $lexer->tokenize($template);
 
         self::assertCount(6, $list);
@@ -66,7 +79,7 @@ final class DefaultLexerTest extends TestCase
     public function testUnclosedException(): void
     {
         $template = '{{test';
-        $lexer = new DefaultLexer(new TemplatorConfig());
+        $lexer = new DefaultLexer(self::$config);
         self::expectException(LexerException::class);
         self::expectExceptionMessage('Unclosed tag "{{" found at position 1:1.');
         $lexer->tokenize($template);
@@ -75,7 +88,7 @@ final class DefaultLexerTest extends TestCase
     public function testNewLineInTag(): void
     {
         $template = "{%foreach lines\n as line %}\n{{test";
-        $lexer = new DefaultLexer(new TemplatorConfig());
+        $lexer = new DefaultLexer(self::$config);
         self::expectException(LexerException::class);
         self::expectExceptionMessage('Unclosed tag "{{" found at position 3:1.');
         $lexer->tokenize($template);
@@ -84,7 +97,7 @@ final class DefaultLexerTest extends TestCase
     public function testPlainText(): void
     {
         $template = 'Single text';
-        $lexer = new DefaultLexer(new TemplatorConfig());
+        $lexer = new DefaultLexer(self::$config);
         $list = $lexer->tokenize($template);
         self::assertCount(1, $list);
         self::assertInstanceOf(TextToken::class, $list[0]);
@@ -94,6 +107,11 @@ final class DefaultLexerTest extends TestCase
     public function testTokenizeWithDifferentTagLengths(): void
     {
         $config = new TemplatorConfig();
+        $container = new ServiceContainer();
+        $container->registerSingleton(TemplatorConfig::class, $config);
+        $provider = new TemplatorProvider($container);
+        $provider->boot();
+
         $config->tokenCollection->upsert(
             new TokenDescriptor(
                 '[[',

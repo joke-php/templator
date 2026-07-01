@@ -14,6 +14,7 @@ use Vasoft\Joke\Templator\Parser\Node\BlockNode;
 use Vasoft\Joke\Templator\Parser\Node\PrintNode;
 use Vasoft\Joke\Templator\Parser\Node\TextNode;
 use Vasoft\Joke\Templator\TemplatorConfig;
+use Vasoft\Joke\Templator\TemplatorProvider;
 
 /**
  * @internal
@@ -28,6 +29,9 @@ abstract class ProcessorTestBase extends TestCase
     {
         $this->config = new TemplatorConfig();
         $this->container = new ServiceContainer();
+        $this->container->registerSingleton(TemplatorConfig::class, $this->config);
+        $provider = new TemplatorProvider($this->container);
+        $provider->boot();
         $this->container->registerSingleton(TemplatorConfig::class, $this->config);
     }
 

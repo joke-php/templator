@@ -11,19 +11,6 @@ use Vasoft\Joke\Templator\Container\TokenCollection;
 use Vasoft\Joke\Templator\Contracts\Handler\NodeHandlerInterface;
 use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
 use Vasoft\Joke\Templator\Exceptions\TemplatorException;
-use Vasoft\Joke\Templator\Handler\Directive\EachHandler;
-use Vasoft\Joke\Templator\Handler\Directive\IfHandler;
-use Vasoft\Joke\Templator\Handler\Node\BlockNodeHandler;
-use Vasoft\Joke\Templator\Handler\Node\PrintNodeHandler;
-use Vasoft\Joke\Templator\Handler\Node\StatementNodeHandler;
-use Vasoft\Joke\Templator\Handler\Node\TextNodeHandler;
-use Vasoft\Joke\Templator\Handler\Statement\CsrfHandler;
-use Vasoft\Joke\Templator\Lexer\PrintToken;
-use Vasoft\Joke\Templator\Lexer\StatementToken;
-use Vasoft\Joke\Templator\Lexer\TokenDescriptor;
-use Vasoft\Joke\Templator\Parser\Node\BlockNode;
-use Vasoft\Joke\Templator\Parser\Node\PrintNode;
-use Vasoft\Joke\Templator\Parser\Node\StatementNode;
 use Vasoft\Joke\Templator\Parser\Node\TextNode;
 
 /**
@@ -70,35 +57,6 @@ class TemplatorConfig extends AbstractConfig
     {
         $this->tokenCollection = new TokenCollection();
         $this->directiveCollection = new DirectiveCollection();
-        $this->initDefaults();
-    }
-
-    /**
-     * Регистрирует стандартные токены, узлы и директивы шаблонизатора.
-     *
-     * Вызывается в конструкторе для настройки базовой функциональности.
-     * Может быть переопределен в наследниках для изменения поведения по умолчанию.
-     *
-     * @todo Добавить в ноду информацию о классе токена и связать обработчики директив с классом токена
-     *       для разрешения возможных коллизий имен директив в разных типах токенов.
-     */
-    protected function initDefaults(): void
-    {
-        $this->tokenCollection->upsert(new TokenDescriptor('{{', '}}', PrintToken::class));
-        $this->tokenCollection->upsert(new TokenDescriptor('{%', '%}', StatementToken::class));
-
-        $this->addNodeHandler(TextNode::class, TextNodeHandler::class);
-        $this->addNodeHandler(PrintNode::class, PrintNodeHandler::class);
-        $this->addNodeHandler(BlockNode::class, BlockNodeHandler::class);
-        $this->addNodeHandler(StatementNode::class, StatementNodeHandler::class);
-
-        $this->directiveCollection->upsert(StatementToken::class, 'if', '/if', ['else', 'elseif']);
-        $this->directiveCollection->upsert(StatementToken::class, 'foreach', '/foreach');
-        $this->directiveCollection->upsert(StatementToken::class, 'csrf');
-
-        $this->addDirectiveHandler('if', IfHandler::class);
-        $this->addDirectiveHandler('foreach', EachHandler::class);
-        $this->addDirectiveHandler('csrf', CsrfHandler::class);
     }
 
     /**

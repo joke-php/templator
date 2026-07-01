@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Vasoft\Joke\Templator\Tests\Parser;
 
 use PHPUnit\Framework\TestCase;
+use Vasoft\Joke\Container\ServiceContainer;
 use Vasoft\Joke\Templator\Exceptions\ParserException;
 use Vasoft\Joke\Templator\Lexer\PrintToken;
 use Vasoft\Joke\Templator\Lexer\StatementToken;
@@ -16,6 +17,7 @@ use Vasoft\Joke\Templator\Parser\Node\PrintNode;
 use Vasoft\Joke\Templator\Parser\Node\StatementNode;
 use Vasoft\Joke\Templator\Parser\Node\TextNode;
 use Vasoft\Joke\Templator\TemplatorConfig;
+use Vasoft\Joke\Templator\TemplatorProvider;
 
 /**
  * @internal
@@ -24,6 +26,17 @@ use Vasoft\Joke\Templator\TemplatorConfig;
  */
 final class DefaultParserTest extends TestCase
 {
+    private static TemplatorConfig $config;
+
+    public static function setUpBeforeClass(): void
+    {
+        $container = new ServiceContainer();
+        self::$config = new TemplatorConfig();
+        $container->registerSingleton(TemplatorConfig::class, self::$config);
+        $provider = new TemplatorProvider($container);
+        $provider->boot();
+    }
+
     public function testParse(): void
     {
         $tokens = [
@@ -37,7 +50,7 @@ final class DefaultParserTest extends TestCase
             new StatementToken('csrf', 8, 1),
         ];
 
-        $ast = new DefaultParser(new TemplatorConfig())->parse($tokens);
+        $ast = new DefaultParser(self::$config)->parse($tokens);
 
         self::assertCount(4, $ast);
         self::assertInstanceOf(PrintNode::class, $ast[0]);
@@ -72,7 +85,7 @@ final class DefaultParserTest extends TestCase
         ];
         self::expectException(ParserException::class);
         self::expectExceptionMessage("Unclosed tag(s): 'if, if'.");
-        new DefaultParser(new TemplatorConfig())->parse($tokens);
+        new DefaultParser(self::$config)->parse($tokens);
     }
 
     public function testUnexpectedEnd(): void
@@ -82,7 +95,7 @@ final class DefaultParserTest extends TestCase
         ];
         self::expectException(ParserException::class);
         self::expectExceptionMessage("Unexpected end tag: '/if' (10:11).");
-        new DefaultParser(new TemplatorConfig())->parse($tokens);
+        new DefaultParser(self::$config)->parse($tokens);
     }
 
     public function testMismatchedTag(): void
@@ -93,7 +106,7 @@ final class DefaultParserTest extends TestCase
         ];
         self::expectException(ParserException::class);
         self::expectExceptionMessage("Mismatched block: expected end of 'if', got '/foreach' (18:4)");
-        new DefaultParser(new TemplatorConfig())->parse($tokens);
+        new DefaultParser(self::$config)->parse($tokens);
     }
 
     public function testUnexpectedBranch(): void
@@ -105,7 +118,7 @@ final class DefaultParserTest extends TestCase
         ];
         self::expectException(ParserException::class);
         self::expectExceptionMessage("Unexpected branch 'elseif' (1:40).");
-        new DefaultParser(new TemplatorConfig())->parse($tokens);
+        new DefaultParser(self::$config)->parse($tokens);
     }
 
     public function testUnknownDirective(): void
@@ -115,7 +128,7 @@ final class DefaultParserTest extends TestCase
         ];
         self::expectException(ParserException::class);
         self::expectExceptionMessage("Unknown directive: 'dir-unknown' (5:1).");
-        new DefaultParser(new TemplatorConfig())->parse($tokens);
+        new DefaultParser(self::$config)->parse($tokens);
     }
 
     public function testUnexpectedBranchOutside(): void
@@ -125,6 +138,6 @@ final class DefaultParserTest extends TestCase
         ];
         self::expectException(ParserException::class);
         self::expectExceptionMessage("Unexpected branch 'elseif' (7:1).");
-        new DefaultParser(new TemplatorConfig())->parse($tokens);
+        new DefaultParser(self::$config)->parse($tokens);
     }
 }
