@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e947b2b01c752fb15841bb6a454b9430",
+    "content-hash": "080828930fb9e5949266787c8982f445",
     "packages": [
         {
             "name": "voral/joke",
-            "version": "1.4.0",
+            "version": "dev-next",
             "source": {
                 "type": "git",
                 "url": "https://github.com/joke-php/joke.git",
-                "reference": "8b51829e0157c56deadeed348c8b4cc71fc32fd5"
+                "reference": "43f3992cdcb2c2a002117f5a915b2764ed276e6e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/joke-php/joke/zipball/8b51829e0157c56deadeed348c8b4cc71fc32fd5",
-                "reference": "8b51829e0157c56deadeed348c8b4cc71fc32fd5",
+                "url": "https://api.github.com/repos/joke-php/joke/zipball/43f3992cdcb2c2a002117f5a915b2764ed276e6e",
+                "reference": "43f3992cdcb2c2a002117f5a915b2764ed276e6e",
                 "shasum": ""
             },
             "require": {
@@ -52,9 +52,9 @@
             "description": "A minimal PHP microframework with manual routing and dependency injection container.",
             "support": {
                 "issues": "https://github.com/joke-php/joke/issues",
-                "source": "https://github.com/joke-php/joke/tree/v1.4.0"
+                "source": "https://github.com/joke-php/joke/tree/next"
             },
-            "time": "2026-06-24T07:23:36+00:00"
+            "time": "2026-07-03T05:07:52+00:00"
         }
     ],
     "packages-dev": [
@@ -5137,7 +5137,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {},
+    "stability-flags": {
+        "voral/joke": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
