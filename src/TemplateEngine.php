@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Vasoft\Joke\Templator;
 
+use Vasoft\Joke\Application\FileSystem;
 use Vasoft\Joke\Cache\FileRelatedCache;
-use Vasoft\Joke\Config\Environment;
 use Vasoft\Joke\Container\Exceptions\ContainerException;
 use Vasoft\Joke\Container\Exceptions\ParameterResolveException;
 use Vasoft\Joke\Container\ServiceContainer;
@@ -31,6 +31,7 @@ class TemplateEngine implements TemplateEngineInterface
      * Формируется автоматически на основе базового пути окружения.
      */
     private string $cachePath;
+    private FileSystem $fs;
 
     /**
      * Создает экземпляр движка шаблонизатора.
@@ -42,9 +43,8 @@ class TemplateEngine implements TemplateEngineInterface
      */
     public function __construct(private readonly ServiceContainer $container)
     {
-        /** @var Environment $env */
-        $env = $this->container->get('env');
-        $this->cachePath = $env->getBasePath() . '/var/cache/templator/';
+        $this->fs = $this->container->get('paths');
+        $this->cachePath = $this->fs->atCache('templator');
     }
 
     /**
@@ -100,9 +100,12 @@ class TemplateEngine implements TemplateEngineInterface
      */
     public function includeFile(string $file, array $context, int $ttl = 86400): void
     {
-        $cache = new FileRelatedCache($this->cachePath, $file, $ttl);
+        $normalized = $this->fs->normalizeFile($file);
+        $this->fs->validatePath($normalized);
+
+        $cache = new FileRelatedCache($this->cachePath, $normalized, $ttl);
         if (!$cache->exists()) {
-            $compiled = $this->compileFile($file, $context);
+            $compiled = $this->compileFile($normalized, $context);
             $cache->set($compiled);
         }
         $templateEngine = $this;
@@ -124,10 +127,13 @@ class TemplateEngine implements TemplateEngineInterface
      */
     public function compileFile(string $path, array $context): string
     {
-        if (!file_exists($path)) {
+        $normalized = $this->fs->normalizeFile($path);
+        $this->fs->validatePath($normalized);
+
+        if (!file_exists($normalized)) {
             throw new TemplatorException("Template file not found: {$path}.");
         }
-        $template = file_get_contents($path);
+        $template = file_get_contents($normalized);
         if (false === $template) {
             throw new TemplatorException("Unable to read template file: {$path}.");
         }

@@ -7,6 +7,7 @@ namespace Vasoft\Joke\Templator\Tests;
 use phpmock\phpunit\PHPMock;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\MockObject\Stub;
+use Vasoft\Joke\Application\FileSystem;
 use Vasoft\Joke\Config\Environment;
 use Vasoft\Joke\Container\ServiceContainer;
 use Vasoft\Joke\Templator\Contracts\LexerInterface;
@@ -174,6 +175,7 @@ final class TemplateEngineTest extends TestCase
             return [];
         });
         $this->container->registerSingleton(LexerInterface::class, $lexer);
+        $this->container->registerSingleton('paths', new FileSystem(self::$cachePath));
 
         $parser = self::getStubBuilder(ParserInterface::class)
             ->disableOriginalConstructor()
