@@ -9,6 +9,7 @@ use Vasoft\Joke\Cache\FileRelatedCache;
 use Vasoft\Joke\Container\Exceptions\ContainerException;
 use Vasoft\Joke\Container\Exceptions\ParameterResolveException;
 use Vasoft\Joke\Container\ServiceContainer;
+use Vasoft\Joke\Exceptions\FileSystemException;
 use Vasoft\Joke\Templator\Contracts\LexerInterface;
 use Vasoft\Joke\Templator\Contracts\NodeProcessorInterface;
 use Vasoft\Joke\Templator\Contracts\Parser\ParserInterface;
@@ -31,10 +32,27 @@ class TemplateEngine implements TemplateEngineInterface
      * Формируется автоматически на основе базового пути окружения.
      */
     private string $cachePath;
+    /**
+     * Сервис файловой системы для работы с путями.
+     */
     private FileSystem $fs;
+    /**
+     * Путь к директории активного шаблона сайта (темы).
+     * Изменяется через setTemplate(). Используется для поиска файлов шаблонов.
+     */
+    private string $templatePath;
+    /**
+     * Путь к директории макетов (layouts) активного шаблона сайта.
+     * Изменяется через setTemplate().
+     */
+    private string $layoutsPath;
+    public private(set) string $templateName {
+        get => $this->templateName;
+    }
 
     /**
      * Создает экземпляр движка шаблонизатора.
+     * Инициализирует файловую систему, путь к кэшу и устанавливает шаблон 'default'.
      *
      * @param ServiceContainer $container контейнер зависимостей для получения сервисов шаблонизатора
      *
@@ -45,6 +63,28 @@ class TemplateEngine implements TemplateEngineInterface
     {
         $this->fs = $this->container->get('paths');
         $this->cachePath = $this->fs->atCache('templator');
+        $this->setTemplate('default');
+    }
+
+    /**
+     * Переключает активный шаблон сайта.
+     *
+     * Обновляет базовый путь к шаблонам и путь к каркасам.
+     * Все последующие вызовы includeFile() и compileFile() будут искать файлы
+     * относительно нового шаблона.
+     *
+     * Структура директорий шаблона:
+     *   templates/{templateName}/          — файлы шаблонов
+     *   templates/{templateName}/layouts/  — каркасы
+     *
+     * @param string $templateName имя шаблона (соответствует имени поддиректории в templates/)
+     */
+    public function setTemplate(string $templateName): static
+    {
+        $this->templateName = $templateName;
+        $this->templatePath = $this->fs->atBase('templates/' . $templateName);
+        $this->layoutsPath = $this->fs->atBase('templates/' . $templateName . '/layouts');
+        return $this;
     }
 
     /**
@@ -123,7 +163,8 @@ class TemplateEngine implements TemplateEngineInterface
      *
      * @return string скомпилированный PHP-код
      *
-     * @throws TemplatorException если файл не существует, недоступен для чтения или ошибка компиляции
+     * @throws TemplatorException  если файл не существует, недоступен для чтения или ошибка компиляции
+     * @throws FileSystemException
      */
     public function compileFile(string $path, array $context): string
     {

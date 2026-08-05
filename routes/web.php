@@ -7,13 +7,14 @@ use Vasoft\Joke\Http\Response\HtmlPageResponse;
 use Vasoft\Joke\Http\Response\ResponseStatus;
 use Vasoft\Joke\Routing\Router;
 use Vasoft\Joke\Templator\TemplateEngine;
+use Vasoft\Joke\Templator\TemplatedResponse;
 
 /**
  * @var Router $router
  */
 $router->get(
     '/',
-    static function (ServiceContainer $container, TemplateEngine $engine) {
+    static function (ServiceContainer $container) {
         ob_start();
         $context = ['name' => 'alex', 'extend' => false, 'status' => ['named' => 10]];
         $engine = new TemplateEngine($container);
@@ -30,6 +31,13 @@ $router->get(
             ResponseStatus::NOT_FOUND,
         )
             ->setBody('<pre>' . $test . '</pre>');
+    },
+);
+$router->get(
+    '/v2',
+    static function (ServiceContainer $container, TemplateEngine $engine) {
+        $context = ['name' => 'alex', 'extend' => false, 'status' => ['named' => 10]];
+        return new TemplatedResponse($container, $engine)->show('pages/index.php', $context);
     },
 );
 
