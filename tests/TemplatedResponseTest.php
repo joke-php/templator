@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Vasoft\Joke\Templator\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use Vasoft\Joke\Application\FileSystem;
+use Vasoft\Joke\Support\FileSystem;
 use Vasoft\Joke\Config\Environment;
 use Vasoft\Joke\Container\ServiceContainer;
 use Vasoft\Joke\Http\Cookies\CookieConfig;

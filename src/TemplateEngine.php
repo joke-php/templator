@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Vasoft\Joke\Templator;
 
-use Vasoft\Joke\Application\FileSystem;
+use Vasoft\Joke\Support\FileSystem;
 use Vasoft\Joke\Cache\FileRelatedCache;
 use Vasoft\Joke\Container\Exceptions\ContainerException;
 use Vasoft\Joke\Container\Exceptions\ParameterResolveException;
@@ -84,6 +84,29 @@ class TemplateEngine implements TemplateEngineInterface
         $this->templateName = $templateName;
         $this->templatePath = $this->fs->atBase('templates/' . $templateName);
         $this->layoutsPath = $this->fs->atBase('templates/' . $templateName . '/layouts');
+        $this->templatePath = $this->fs->normalizeDir($this->templatePath);
+        $this->layoutsPath = $this->fs->normalizeDir($this->layoutsPath);
+
+        return $this;
+    }
+
+    /**
+     * Подключение файлы конфигурации сайта.
+     *
+     * @params array<string,mixed> Переменные для передачи в контекст файла
+     *
+     * @return $this
+     *
+     * @throws FileSystemException
+     */
+    public function includeSiteTemplateConfig(array $vars = []): static
+    {
+        $vars['engine'] = $this;
+        $vars['container'] = $this->container;
+        $vars['templatePath'] = $this->templatePath;
+        $configFileName = $this->fs->normalizeFile($this->templatePath . '/config.php');
+        $this->fs->includeFileOnce($configFileName, $vars);
+
         return $this;
     }
 

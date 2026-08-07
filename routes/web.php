@@ -9,36 +9,20 @@ use Vasoft\Joke\Routing\Router;
 use Vasoft\Joke\Templator\TemplateEngine;
 use Vasoft\Joke\Templator\TemplatedResponse;
 
+$context = ['name' => 'alex', 'extend' => false, 'status' => ['named' => 10]];
 /**
  * @var Router $router
  */
 $router->get(
     '/',
-    static function (ServiceContainer $container) {
-        ob_start();
-        $context = ['name' => 'alex', 'extend' => false, 'status' => ['named' => 10]];
-        $engine = new TemplateEngine($container);
-        $content = $engine->compileString(
-            '{{name}} - {%if extend%}test1{%else%}test2{%/if%}
-            {{status.named}}',
-            $context,
-        );
-        file_put_contents('testik.php', $content);
-        require 'testik.php';
-        $test = ob_get_clean();
-
-        return new HtmlPageResponse($container)->setStatus(
-            ResponseStatus::NOT_FOUND,
-        )
-            ->setBody('<pre>' . $test . '</pre>');
-    },
+    static fn(ServiceContainer $container, TemplateEngine $engine) => new TemplatedResponse($container, $engine)->show(
+        'pages/index.php',
+        $context,
+    ),
 );
 $router->get(
-    '/v2',
-    static function (ServiceContainer $container, TemplateEngine $engine) {
-        $context = ['name' => 'alex', 'extend' => false, 'status' => ['named' => 10]];
-        return new TemplatedResponse($container, $engine)->show('pages/index.php', $context);
-    },
+    '/dark',
+    static fn(ServiceContainer $container, TemplateEngine $engine) => new TemplatedResponse($container, $engine, 'dark')->show('pages/index.php', $context),
 );
 
 $router->get(

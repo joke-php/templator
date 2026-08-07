@@ -76,4 +76,11 @@ class TemplatedResponse extends HtmlPageResponse
 
         return $this->setBody(ob_get_clean());
     }
+
+    public function getBody(): string
+    {
+        $this->engine->includeSiteTemplateConfig(['response' => $this]);
+
+        return parent::getBody();
+    }
 }
