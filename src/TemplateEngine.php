@@ -40,12 +40,12 @@ class TemplateEngine implements TemplateEngineInterface
      * Путь к директории активного шаблона сайта (темы).
      * Изменяется через setTemplate(). Используется для поиска файлов шаблонов.
      */
-    private string $templatePath;
+    public private(set) string $templatePath;
     /**
      * Путь к директории макетов (layouts) активного шаблона сайта.
      * Изменяется через setTemplate().
      */
-    private string $layoutsPath;
+    public private(set) string $layoutsPath;
     public private(set) string $templateName {
         get => $this->templateName;
     }
@@ -171,9 +171,11 @@ class TemplateEngine implements TemplateEngineInterface
             $compiled = $this->compileFile($normalized, $context);
             $cache->set($compiled);
         }
-        $templateEngine = $this;
-        $container = $this->container;
-        include $cache->path;
+        $this->fs->includeFile($cache->path, [
+            'engine' => $this,
+            'container' => $this->container,
+            'context' => $context,
+        ]);
     }
 
     /**

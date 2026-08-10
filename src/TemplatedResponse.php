@@ -69,10 +69,10 @@ class TemplatedResponse extends HtmlPageResponse
      *
      * @throws TemplatorException если файл не найден, путь небезопасен или ошибка компиляции/рендеринга
      */
-    public function show(string $fileName, array $context = []): self
+    public function show(string $fileName, array $context = [], int $ttl = 86400): self
     {
         ob_start();
-        $this->engine->includeFile($fileName, $context);
+        $this->engine->includeFile($fileName, $context, $ttl);
 
         return $this->setBody(ob_get_clean());
     }

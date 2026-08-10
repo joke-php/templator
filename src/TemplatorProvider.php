@@ -14,11 +14,13 @@ use Vasoft\Joke\Templator\Contracts\LexerInterface;
 use Vasoft\Joke\Templator\Contracts\Parser\ParserInterface;
 use Vasoft\Joke\Templator\Handler\Directive\EachHandler;
 use Vasoft\Joke\Templator\Handler\Directive\IfHandler;
+use Vasoft\Joke\Templator\Handler\Directive\LayoutHandler;
 use Vasoft\Joke\Templator\Handler\Node\BlockNodeHandler;
 use Vasoft\Joke\Templator\Handler\Node\PrintNodeHandler;
 use Vasoft\Joke\Templator\Handler\Node\StatementNodeHandler;
 use Vasoft\Joke\Templator\Handler\Node\TextNodeHandler;
 use Vasoft\Joke\Templator\Handler\Statement\CsrfHandler;
+use Vasoft\Joke\Templator\Handler\Statement\RawHandler;
 use Vasoft\Joke\Templator\Lexer\DefaultLexer;
 use Vasoft\Joke\Templator\Lexer\PrintToken;
 use Vasoft\Joke\Templator\Lexer\StatementToken;
@@ -116,10 +118,14 @@ class TemplatorProvider extends AbstractProvider implements ConfigurableServiceP
         $config->directiveCollection->upsert($stmt, 'if', '/if', ['else', 'elseif']);
         $config->directiveCollection->upsert($stmt, 'foreach', '/foreach');
         $config->directiveCollection->upsert($stmt, 'csrf');
+        $config->directiveCollection->upsert($stmt, 'raw');
+        $config->directiveCollection->upsert($stmt, 'layout', '/layout');
 
         $config->addDirectiveHandler('if', IfHandler::class);
         $config->addDirectiveHandler('foreach', EachHandler::class);
         $config->addDirectiveHandler('csrf', CsrfHandler::class);
+        $config->addDirectiveHandler('raw', RawHandler::class);
+        $config->addDirectiveHandler('layout', LayoutHandler::class);
     }
 
     /**

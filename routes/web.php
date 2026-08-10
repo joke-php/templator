@@ -18,11 +18,16 @@ $router->get(
     static fn(ServiceContainer $container, TemplateEngine $engine) => new TemplatedResponse($container, $engine)->show(
         'pages/index.php',
         $context,
+        0,
     ),
 );
 $router->get(
     '/dark',
-    static fn(ServiceContainer $container, TemplateEngine $engine) => new TemplatedResponse($container, $engine, 'dark')->show('pages/index.php', $context),
+    static fn(ServiceContainer $container, TemplateEngine $engine) => new TemplatedResponse(
+        $container,
+        $engine,
+        'dark',
+    )->show('pages/index.php', $context, 0),
 );
 
 $router->get(
