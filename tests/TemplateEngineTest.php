@@ -6,6 +6,7 @@ namespace Vasoft\Joke\Templator\Tests;
 
 use phpmock\phpunit\PHPMock;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\MockObject\Stub;
 use Vasoft\Joke\Support\FileSystem;
 use Vasoft\Joke\Config\Environment;
@@ -32,6 +33,35 @@ final class TemplateEngineTest extends TestCase
     private string $lastTemplate = '';
     private array $lastContext = [];
     private string $compiled = '';
+    private static string $layoutPath = '';
+    private static string $defaultLayoutPath = '';
+
+    #[TestDox('Получение имени файла каркаса согласно иерархии наследования')]
+    public function testLayoutPath(): void
+    {
+        $engine = new TemplateEngine($this->container);
+        $engine->setTemplate('main');
+
+        self::assertSame(
+            self::$defaultLayoutPath . 'exists.php',
+            $engine->getLayoutPath('exists'),
+            'Не найден в шаблоне по умолчанию',
+        );
+        self::assertSame(
+            self::$layoutPath . 'main.php',
+            $engine->getLayoutPath('main'),
+            'Не найден в текущем шаблоне',
+        );
+    }
+
+    #[TestDox('Получение имени файла каркаса согласно иерархии наследования')]
+    public function testLayoutPathException(): void
+    {
+        $engine = new TemplateEngine($this->container);
+        self::expectException(TemplatorException::class);
+        self::expectExceptionMessageIs('Unable to locate layout file: unknown.');
+        $engine->getLayoutPath('unknown');
+    }
 
     public function testCompileFile(): void
     {
@@ -207,7 +237,12 @@ final class TemplateEngineTest extends TestCase
     private static function ensureTemporaryDir(): void
     {
         self::$cachePath = sys_get_temp_dir() . '/joke-template-engine-' . uniqid() . '/';
-        mkdir(self::$cachePath, 0o755, true);
+        self::$layoutPath = self::$cachePath . 'templates/main/layouts/';
+        self::$defaultLayoutPath = self::$cachePath . 'templates/default/layouts/';
+        mkdir(self::$cachePath . 'templates/main/layouts/', 0o755, true);
+        mkdir(self::$cachePath . 'templates/default/layouts/', 0o755, true);
+        file_put_contents(self::$layoutPath . 'main.php', '');
+        file_put_contents(self::$defaultLayoutPath . 'exists.php', '');
     }
 
     private static function clean(): void

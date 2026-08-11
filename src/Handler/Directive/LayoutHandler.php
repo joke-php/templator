@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Vasoft\Joke\Templator\Handler\Directive;
 
-use Vasoft\Joke\Support\FileSystem;
 use Vasoft\Joke\Templator\Contracts\NodeProcessorInterface;
 use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
 use Vasoft\Joke\Templator\Exceptions\CompileException;
@@ -38,11 +37,9 @@ class LayoutHandler extends NodeHandler
 {
     /**
      * @param TemplateEngine $engine Движок шаблонов
-     * @param FileSystem     $fs     Файловая система для безопасного разрешения путей каркасов
      */
     public function __construct(
         private readonly TemplateEngine $engine,
-        private readonly FileSystem $fs,
     ) {}
 
     /**
@@ -73,7 +70,8 @@ class LayoutHandler extends NodeHandler
             throw new CompileException($this->getErrorMessage('BlockNode', $node));
         }
         $layoutName = trim($node->arguments);
-        $filename = $this->fs->at($this->engine->layoutsPath, $layoutName . '.php');
+
+        $filename = $this->engine->getLayoutPath($layoutName);
 
         $innerPhpCode = $processor->process($node->children, $context, $localVars);
 

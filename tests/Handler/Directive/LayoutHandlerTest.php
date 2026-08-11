@@ -7,7 +7,6 @@ namespace Vasoft\Joke\Templator\Tests\Handler\Directive;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\MockObject\Stub;
-use Vasoft\Joke\Support\FileSystem;
 use Vasoft\Joke\Templator\Exceptions\CompileException;
 use Vasoft\Joke\Templator\Exceptions\RenderingException;
 use Vasoft\Joke\Templator\Handler\Directive\LayoutHandler;
@@ -29,7 +28,6 @@ final class LayoutHandlerTest extends TestCase
 {
     private static Stub|DefaultRenderer $renderer;
     private static Stub|TemplateEngine $engine;
-    private static Stub|FileSystem $fs;
 
     public static function setUpBeforeClass(): void
     {
@@ -43,18 +41,14 @@ final class LayoutHandlerTest extends TestCase
 
         $reflection = new \ReflectionProperty(TemplateEngine::class, 'layoutsPath');
         $reflection->setValue(self::$engine, '/layouts/');
-
-        self::$fs = self::getStubBuilder(FileSystem::class)
-            ->disableOriginalConstructor()
-            ->getStub();
     }
 
     #[TestDox('Компилирует код помещающий дочерние узлы в заданный каркас')]
     public function testCompile(): void
     {
-        $handler = new LayoutHandler(self::$engine, self::$fs);
+        $handler = new LayoutHandler(self::$engine);
         $node = new BlockNode(StatementToken::class, 'test', 'main');
-        self::$fs->method('at')->willReturn('/layouts/main.php');
+        self::$engine->method('getLayoutPath')->willReturn('/layouts/main.php');
         self::$renderer->method('process')->willReturn('<?=$content[\'test\']?>');
         $expected = <<<'PHP'
                 <?php
@@ -73,7 +67,7 @@ final class LayoutHandlerTest extends TestCase
     #[TestDox('Рендер выбрасывает исключение если получено не StatementNode')]
     public function testRenderException(): void
     {
-        $handler = new LayoutHandler(self::$engine, self::$fs);
+        $handler = new LayoutHandler(self::$engine);
         $node = new PrintNode(StatementToken::class, 'test');
         self::expectException(RenderingException::class);
         self::expectExceptionMessageIs('Not implemented yet.');
@@ -83,7 +77,7 @@ final class LayoutHandlerTest extends TestCase
     #[TestDox('Рендер выбрасывает исключение о нереализованном функционале')]
     public function testRenderExceptionNotImplement(): void
     {
-        $handler = new LayoutHandler(self::$engine, self::$fs);
+        $handler = new LayoutHandler(self::$engine);
         $node = new BlockNode(StatementToken::class, 'test', '');
         self::expectException(RenderingException::class);
         self::expectExceptionMessageIs('Not implemented yet.');
@@ -93,7 +87,7 @@ final class LayoutHandlerTest extends TestCase
     #[TestDox('Компиляция выбрасывает исключение если получено не BlockNode')]
     public function testCompileException(): void
     {
-        $handler = new LayoutHandler(self::$engine, self::$fs);
+        $handler = new LayoutHandler(self::$engine);
         $node = new PrintNode(StatementToken::class, 'test');
         self::expectException(CompileException::class);
         self::expectExceptionMessageIs(

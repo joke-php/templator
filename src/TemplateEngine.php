@@ -27,6 +27,8 @@ use Vasoft\Joke\Templator\Exceptions\TemplatorException;
  */
 class TemplateEngine implements TemplateEngineInterface
 {
+    /** @var non-empty-string Имя шаблона по умолчанию */
+    public const string DEFAULT_TEMPLATE = 'default';
     /**
      * Путь к директории кэша скомпилированных шаблонов.
      * Формируется автоматически на основе базового пути окружения.
@@ -43,8 +45,22 @@ class TemplateEngine implements TemplateEngineInterface
      * @var non-empty-string
      */
     public private(set) string $templatePath;
+
     /**
-     * Путь к директории макетов (layouts) активного шаблона сайта.
+     * Путь к директории шаблона сайта по умолчанию.
+     * Используется для поиска файлов шаблонов.
+     *
+     * @var non-empty-string
+     */
+    public readonly string $defaultTemplatePath;
+    /**
+     * Путь к директории каркасов (layouts) шаблона сайта по умолчанию.
+     *
+     * @var non-empty-string
+     */
+    public readonly string $defaultLayoutsPath;
+    /**
+     * Путь к директории каркасов (layouts) активного шаблона сайта.
      * Изменяется через setTemplate().
      *
      * @var non-empty-string
@@ -59,7 +75,7 @@ class TemplateEngine implements TemplateEngineInterface
 
     /**
      * Создает экземпляр движка шаблонизатора.
-     * Инициализирует файловую систему, путь к кэшу и устанавливает шаблон 'default'.
+     * Инициализирует файловую систему, путь к кэшу и устанавливает шаблон по умолчанию.
      *
      * @param ServiceContainer $container контейнер зависимостей для получения сервисов шаблонизатора
      *
@@ -72,7 +88,9 @@ class TemplateEngine implements TemplateEngineInterface
         $fs = $this->container->get('paths');
         $this->fs = $fs;
         $this->cachePath = $this->fs->atCache('templator');
-        $this->setTemplate('default');
+        $this->setTemplate(static::DEFAULT_TEMPLATE);
+        $this->defaultTemplatePath = $this->fs->atBase('templates/' . static::DEFAULT_TEMPLATE);
+        $this->defaultLayoutsPath = $this->fs->atBase('templates/' . static::DEFAULT_TEMPLATE . '/layouts');
     }
 
     /**
@@ -97,6 +115,35 @@ class TemplateEngine implements TemplateEngineInterface
         $this->layoutsPath = $this->fs->normalizeDir($this->layoutsPath);
 
         return $this;
+    }
+
+    /**
+     * Разрешает путь к файлу каркаса с поддержкой fallback-шаблона.
+     *
+     * Порядок поиска:
+     * 1. Активный шаблон: templates/{current}/layouts/{name}.php
+     * 2. Шаблон по умолчанию: templates/default/layouts/{name}.php {@see self::DEFAULT_TEMPLATE}
+     *
+     * @param non-empty-string $layoutName базовое имя каркаса
+     *
+     * @return non-empty-string путь к существующему файлу
+     *
+     * @throws TemplatorException при отсутствии файла во всех проверяемых локациях
+     */
+    public function getLayoutPath(string $layoutName): string
+    {
+        $fileName = $this->fs->at($this->layoutsPath, $layoutName . '.php');
+        if (file_exists($fileName)) {
+            return $fileName;
+        }
+        if ($this->templateName !== static::DEFAULT_TEMPLATE) {
+            $fileName = $this->fs->at($this->defaultLayoutsPath, $layoutName . '.php');
+            if (file_exists($fileName)) {
+                return $fileName;
+            }
+        }
+
+        throw new TemplatorException('Unable to locate layout file: ' . $layoutName . '.');
     }
 
     /**
