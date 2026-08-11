@@ -134,7 +134,7 @@ final class TemplateEngineTest extends TestCase
                 echo "Hi",PHP_EOL;
                 echo $context["testIncludeFile"],PHP_EOL;
                 echo spl_object_id($container), PHP_EOL;
-                echo spl_object_id($templateEngine), PHP_EOL;
+                echo spl_object_id($engine), PHP_EOL;
             PHP;
         $engine = new TemplateEngine($this->container);
         $containerId = spl_object_id($this->container);

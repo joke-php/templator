@@ -39,13 +39,20 @@ class TemplateEngine implements TemplateEngineInterface
     /**
      * Путь к директории активного шаблона сайта (темы).
      * Изменяется через setTemplate(). Используется для поиска файлов шаблонов.
+     *
+     * @var non-empty-string
      */
     public private(set) string $templatePath;
     /**
      * Путь к директории макетов (layouts) активного шаблона сайта.
      * Изменяется через setTemplate().
+     *
+     * @var non-empty-string
      */
     public private(set) string $layoutsPath;
+    /**
+     * @var non-empty-string
+     */
     public private(set) string $templateName {
         get => $this->templateName;
     }
@@ -61,7 +68,9 @@ class TemplateEngine implements TemplateEngineInterface
      */
     public function __construct(private readonly ServiceContainer $container)
     {
-        $this->fs = $this->container->get('paths');
+        /** @var FileSystem $fs */
+        $fs = $this->container->get('paths');
+        $this->fs = $fs;
         $this->cachePath = $this->fs->atCache('templator');
         $this->setTemplate('default');
     }
@@ -77,7 +86,7 @@ class TemplateEngine implements TemplateEngineInterface
      *   templates/{templateName}/          — файлы шаблонов
      *   templates/{templateName}/layouts/  — каркасы
      *
-     * @param string $templateName имя шаблона (соответствует имени поддиректории в templates/)
+     * @param non-empty-string $templateName имя шаблона (соответствует имени поддиректории в templates/)
      */
     public function setTemplate(string $templateName): static
     {
@@ -93,7 +102,7 @@ class TemplateEngine implements TemplateEngineInterface
     /**
      * Подключение файлы конфигурации сайта.
      *
-     * @params array<string,mixed> Переменные для передачи в контекст файла
+     * @param array<string,mixed> $vars Переменные для передачи в контекст файла
      *
      * @return $this
      *
@@ -155,7 +164,7 @@ class TemplateEngine implements TemplateEngineInterface
      * Важно: Внутри include доступны переменные $templateEngine и $container.
      * Скомпилированный шаблон должен использовать именно эти переменные для доступа к сервисам.
      *
-     * @param string              $file    путь к файлу шаблона
+     * @param non-empty-string    $file    путь к файлу шаблона
      * @param array<string,mixed> $context данные, передаваемые в шаблон (извлекаются через extract или напрямую)
      * @param int                 $ttl     время жизни кэша в секундах (по умолчанию 24 часа)
      *
@@ -183,7 +192,7 @@ class TemplateEngine implements TemplateEngineInterface
      *
      * Читает содержимое файла и делегирует компиляцию методу compileString().
      *
-     * @param string              $path    путь к файлу шаблона
+     * @param non-empty-string    $path    путь к файлу шаблона
      * @param array<string,mixed> $context данные контекста для компиляции
      *
      * @return string скомпилированный PHP-код

@@ -62,14 +62,12 @@ class TemplatedResponse extends HtmlPageResponse
      * Использует буферизацию вывода (ob_start/ob_get_clean) для перехвата
      * результата includeFile() и преобразования его в строку тела ответа.
      *
-     * @param string              $fileName путь к файлу шаблона (относительно текущего шаблона)
+     * @param non-empty-string    $fileName путь к файлу шаблона (относительно текущего шаблона)
      * @param array<string,mixed> $context  данные, передаваемые в шаблон
-     *
-     * @return $this для цепочки вызовов
      *
      * @throws TemplatorException если файл не найден, путь небезопасен или ошибка компиляции/рендеринга
      */
-    public function show(string $fileName, array $context = [], int $ttl = 86400): self
+    public function show(string $fileName, array $context = [], int $ttl = 86400): static
     {
         ob_start();
         $this->engine->includeFile($fileName, $context, $ttl);

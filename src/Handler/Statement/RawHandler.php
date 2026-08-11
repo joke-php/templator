@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Vasoft\Joke\Templator\Handler\Statement;
 
-use Vasoft\Joke\Container\ServiceContainer;
 use Vasoft\Joke\Templator\Contracts\NodeProcessorInterface;
 use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
 use Vasoft\Joke\Templator\Exceptions\CompileException;
@@ -13,29 +12,41 @@ use Vasoft\Joke\Templator\Handler\NodeHandler;
 use Vasoft\Joke\Templator\Parser\Node\StatementNode;
 
 /**
- * Обработчик директивы CSRF-токена.
+ * Обработчик директивы {%raw expression%}.
  *
- * Отвечает за генерацию скрытого поля или вывод токена защиты от межсайтовой подделки запросов (CSRF).
- * Использует ServiceContainer для получения менеджера токенов и объекта запроса,
- * обеспечивая работу как в режиме компиляции, так и в режиме интерпретации.
+ * Выводит значение переменной БЕЗ HTML-экранирования.
+ * Используется для вывода заранее подготовленного HTML-контента,
+ * например содержимого каркаса через {%raw __layout.content%}.
+ *
+ * Для обычного вывода с экранированием используйте {{ expression }}.
+ *
+ * @see StatementNode Ожидаемый тип узла AST
  */
 class RawHandler extends NodeHandler
 {
     /**
-     * Создает новый обработчик CSRF-директивы.
+     * Компилирует директиву raw в PHP-echo без экранирования.
      *
-     * @param ServiceContainer $serviceContainer контейнер зависимостей для доступа к сервисам безопасности
+     * Генерирует код вида: <?= $variable ?>
+     * В отличие от {{ }}, НЕ оборачивает вывод в htmlspecialchars().
+     *
+     * @param StatementNode          $node      Узел выражения {%raw var.name%}
+     * @param NodeProcessorInterface $processor Процессор узлов (не используется,
+     *                                          но требуется интерфейсом)
+     * @param array<string, mixed>   $context   Контекст переменных шаблона
+     * @param list<string>           $localVars Локальные переменные цикла/блока
+     *
+     * @return string PHP-код echo без экранирования
+     *
+     * @throws CompileException Если передан узел неверного типа
      */
-    public function __construct(
-        private readonly ServiceContainer $serviceContainer,
-    ) {}
-
     public function compile(
         NodeInterface $node,
         NodeProcessorInterface $processor,
         array $context,
         array $localVars = [],
     ): string {
+        // @phpstan-ignore instanceof.alwaysTrue
         if (!$node instanceof StatementNode) {
             throw new CompileException($this->getErrorMessage('StatementNode', $node));
         }
@@ -46,17 +57,25 @@ class RawHandler extends NodeHandler
     }
 
     /**
-     * {@inheritDoc}
+     * Рендерит директиву raw в интерпретируемом режиме без экранирования.
      *
-     * Извлекает значение из контекста и возвращает его, предварительно экранировав.
+     * Извлекает значение из контекста и возвращает его КАК ЕСТЬ.
+     * Ответственность за безопасность контента лежит на источнике данных.
      *
-     * @throws RenderingException если передан узел неверного типа
+     * @param StatementNode          $node      Узел выражения
+     * @param NodeProcessorInterface $processor Процессор узлов (не используется)
+     * @param array<string, mixed>   $context   Контекст переменных
+     *
+     * @return string Значение переменной без HTML-экранирования
+     *
+     * @throws RenderingException Если передан узел неверного типа
      */
     public function render(
         NodeInterface $node,
         NodeProcessorInterface $processor,
         array $context,
     ): string {
+        // @phpstan-ignore instanceof.alwaysTrue
         if (!$node instanceof StatementNode) {
             throw new RenderingException($this->getErrorMessage('StatementNode', $node));
         }

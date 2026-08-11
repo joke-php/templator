@@ -119,8 +119,8 @@ final class TemplatedResponseTest extends TestCase
                 echo "Hi",PHP_EOL;
                 echo $context["testIncludeFile"],PHP_EOL;
                 echo spl_object_id($container), PHP_EOL;
-                echo spl_object_id($templateEngine), PHP_EOL;
-                echo $templateEngine->templateName, PHP_EOL;
+                echo spl_object_id($engine), PHP_EOL;
+                echo $engine->templateName, PHP_EOL;
             PHP;
 
         $expected = <<<TEXT

@@ -17,11 +17,13 @@ use Vasoft\Joke\Templator\Compiler\DefaultCompiler;
 use Vasoft\Joke\Templator\Contracts\LexerInterface;
 use Vasoft\Joke\Templator\Handler\Directive\EachHandler;
 use Vasoft\Joke\Templator\Handler\Directive\IfHandler;
+use Vasoft\Joke\Templator\Handler\Directive\LayoutHandler;
 use Vasoft\Joke\Templator\Handler\Node\BlockNodeHandler;
 use Vasoft\Joke\Templator\Handler\Node\PrintNodeHandler;
 use Vasoft\Joke\Templator\Handler\Node\StatementNodeHandler;
 use Vasoft\Joke\Templator\Handler\Node\TextNodeHandler;
 use Vasoft\Joke\Templator\Handler\Statement\CsrfHandler;
+use Vasoft\Joke\Templator\Handler\Statement\RawHandler;
 use Vasoft\Joke\Templator\Lexer\DefaultLexer;
 use Vasoft\Joke\Templator\Parser\Node\BlockNode;
 use Vasoft\Joke\Templator\Parser\Node\PrintNode;
@@ -39,9 +41,6 @@ use Vasoft\Joke\Templator\TemplatorProvider;
  */
 final class TemplatorProviderTest extends TestCase
 {
-    /**
-     * @var (object&Stub)|Stub
-     */
     private static Stub|ServiceContainer $container;
 
     public static function setUpBeforeClass(): void
@@ -111,6 +110,8 @@ final class TemplatorProviderTest extends TestCase
         yield ['if', IfHandler::class];
         yield ['foreach', EachHandler::class];
         yield ['csrf', CsrfHandler::class];
+        yield ['raw', RawHandler::class];
+        yield ['layout', LayoutHandler::class];
     }
 
     public function testProvides(): void

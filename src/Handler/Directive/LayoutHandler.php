@@ -13,15 +13,54 @@ use Vasoft\Joke\Templator\Handler\NodeHandler;
 use Vasoft\Joke\Templator\Parser\Node\BlockNode;
 use Vasoft\Joke\Templator\TemplateEngine;
 
+/**
+ *  Обработчик директивы {%layout name%}.
+ *
+ *  Реализует механизм наследования каркасов.
+ *  Вместо прямого включения каркаса в текущий шаблон, генерирует PHP-код,
+ *  который:
+ *  1. Захватывает вывод внутреннего блока через output buffering.
+ *  2. Формирует контекст для каркаса с ключом $__layout['content'].
+ *  3. Делегирует подключение файла каркаса TemplateEngine для сохранения
+ *     единого механизма изоляции переменных и обработки ошибок.
+ *
+ *  В файле каркаса содержимое страницы выводится через директиву:
+ *    {%raw __layout.content%}
+ *
+ * @note Директива работает только в режиме компиляции.
+ *        Метод render() временно выбрасывает RenderingException;
+ *        поддержка интерпретируемого режима планируется в будущих версиях.
+ *
+ * @see BlockNode      Ожидаемый тип узла AST
+ * @see TemplateEngine::includeFile() Метод подключения каркаса
+ */
 class LayoutHandler extends NodeHandler
 {
+    /**
+     * @param TemplateEngine $engine Движок шаблонов
+     * @param FileSystem     $fs     Файловая система для безопасного разрешения путей каркасов
+     */
     public function __construct(
         private readonly TemplateEngine $engine,
         private readonly FileSystem $fs,
     ) {}
 
     /**
-     * @throws CompileException если передан узел неверного типа или условие пустое
+     * Компилирует директиву layout в PHP-код с захватом вывода.
+     *
+     * Генерируемый код использует ob_start()/ob_get_clean() для получения
+     * результата рендеринга дочерних узлов как строки, которая затем
+     * передаётся в каркас через $__layoutContext['__layout']['content'].
+     *
+     * @param BlockNode              $node      Узел блока {%layout name%}...{%/layout%}
+     * @param NodeProcessorInterface $processor Процессор для компиляции дочерних узлов
+     * @param array<string, mixed>   $context   Контекст переменных шаблона (не используется напрямую,
+     *                                          но передаётся процессору для дочерних узлов)
+     * @param list<string>           $localVars Локальные переменные цикла/блока
+     *
+     * @return string Сгенерированный PHP-код с буферизацией и подключением каркаса
+     *
+     * @throws CompileException Если передан узел неверного типа или файл каркаса не найден
      */
     public function compile(
         NodeInterface $node,
@@ -29,10 +68,11 @@ class LayoutHandler extends NodeHandler
         array $context,
         array $localVars = [],
     ): string {
+        // @phpstan-ignore instanceof.alwaysTrue
         if (!$node instanceof BlockNode) {
             throw new CompileException($this->getErrorMessage('BlockNode', $node));
         }
-        $layoutName = explode(' ', trim($node->arguments), 1)[0];
+        $layoutName = trim($node->arguments);
         $filename = $this->fs->at($this->engine->layoutsPath, $layoutName . '.php');
 
         $innerPhpCode = $processor->process($node->children, $context, $localVars);
@@ -51,17 +91,19 @@ class LayoutHandler extends NodeHandler
     }
 
     /**
-     * @throws RenderingException если передан узел неверного типа
+     * Рендеринг директивы layout в интерпретируемом режиме не поддерживается.
+     *
+     * @param NodeInterface          $node      Узел блока
+     * @param NodeProcessorInterface $processor Процессор узлов
+     * @param array<string, mixed>   $context   Контекст переменных
+     *
+     * @throws RenderingException Всегда, так как метод не реализован
      */
     public function render(
         NodeInterface $node,
         NodeProcessorInterface $processor,
         array $context,
-    ): string {
-        if (!$node instanceof BlockNode) {
-            throw new RenderingException($this->getErrorMessage('BlockNode', $node));
-        }
-
+    ): never {
         throw new RenderingException('Not implemented yet.');
     }
 }
