@@ -9,6 +9,7 @@ use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\MockObject\Stub;
 use Vasoft\Joke\Templator\Exceptions\CompileException;
 use Vasoft\Joke\Templator\Exceptions\RenderingException;
+use Vasoft\Joke\Templator\Exceptions\RequiredParameterException;
 use Vasoft\Joke\Templator\Handler\Directive\LayoutHandler;
 use PHPUnit\Framework\TestCase;
 use Vasoft\Joke\Templator\Lexer\StatementToken;
@@ -62,6 +63,16 @@ final class LayoutHandlerTest extends TestCase
                 ?>
             PHP;
         self::assertSame($expected, $handler->compile($node, self::$renderer, []));
+    }
+
+    #[TestDox('Выбрасывает исключение если не передано имя каркаса')]
+    public function testExceptionIfEmptyLayoutName(): void
+    {
+        $handler = new LayoutHandler(self::$engine);
+        $node = new BlockNode(StatementToken::class, 'test', ' ');
+        self::expectException(RequiredParameterException::class);
+        self::expectExceptionMessageIs('Required parameter "layoutName" for directive "layout" is missing.');
+        $handler->compile($node, self::$renderer, []);
     }
 
     #[TestDox('Рендер выбрасывает исключение если получено не StatementNode')]

@@ -8,6 +8,8 @@ use Vasoft\Joke\Templator\Contracts\NodeProcessorInterface;
 use Vasoft\Joke\Templator\Contracts\Parser\NodeInterface;
 use Vasoft\Joke\Templator\Exceptions\CompileException;
 use Vasoft\Joke\Templator\Exceptions\RenderingException;
+use Vasoft\Joke\Templator\Exceptions\RequiredParameterException;
+use Vasoft\Joke\Templator\Exceptions\TemplatorException;
 use Vasoft\Joke\Templator\Handler\NodeHandler;
 use Vasoft\Joke\Templator\Parser\Node\BlockNode;
 use Vasoft\Joke\Templator\TemplateEngine;
@@ -57,7 +59,9 @@ class LayoutHandler extends NodeHandler
      *
      * @return string Сгенерированный PHP-код с буферизацией и подключением каркаса
      *
-     * @throws CompileException Если передан узел неверного типа или файл каркаса не найден
+     * @throws CompileException           Если передан узел неверного типа или файл каркаса не найден
+     * @throws RequiredParameterException Если не передано имя каркаса
+     * @throws TemplatorException         Если отсутствует файл каркаса
      */
     public function compile(
         NodeInterface $node,
@@ -70,7 +74,9 @@ class LayoutHandler extends NodeHandler
             throw new CompileException($this->getErrorMessage('BlockNode', $node));
         }
         $layoutName = trim($node->arguments);
-
+        if (empty($layoutName)) {
+            throw new RequiredParameterException('layout', 'layoutName');
+        }
         $filename = $this->engine->getLayoutPath($layoutName);
 
         $innerPhpCode = $processor->process($node->children, $context, $localVars);
