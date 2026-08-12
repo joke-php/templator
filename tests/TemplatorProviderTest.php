@@ -14,6 +14,7 @@ use Vasoft\Joke\Config\Exceptions\ConfigException;
 use Vasoft\Joke\Config\Exceptions\UnknownConfigException;
 use Vasoft\Joke\Container\ServiceContainer;
 use Vasoft\Joke\Templator\Compiler\DefaultCompiler;
+use Vasoft\Joke\Templator\Component\ComponentCollection;
 use Vasoft\Joke\Templator\Contracts\LexerInterface;
 use Vasoft\Joke\Templator\Handler\Directive\EachHandler;
 use Vasoft\Joke\Templator\Handler\Directive\IfHandler;
@@ -117,7 +118,7 @@ final class TemplatorProviderTest extends TestCase
     public function testProvides(): void
     {
         $provider = new TemplatorProvider(self::$container);
-        self::assertSame([TemplateEngine::class], $provider->provides());
+        self::assertSame([TemplateEngine::class, ComponentCollection::class], $provider->provides());
     }
 
     public function testRegister(): void
@@ -133,10 +134,12 @@ final class TemplatorProviderTest extends TestCase
         self::assertTrue($container->has('templator.compiler'));
         self::assertTrue($container->has('templator.renderer'));
         self::assertTrue($container->has('paths'));
+        self::assertTrue($container->has(ComponentCollection::class));
         self::assertInstanceOf(TemplateEngine::class, $container->get(TemplateEngine::class));
         self::assertInstanceOf(DefaultLexer::class, $container->get(LexerInterface::class));
         self::assertInstanceOf(DefaultCompiler::class, $container->get('templator.compiler'));
         self::assertInstanceOf(DefaultRenderer::class, $container->get('templator.renderer'));
+        self::assertInstanceOf(ComponentCollection::class, $container->get(ComponentCollection::class));
     }
 
     public function testBuildConfig(): void

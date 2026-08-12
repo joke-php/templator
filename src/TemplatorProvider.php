@@ -10,6 +10,7 @@ use Vasoft\Joke\Container\ServiceContainer;
 use Vasoft\Joke\Contract\Provider\ConfigurableServiceProviderInterface;
 use Vasoft\Joke\Provider\AbstractProvider;
 use Vasoft\Joke\Templator\Compiler\DefaultCompiler;
+use Vasoft\Joke\Templator\Component\ComponentCollection;
 use Vasoft\Joke\Templator\Contracts\LexerInterface;
 use Vasoft\Joke\Templator\Contracts\Parser\ParserInterface;
 use Vasoft\Joke\Templator\Handler\Directive\EachHandler;
@@ -63,6 +64,7 @@ class TemplatorProvider extends AbstractProvider implements ConfigurableServiceP
         $this->serviceContainer->registerSingleton(ParserInterface::class, DefaultParser::class);
         $this->serviceContainer->registerSingleton('templator.compiler', DefaultCompiler::class);
         $this->serviceContainer->registerSingleton('templator.renderer', DefaultRenderer::class);
+        $this->serviceContainer->registerSingleton(ComponentCollection::class, ComponentCollection::class);
     }
 
     /**
@@ -146,7 +148,7 @@ class TemplatorProvider extends AbstractProvider implements ConfigurableServiceP
      */
     public function provides(): array
     {
-        return [TemplateEngine::class];
+        return [TemplateEngine::class, ComponentCollection::class];
     }
 
     /**

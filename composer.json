@@ -25,7 +25,8 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Vasoft\\Joke\\Templator\\Tests\\": "tests/"
+      "Vasoft\\Joke\\Templator\\Tests\\": "tests/",
+      "Vasoft\\Joke\\Templator\\Demo\\": "demo/"
     }
   },
   "scripts": {
