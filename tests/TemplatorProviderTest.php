@@ -15,6 +15,7 @@ use Vasoft\Joke\Config\Exceptions\UnknownConfigException;
 use Vasoft\Joke\Container\ServiceContainer;
 use Vasoft\Joke\Templator\Compiler\DefaultCompiler;
 use Vasoft\Joke\Templator\Component\ComponentCollection;
+use Vasoft\Joke\Templator\Component\ComponentHandler;
 use Vasoft\Joke\Templator\Contracts\LexerInterface;
 use Vasoft\Joke\Templator\Handler\Directive\EachHandler;
 use Vasoft\Joke\Templator\Handler\Directive\IfHandler;
@@ -113,6 +114,7 @@ final class TemplatorProviderTest extends TestCase
         yield ['csrf', CsrfHandler::class];
         yield ['raw', RawHandler::class];
         yield ['layout', LayoutHandler::class];
+        yield ['component', ComponentHandler::class];
     }
 
     public function testProvides(): void

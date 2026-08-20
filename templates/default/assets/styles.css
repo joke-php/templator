@@ -1,4 +1,9 @@
 body {
     background-color: #eee;
-    color:#333;
+    color: #333;
+}
+
+.note {
+    border: 1px solid #030;
+    background: rgba(0, 75, 0, 0.8);
 }

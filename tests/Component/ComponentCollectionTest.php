@@ -9,7 +9,7 @@ use PHPUnit\Framework\Attributes\TestDox;
 use Vasoft\Joke\Container\ServiceContainer;
 use PHPUnit\Framework\TestCase;
 use Vasoft\Joke\Templator\Component\ComponentCollection;
-use Vasoft\Joke\Templator\Demo\Component\SimpleComponent;
+use Vasoft\Joke\Templator\Demo\Component\RandomComponent;
 use Vasoft\Joke\Templator\Exceptions\TemplatorException;
 
 /**
@@ -31,15 +31,15 @@ final class ComponentCollectionTest extends TestCase
     #[TestDox('reset Перезаписывает всю коллекцию')]
     public function testReset(): void
     {
-        $component = new SimpleComponent(self::$container);
+        $component = new RandomComponent(self::$container);
         $collection = new ComponentCollection(self::$container);
         $collection->set('vendor1.example', $component);
         $collection->set('vendor2.example', $component);
         $collection->set('vendor3.example', $component);
         $collection->reset([
-            'vendor1.example' => SimpleComponent::class,
-            'vendor2.example' => new SimpleComponent(self::$container),
-            'vendor3.example' => static fn(ServiceContainer $container) => new SimpleComponent($container),
+            'vendor1.example' => RandomComponent::class,
+            'vendor2.example' => new RandomComponent(self::$container),
+            'vendor3.example' => static fn(ServiceContainer $container) => new RandomComponent($container),
         ]);
         $entity1 = $collection->get('vendor1.example');
         $entity2 = $collection->get('vendor2.example');
@@ -47,17 +47,17 @@ final class ComponentCollectionTest extends TestCase
         self::assertNotSame($component, $entity1);
         self::assertNotSame($component, $entity2);
         self::assertNotSame($component, $entity3);
-        self::assertInstanceOf(SimpleComponent::class, $entity1, 'Не вернуло компонент из объекта');
-        self::assertInstanceOf(SimpleComponent::class, $entity2, 'Не вернуло компонент из имени класса');
-        self::assertInstanceOf(SimpleComponent::class, $entity3, 'Не вернуло компонент из замыкания');
+        self::assertInstanceOf(RandomComponent::class, $entity1, 'Не вернуло компонент из объекта');
+        self::assertInstanceOf(RandomComponent::class, $entity2, 'Не вернуло компонент из имени класса');
+        self::assertInstanceOf(RandomComponent::class, $entity3, 'Не вернуло компонент из замыкания');
     }
 
     #[TestDox('Set регистрирует конкретную сущность и перезаписывает ранее заданную')]
     public function testResetOne(): void
     {
-        $component = new SimpleComponent(self::$container);
+        $component = new RandomComponent(self::$container);
         $collection = new ComponentCollection(self::$container);
-        $collection->set('vendor1.example', new SimpleComponent(self::$container));
+        $collection->set('vendor1.example', new RandomComponent(self::$container));
         $collection->set('vendor1.example', $component);
         $entity1 = $collection->get('vendor1.example');
         self::assertSame($component, $entity1);
@@ -67,18 +67,18 @@ final class ComponentCollectionTest extends TestCase
     public function testSetClassName(): void
     {
         $collection = new ComponentCollection(self::$container);
-        $collection->set('vendor1.example', SimpleComponent::class);
+        $collection->set('vendor1.example', RandomComponent::class);
         $entity1 = $collection->get('vendor1.example');
-        self::assertInstanceOf(SimpleComponent::class, $entity1);
+        self::assertInstanceOf(RandomComponent::class, $entity1);
     }
 
     #[TestDox('Set регистрирует замыкание')]
     public function testSetCallback(): void
     {
         $collection = new ComponentCollection(self::$container);
-        $collection->set('vendor1.example', static fn(ServiceContainer $container) => new SimpleComponent($container));
+        $collection->set('vendor1.example', static fn(ServiceContainer $container) => new RandomComponent($container));
         $entity1 = $collection->get('vendor1.example');
-        self::assertInstanceOf(SimpleComponent::class, $entity1);
+        self::assertInstanceOf(RandomComponent::class, $entity1);
     }
 
     #[TestDox('Исключение если компонент не зарегистрирован')]

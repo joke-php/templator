@@ -9,24 +9,32 @@ use Vasoft\Joke\Routing\Router;
 use Vasoft\Joke\Templator\TemplateEngine;
 use Vasoft\Joke\Templator\TemplatedResponse;
 
-$context = ['name' => 'alex', 'extend' => false, 'status' => ['named' => 10]];
+$context = [
+    'name' => 'alex',
+    'extend' => false,
+    'status' => ['named' => 10],
+    'randomRange' => ['min' => 10, 'max' => 99],
+];
 /**
  * @var Router $router
  */
 $router->get(
     '/',
-    static fn(ServiceContainer $container, TemplateEngine $engine) => new TemplatedResponse($container, $engine)->show(
+    static fn(ServiceContainer $container, TemplateEngine $engine) => new TemplatedResponse(
+        $container,
+        $engine,
+        'dark',
+    )->show(
         'pages/index.php',
         $context,
         0,
     ),
 );
 $router->get(
-    '/dark',
+    '/default',
     static fn(ServiceContainer $container, TemplateEngine $engine) => new TemplatedResponse(
         $container,
         $engine,
-        'dark',
     )->show('pages/index.php', $context, 0),
 );
 

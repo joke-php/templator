@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "49c2ecef8999f8d654f65ddaa3a0b950",
+    "content-hash": "080828930fb9e5949266787c8982f445",
     "packages": [
         {
             "name": "voral/joke",
@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/joke-php/joke.git",
-                "reference": "af4d0e7f6f3b4c8a2249b33af084458a1e7eea9f"
+                "reference": "f23a6439b33f24c9eb1d0a245374431237fc6ffb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/joke-php/joke/zipball/af4d0e7f6f3b4c8a2249b33af084458a1e7eea9f",
-                "reference": "af4d0e7f6f3b4c8a2249b33af084458a1e7eea9f",
+                "url": "https://api.github.com/repos/joke-php/joke/zipball/f23a6439b33f24c9eb1d0a245374431237fc6ffb",
+                "reference": "f23a6439b33f24c9eb1d0a245374431237fc6ffb",
                 "shasum": ""
             },
             "require": {
@@ -54,7 +54,7 @@
                 "issues": "https://github.com/joke-php/joke/issues",
                 "source": "https://github.com/joke-php/joke/tree/next"
             },
-            "time": "2026-08-11T04:56:17+00:00"
+            "time": "2026-08-18T06:34:30+00:00"
         }
     ],
     "packages-dev": [

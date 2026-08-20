@@ -11,6 +11,7 @@ use Vasoft\Joke\Contract\Provider\ConfigurableServiceProviderInterface;
 use Vasoft\Joke\Provider\AbstractProvider;
 use Vasoft\Joke\Templator\Compiler\DefaultCompiler;
 use Vasoft\Joke\Templator\Component\ComponentCollection;
+use Vasoft\Joke\Templator\Component\ComponentHandler;
 use Vasoft\Joke\Templator\Contracts\LexerInterface;
 use Vasoft\Joke\Templator\Contracts\Parser\ParserInterface;
 use Vasoft\Joke\Templator\Handler\Directive\EachHandler;
@@ -122,12 +123,14 @@ class TemplatorProvider extends AbstractProvider implements ConfigurableServiceP
         $config->directiveCollection->upsert($stmt, 'csrf');
         $config->directiveCollection->upsert($stmt, 'raw');
         $config->directiveCollection->upsert($stmt, 'layout', '/layout');
+        $config->directiveCollection->upsert($stmt, 'component');
 
         $config->addDirectiveHandler('if', IfHandler::class);
         $config->addDirectiveHandler('foreach', EachHandler::class);
         $config->addDirectiveHandler('csrf', CsrfHandler::class);
         $config->addDirectiveHandler('raw', RawHandler::class);
         $config->addDirectiveHandler('layout', LayoutHandler::class);
+        $config->addDirectiveHandler('component', ComponentHandler::class);
     }
 
     /**

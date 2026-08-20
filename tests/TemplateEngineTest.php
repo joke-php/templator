@@ -54,6 +54,21 @@ final class TemplateEngineTest extends TestCase
         );
     }
 
+    #[TestDox('getLayoutPath кеширует результат')]
+    #[RunInSeparateProcess]
+    public function testLayoutPathCached(): void
+    {
+        $fileGetContents = $this->getFunctionMock('Vasoft\Joke\Templator', 'file_exists');
+        $fileGetContents->expects(self::once())->willReturn(true);
+
+        $engine = new TemplateEngine($this->container);
+        $engine->getLayoutPath('exists');
+        self::assertSame(
+            self::$defaultLayoutPath . 'exists.php',
+            $engine->getLayoutPath('exists'),
+        );
+    }
+
     #[TestDox('Получение имени файла каркаса согласно иерархии наследования')]
     public function testLayoutPathException(): void
     {

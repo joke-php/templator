@@ -2,3 +2,11 @@ body {
     background-color: #333;
     color: #999;
 }
+
+.note {
+    border: 1px solid #030;
+    background: rgba(0, 75, 0, 0.3);
+    border-radius: 4px;
+    padding: 16px;
+    border-left-width: 10px;
+}

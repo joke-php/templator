@@ -10,6 +10,8 @@ use Vasoft\Joke\Container\Exceptions\ContainerException;
 use Vasoft\Joke\Container\Exceptions\ParameterResolveException;
 use Vasoft\Joke\Container\ServiceContainer;
 use Vasoft\Joke\Exceptions\FileSystemException;
+use Vasoft\Joke\Templator\Component\BaseComponent;
+use Vasoft\Joke\Templator\Component\ComponentCollection;
 use Vasoft\Joke\Templator\Contracts\LexerInterface;
 use Vasoft\Joke\Templator\Contracts\NodeProcessorInterface;
 use Vasoft\Joke\Templator\Contracts\Parser\ParserInterface;
@@ -72,6 +74,12 @@ class TemplateEngine implements TemplateEngineInterface
     public private(set) string $templateName {
         get => $this->templateName;
     }
+    /** @var array<non-empty-string,non-empty-string> Соответствие имени шаблона и каталога */
+    private array $componentTemplates = [];
+    /** @var array<non-empty-string,non-empty-string> Соответствие имени каракаса и файла каркаса */
+    private array $layoutTemplates = [];
+    /** @var list<array<string,mixed>> Контекст движка для разного уровня вложенности */
+    private array $engineContext = [];
 
     /**
      * Создает экземпляр движка шаблонизатора.
@@ -89,8 +97,17 @@ class TemplateEngine implements TemplateEngineInterface
         $this->fs = $fs;
         $this->cachePath = $this->fs->atCache('templator');
         $this->setTemplate(static::DEFAULT_TEMPLATE);
-        $this->defaultTemplatePath = $this->fs->atBase('templates/' . static::DEFAULT_TEMPLATE);
-        $this->defaultLayoutsPath = $this->fs->atBase('templates/' . static::DEFAULT_TEMPLATE . '/layouts');
+        $this->defaultTemplatePath = $this->fs->normalizeDir(
+            $this->fs->atBase('templates/' . static::DEFAULT_TEMPLATE),
+        );
+        $this->defaultLayoutsPath = $this->fs->normalizeDir(
+            $this->fs->atBase('templates/' . static::DEFAULT_TEMPLATE . '/layouts'),
+        );
+        $this->engineContext[] = [
+            'engine' => $this,
+            'container' => $this->container,
+            'components' => $this->container->get(ComponentCollection::class),
+        ];
     }
 
     /**
@@ -118,7 +135,7 @@ class TemplateEngine implements TemplateEngineInterface
     }
 
     /**
-     * Разрешает путь к файлу каркаса с поддержкой fallback-шаблона.
+     * Разрешает путь к файлу каркаса с реализацией каскадное наследование.
      *
      * Порядок поиска:
      * 1. Активный шаблон: templates/{current}/layouts/{name}.php
@@ -132,18 +149,83 @@ class TemplateEngine implements TemplateEngineInterface
      */
     public function getLayoutPath(string $layoutName): string
     {
+        if (array_key_exists($layoutName, $this->layoutTemplates)) {
+            return $this->layoutTemplates[$layoutName];
+        }
         $fileName = $this->fs->at($this->layoutsPath, $layoutName . '.php');
         if (file_exists($fileName)) {
+            $this->layoutTemplates[$layoutName] = $fileName;
+
             return $fileName;
         }
         if ($this->templateName !== static::DEFAULT_TEMPLATE) {
             $fileName = $this->fs->at($this->defaultLayoutsPath, $layoutName . '.php');
             if (file_exists($fileName)) {
+                $this->layoutTemplates[$layoutName] = $fileName;
+
                 return $fileName;
             }
         }
 
         throw new TemplatorException('Unable to locate layout file: ' . $layoutName . '.');
+    }
+
+    /**
+     * Возвращает путь к каталогу шаблона компонента с реализацией каскадное наследование.
+     *
+     * Порядок поиска:
+     * 1. Активный шаблон: templates/{current}/components/{vendor}/{component}/{templateName}
+     * 2. Шаблон по умолчанию: templates/default/components/{vendor}/{component}/{templateName} {@see self::DEFAULT_TEMPLATE}
+     * 3. Шаблоны из комплекта установки vendor/{каталог пакета}/templates/components/{vendor}/{component}/{templateName} (для сторонних компонентов) или templates/components/{vendor}/{component}/{templateName} (для компонентов текущего проекта)
+     *
+     * @param BaseComponent    $component    имя класса компонента
+     * @param non-empty-string $templateName имя шаблона
+     *
+     * @return non-empty-string путь к существующему каталогу
+     *
+     * @throws TemplatorException при отсутствии каталога во всех проверяемых локациях
+     */
+    public function getComponentTemplateDir(BaseComponent $component, string $templateName): string
+    {
+        $index = $component::class . '#' . $templateName;
+        if (array_key_exists($index, $this->componentTemplates)) {
+            return $this->componentTemplates[$index];
+        }
+        $suffix = $component->vendor() . '/' . $component->name() . '/' . $templateName;
+        $dirName = $this->fs->at($this->templatePath . 'components/', $suffix);
+        if (file_exists($dirName) && is_dir($dirName)) {
+            $dirName = $this->fs->normalizeDir($dirName);
+            $this->componentTemplates[$index] = $dirName;
+
+            return $dirName;
+        }
+        if ($this->templateName !== static::DEFAULT_TEMPLATE) {
+            $dirName = $this->fs->at($this->defaultTemplatePath . 'components/', $suffix);
+            if (file_exists($dirName) && is_dir($dirName)) {
+                $dirName = $this->fs->normalizeDir($dirName);
+                $this->componentTemplates[$index] = $dirName;
+
+                return $dirName;
+            }
+        }
+        $defaultPath = $component->getDefaultTemplatePath();
+        if ('' !== $defaultPath) {
+            $dirName = $this->fs->at($defaultPath, $templateName);
+            if (file_exists($dirName) && is_dir($dirName)) {
+                $dirName = $this->fs->normalizeDir($dirName);
+                $this->componentTemplates[$index] = $dirName;
+
+                return $dirName;
+            }
+        }
+
+        throw new TemplatorException(
+            sprintf(
+                "Unable to locate template '%s' for '%s'.",
+                $templateName,
+                $component::componentName(),
+            ),
+        );
     }
 
     /**
@@ -157,8 +239,8 @@ class TemplateEngine implements TemplateEngineInterface
      */
     public function includeSiteTemplateConfig(array $vars = []): static
     {
-        $vars['engine'] = $this;
-        $vars['container'] = $this->container;
+        $parentVars = !empty($this->engineContext) ? end($this->engineContext) : [];
+        $vars = array_merge($parentVars, $vars);
         $vars['templatePath'] = $this->templatePath;
         $configFileName = $this->fs->normalizeFile($this->templatePath . '/config.php');
         $this->fs->includeFileOnce($configFileName, $vars);
@@ -211,13 +293,14 @@ class TemplateEngine implements TemplateEngineInterface
      * Важно: Внутри include доступны переменные $templateEngine и $container.
      * Скомпилированный шаблон должен использовать именно эти переменные для доступа к сервисам.
      *
-     * @param non-empty-string    $file    путь к файлу шаблона
-     * @param array<string,mixed> $context данные, передаваемые в шаблон (извлекаются через extract или напрямую)
-     * @param int                 $ttl     время жизни кэша в секундах (по умолчанию 24 часа)
+     * @param non-empty-string    $file               путь к файлу шаблона
+     * @param array<string,mixed> $context            данные, передаваемые в шаблон (извлекаются через extract или напрямую)
+     * @param int                 $ttl                время жизни кэша в секундах (по умолчанию 24 часа)
+     * @param array<string,mixed> $extraEngineContext Переменные передаваемые в контекст файла
      *
      * @throws TemplatorException если файл шаблона не найден или ошибка компиляции
      */
-    public function includeFile(string $file, array $context, int $ttl = 86400): void
+    public function includeFile(string $file, array $context, int $ttl = 864000, array $extraEngineContext = []): void
     {
         $normalized = $this->fs->normalizeFile($file);
         $this->fs->validatePath($normalized);
@@ -227,11 +310,17 @@ class TemplateEngine implements TemplateEngineInterface
             $compiled = $this->compileFile($normalized, $context);
             $cache->set($compiled);
         }
-        $this->fs->includeFile($cache->path, [
-            'engine' => $this,
-            'container' => $this->container,
-            'context' => $context,
-        ]);
+        $parentVars = !empty($this->engineContext) ? end($this->engineContext) : [];
+        $currentVars = array_merge($parentVars, $extraEngineContext);
+        $this->engineContext[] = $currentVars;
+
+        try {
+            $currentVars['context'] = $context;
+
+            $this->fs->includeFile($cache->path, $currentVars);
+        } finally {
+            array_pop($this->engineContext);
+        }
     }
 
     /**

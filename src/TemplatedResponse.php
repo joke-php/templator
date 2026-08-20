@@ -34,7 +34,7 @@ class TemplatedResponse extends HtmlPageResponse
      * @param string           $templateName Имя шаблона сайта. Пустая строка означает использование текущего.
      */
     public function __construct(
-        ServiceContainer $container,
+        public readonly ServiceContainer $container,
         public readonly TemplateEngine $engine,
         string $templateName = '',
     ) {
@@ -70,15 +70,12 @@ class TemplatedResponse extends HtmlPageResponse
     public function show(string $fileName, array $context = [], int $ttl = 86400): static
     {
         ob_start();
-        $this->engine->includeFile($fileName, $context, $ttl);
+
+        $this->engine->includeSiteTemplateConfig(['response' => $this]);
+        $this->engine->includeFile($fileName, $context, $ttl, [
+            'response' => $this,
+        ]);
 
         return $this->setBody(ob_get_clean());
-    }
-
-    public function getBody(): string
-    {
-        $this->engine->includeSiteTemplateConfig(['response' => $this]);
-
-        return parent::getBody();
     }
 }
