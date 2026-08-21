@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Vasoft\Joke\Templator\Demo\Handler\Statement;
+namespace Vasoft\Joke\Templator\Tests\Handler\Statement;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
