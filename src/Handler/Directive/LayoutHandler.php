@@ -78,6 +78,10 @@ class LayoutHandler extends NodeHandler
             throw new RequiredParameterException('layout', 'layoutName');
         }
         $filename = $this->engine->getLayoutPath($layoutName);
+        $dir = dirname($filename);
+        $layoutCss = $dir . '/' . $layoutName . '.css';
+        $layoutJs = $dir . '/' . $layoutName . '.js';
+
 
         $innerPhpCode = $processor->process($node->children, $context, $localVars);
 
@@ -88,7 +92,7 @@ class LayoutHandler extends NodeHandler
                 {$innerPhpCode}
                 <?php
                  \$__content = ob_get_clean();
-                \$__layoutContext = ['__layout' => ['content' => \$__content]];
+                \$__layoutContext = ['__layout' => ['content' => \$__content, 'css' => '{$layoutCss}', 'js' => '{$layoutJs}']];
                 \$engine->includeFile('{$filename}',\$__layoutContext,0);
                 ?>
             PHP;

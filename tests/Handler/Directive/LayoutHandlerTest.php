@@ -58,7 +58,7 @@ final class LayoutHandlerTest extends TestCase
                 <?=$content['test']?>
                 <?php
                  $__content = ob_get_clean();
-                $__layoutContext = ['__layout' => ['content' => $__content]];
+                $__layoutContext = ['__layout' => ['content' => $__content, 'css' => '/layouts/main.css', 'js' => '/layouts/main.js']];
                 $engine->includeFile('/layouts/main.php',$__layoutContext,0);
                 ?>
             PHP;
