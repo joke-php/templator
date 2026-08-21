@@ -103,9 +103,9 @@ final class ComponentHandlerTest extends TestCase
     {
         $handler = new ComponentHandler();
         $node = new PrintNode(StatementToken::class, 'test');
-        self::expectException(RenderingException::class);
-        self::expectExceptionMessageIs('Not implemented yet.');
-        $handler->render($node, self::$renderer, []);
+        self::expectException(CompileException::class);
+        self::expectExceptionMessageIs('Expected instance of StatementNode, got Vasoft\Joke\Templator\Parser\Node\PrintNode.');
+        $handler->compile($node, self::$renderer, []);
     }
 
     #[TestDox('Рендер выбрасывает исключение о нереализованном функционале')]
