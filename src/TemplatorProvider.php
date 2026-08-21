@@ -23,6 +23,7 @@ use Vasoft\Joke\Templator\Handler\Node\StatementNodeHandler;
 use Vasoft\Joke\Templator\Handler\Node\TextNodeHandler;
 use Vasoft\Joke\Templator\Handler\Statement\CsrfHandler;
 use Vasoft\Joke\Templator\Handler\Statement\DeferHandler;
+use Vasoft\Joke\Templator\Handler\Statement\IncludeHandler;
 use Vasoft\Joke\Templator\Handler\Statement\RawHandler;
 use Vasoft\Joke\Templator\Lexer\DefaultLexer;
 use Vasoft\Joke\Templator\Lexer\PrintToken;
@@ -126,6 +127,7 @@ class TemplatorProvider extends AbstractProvider implements ConfigurableServiceP
         $config->directiveCollection->upsert($stmt, 'layout', '/layout');
         $config->directiveCollection->upsert($stmt, 'component');
         $config->directiveCollection->upsert($stmt, 'defer');
+        $config->directiveCollection->upsert($stmt, 'include');
 
         $config->addDirectiveHandler('if', IfHandler::class);
         $config->addDirectiveHandler('foreach', EachHandler::class);
@@ -134,6 +136,7 @@ class TemplatorProvider extends AbstractProvider implements ConfigurableServiceP
         $config->addDirectiveHandler('layout', LayoutHandler::class);
         $config->addDirectiveHandler('component', ComponentHandler::class);
         $config->addDirectiveHandler('defer', DeferHandler::class);
+        $config->addDirectiveHandler('include', IncludeHandler::class);
     }
 
     /**

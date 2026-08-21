@@ -17,7 +17,6 @@ class DayComponent extends BaseComponent
 
     public function __construct(public readonly ServiceContainer $container) {}
 
-
     public static function vendor(): string
     {
         return 'vasoft';

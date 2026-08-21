@@ -279,6 +279,7 @@ class TemplateEngine implements TemplateEngineInterface
             if ($e instanceof TemplatorException) {
                 throw $e;
             }
+
             throw new TemplatorException('Error compile template: ' . $e->getMessage(), 0, $e);
         }
     }
