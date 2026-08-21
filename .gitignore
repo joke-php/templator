@@ -9,3 +9,4 @@ Thumbs.db
 /reports
 .phpunit.result.cache
 /var
+/public/assets
