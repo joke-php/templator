@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Vasoft\Joke\Templator\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestDox;
 use Vasoft\Joke\Support\FileSystem;
 use Vasoft\Joke\Config\Environment;
 use Vasoft\Joke\Container\ServiceContainer;
@@ -14,6 +15,7 @@ use Vasoft\Joke\Templator\Container\DeferService;
 use Vasoft\Joke\Templator\Contracts\LexerInterface;
 use Vasoft\Joke\Templator\Contracts\NodeProcessorInterface;
 use Vasoft\Joke\Templator\Contracts\Parser\ParserInterface;
+use Vasoft\Joke\Templator\Exceptions\TemplatorException;
 use Vasoft\Joke\Templator\TemplatedResponse;
 use PHPUnit\Framework\TestCase;
 use Vasoft\Joke\Templator\TemplateEngine;
@@ -31,6 +33,11 @@ final class TemplatedResponseTest extends TestCase
     private TemplateEngine $engine;
     private string $compiled;
 
+    protected function registerFileSystem(ServiceContainer $container): void{
+        $fs = new FileSystem($this->tempDir);
+        $container->registerSingleton(FileSystem::class, $fs);
+        $container->registerAlias('paths', FileSystem::class);
+    }
     protected function setUp(): void
     {
         $this->tempDir = sys_get_temp_dir() . '/joke_tpl_response_test_' . uniqid();
@@ -40,9 +47,7 @@ final class TemplatedResponseTest extends TestCase
         $this->container = new ServiceContainer();
         $this->container->registerSingleton(TemplatorConfig::class, TemplatorConfig::class);
         $this->container->registerSingleton(DeferService::class, DeferService::class);
-        $fs = new FileSystem($this->tempDir);
-        $this->container->registerSingleton(FileSystem::class, $fs);
-        $this->container->registerAlias('paths', FileSystem::class);
+        $this->registerFileSystem($this->container);
         $this->container->registerSingleton(PageBuilderConfig::class, PageBuilderConfig::class);
         $this->container->registerSingleton(CookieConfig::class, CookieConfig::class);
         $lexer = self::getStubBuilder(LexerInterface::class)
@@ -159,5 +164,44 @@ final class TemplatedResponseTest extends TestCase
         yield ['', ''];
         yield ['main', ''];
         yield ['main', 'custom'];
+    }
+
+    #[TestDox('Создает сервис отложенного вывода если не существовал в контейнере и возвращает')]
+    public function testGetDefer(): void
+    {
+        $container = new ServiceContainer();
+        $container->registerSingleton(PageBuilderConfig::class, PageBuilderConfig::class);
+        $container->registerSingleton(CookieConfig::class, CookieConfig::class);
+        $container->registerSingleton(TemplatorConfig::class, TemplatorConfig::class);
+        $this->registerFileSystem($container);
+        $response = new TemplatedResponse($container, $this->engine, '');
+        self::assertInstanceOf(DeferService::class, $response->getDeferService());
+        self::assertTrue($this->container->has(DeferService::class));
+    }
+    #[TestDox('Возвращает сервис отложенного вывода из контейнера')]
+    public function testGetDeferExists(): void
+    {
+        $container = new ServiceContainer();
+        $container->registerSingleton(PageBuilderConfig::class, PageBuilderConfig::class);
+        $container->registerSingleton(CookieConfig::class, CookieConfig::class);
+        $service = new DeferService(new TemplatorConfig());
+        $container->registerSingleton(DeferService::class, $service);
+        $this->registerFileSystem($container);
+        $response = new TemplatedResponse($container, $this->engine, '');
+        self::assertSame(spl_object_id($service), spl_object_id($response->getDeferService()));
+    }
+    #[TestDox('Выбрасывает исключение если некорректный сервис')]
+    public function testGetNonCorrect(): void
+    {
+        $container = new ServiceContainer();
+        $container->registerSingleton(PageBuilderConfig::class, PageBuilderConfig::class);
+        $container->registerSingleton(CookieConfig::class, CookieConfig::class);
+        $this->registerFileSystem($container);
+        $service = new \stdClass();
+        $container->registerSingleton(DeferService::class, $service);
+        $response = new TemplatedResponse($container, $this->engine, '');
+        self::expectException(TemplatorException::class);
+        self::expectExceptionMessageIs('Invalid type of DefferService');
+        $response->getDeferService();
     }
 }
