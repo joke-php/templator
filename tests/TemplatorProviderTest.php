@@ -25,6 +25,7 @@ use Vasoft\Joke\Templator\Handler\Node\PrintNodeHandler;
 use Vasoft\Joke\Templator\Handler\Node\StatementNodeHandler;
 use Vasoft\Joke\Templator\Handler\Node\TextNodeHandler;
 use Vasoft\Joke\Templator\Handler\Statement\CsrfHandler;
+use Vasoft\Joke\Templator\Handler\Statement\DeferHandler;
 use Vasoft\Joke\Templator\Handler\Statement\RawHandler;
 use Vasoft\Joke\Templator\Lexer\DefaultLexer;
 use Vasoft\Joke\Templator\Parser\Node\BlockNode;
@@ -115,6 +116,7 @@ final class TemplatorProviderTest extends TestCase
         yield ['raw', RawHandler::class];
         yield ['layout', LayoutHandler::class];
         yield ['component', ComponentHandler::class];
+        yield ['defer', DeferHandler::class];
     }
 
     public function testProvides(): void

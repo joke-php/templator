@@ -7,6 +7,7 @@ namespace Vasoft\Joke\Templator\Demo;
 use Vasoft\Joke\Container\ServiceContainer;
 use Vasoft\Joke\Provider\AbstractProvider;
 use Vasoft\Joke\Templator\Component\ComponentCollection;
+use Vasoft\Joke\Templator\Demo\Component\DayComponent;
 use Vasoft\Joke\Templator\Demo\Component\RandomComponent;
 
 class DemoProvider extends AbstractProvider
@@ -25,6 +26,7 @@ class DemoProvider extends AbstractProvider
         /** @var ComponentCollection $components */
         $components = $this->serviceContainer->get(ComponentCollection::class);
         $components->set(RandomComponent::componentName(), RandomComponent::class);
+        $components->set(DayComponent::componentName(), DayComponent::class);
     }
 
     public function provides(): array

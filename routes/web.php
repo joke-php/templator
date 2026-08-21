@@ -20,15 +20,24 @@ $context = [
  */
 $router->get(
     '/',
-    static fn(ServiceContainer $container, TemplateEngine $engine) => new TemplatedResponse(
-        $container,
-        $engine,
-        'dark',
-    )->show(
-        'pages/index.php',
-        $context,
-        0,
-    ),
+    static function (
+        ServiceContainer $container,
+        TemplateEngine $engine,
+    ) use ($context) {
+        $response = new TemplatedResponse(
+            $container,
+            $engine,
+            'dark',
+        );
+        $container->registerSingleton(TemplatedResponse::class, $response);
+        $response->builder->setTitle('Пример');
+
+        return $response->show(
+            'pages/index.php',
+            $context,
+            0,
+        );
+    },
 );
 $router->get(
     '/default',

@@ -54,7 +54,7 @@ class RandomComponent extends BaseComponent
     protected function execute(PageBuilder $pageBuilder): void
     {
         $this->demo = (string) random_int($this->min, $this->max);
-        $pageBuilder->setTitle('example');
+        $pageBuilder->setTitle('example<small> 1</small>');
     }
 
     protected function beforeRender(PageBuilder $pageBuilder): void

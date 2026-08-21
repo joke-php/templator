@@ -235,7 +235,7 @@ class TemplateEngine implements TemplateEngineInterface
      *
      * @return $this
      *
-     * @throws FileSystemException
+     * @throws FileSystemException Если путь вне basePath
      */
     public function includeSiteTemplateConfig(array $vars = []): static
     {
@@ -279,7 +279,6 @@ class TemplateEngine implements TemplateEngineInterface
             if ($e instanceof TemplatorException) {
                 throw $e;
             }
-
             throw new TemplatorException('Error compile template: ' . $e->getMessage(), 0, $e);
         }
     }

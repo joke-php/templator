@@ -10,12 +10,14 @@ use Vasoft\Joke\Config\Environment;
 use Vasoft\Joke\Container\ServiceContainer;
 use Vasoft\Joke\Http\Cookies\CookieConfig;
 use Vasoft\Joke\Http\Response\Html\PageBuilderConfig;
+use Vasoft\Joke\Templator\Container\DeferService;
 use Vasoft\Joke\Templator\Contracts\LexerInterface;
 use Vasoft\Joke\Templator\Contracts\NodeProcessorInterface;
 use Vasoft\Joke\Templator\Contracts\Parser\ParserInterface;
 use Vasoft\Joke\Templator\TemplatedResponse;
 use PHPUnit\Framework\TestCase;
 use Vasoft\Joke\Templator\TemplateEngine;
+use Vasoft\Joke\Templator\TemplatorConfig;
 
 /**
  * @internal
@@ -36,6 +38,8 @@ final class TemplatedResponseTest extends TestCase
         $this->compiled = '<?php echo "Hi";';
 
         $this->container = new ServiceContainer();
+        $this->container->registerSingleton(TemplatorConfig::class, TemplatorConfig::class);
+        $this->container->registerSingleton(DeferService::class, DeferService::class);
         $fs = new FileSystem($this->tempDir);
         $this->container->registerSingleton(FileSystem::class, $fs);
         $this->container->registerAlias('paths', FileSystem::class);
@@ -103,6 +107,7 @@ final class TemplatedResponseTest extends TestCase
         file_put_contents($fileName, $template);
 
         $response = new TemplatedResponse($this->container, $this->engine, $templateName);
+        $response->builder->setTitle('example <small>1</small>');
         $containerId = spl_object_id($this->container);
         $engineId = spl_object_id($this->engine);
 
@@ -120,12 +125,15 @@ final class TemplatedResponseTest extends TestCase
                 echo $context["testIncludeFile"],PHP_EOL;
                 echo spl_object_id($container), PHP_EOL;
                 echo spl_object_id($engine), PHP_EOL;
+                echo $response->getDeferService()->registerRaw('page.title',(string)($context['page']['title']??'')).PHP_EOL;
+                echo $response->getDeferService()->register('page.title',(string)($context['page']['title']??'')).PHP_EOL;
                 echo $engine->templateName, PHP_EOL;
             PHP;
 
         $expected = <<<TEXT
             <html lang="ru">
             <head>
+            <title>example 1</title>
             <meta charset="UTF-8">
             </head>
             <body>
@@ -133,6 +141,8 @@ final class TemplatedResponseTest extends TestCase
             {$context['testIncludeFile']}
             {$containerId}
             {$engineId}
+            example <small>1</small>
+            example &lt;small&gt;1&lt;/small&gt;
             {$templateName}
 
             </body>

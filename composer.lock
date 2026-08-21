@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/joke-php/joke.git",
-                "reference": "f23a6439b33f24c9eb1d0a245374431237fc6ffb"
+                "reference": "a809609bb9875da74e0d8e7b3621fc635ef79a48"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/joke-php/joke/zipball/f23a6439b33f24c9eb1d0a245374431237fc6ffb",
-                "reference": "f23a6439b33f24c9eb1d0a245374431237fc6ffb",
+                "url": "https://api.github.com/repos/joke-php/joke/zipball/a809609bb9875da74e0d8e7b3621fc635ef79a48",
+                "reference": "a809609bb9875da74e0d8e7b3621fc635ef79a48",
                 "shasum": ""
             },
             "require": {
@@ -54,7 +54,7 @@
                 "issues": "https://github.com/joke-php/joke/issues",
                 "source": "https://github.com/joke-php/joke/tree/next"
             },
-            "time": "2026-08-18T06:34:30+00:00"
+            "time": "2026-08-21T05:29:22+00:00"
         }
     ],
     "packages-dev": [
