@@ -1,5 +1,5 @@
 {
-  "name": "voral/joke-templator",
+  "name": "joke-php/templator",
   "description": "Templator for Joke micro-framework",
   "type": "library",
   "version": "0.0.1",

@@ -10,7 +10,7 @@
 ## Установка
 
 ```bash
-composer require voral/joke-templator
+composer require joke-php/templator
 ```
 
 Регистрация провайдера в `bootstrap/kernel.php`:
