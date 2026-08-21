@@ -19,6 +19,10 @@ use Vasoft\Joke\Templator\Parser\Node\TextNode;
 class TemplatorConfig extends AbstractConfig
 {
     /**
+     * Ttl по умолчанию лдля кеша файлов.
+     */
+    public private(set) int $defaultTtl = 86400;
+    /**
      * Коллекция дескрипторов токенов для лексического анализа.
      * Определяет открывающие/закрывающие маркеры и соответствующие классы токенов.
      */
@@ -138,6 +142,23 @@ class TemplatorConfig extends AbstractConfig
     {
         $this->guard();
         $this->encoding = $encoding;
+
+        return $this;
+    }
+
+    /**
+     * Устанавливает TTl файлового кеша по умолчанию.
+     *
+     * В настоящий момент используется только для директивы layout
+     *
+     * @return $this для цепочки вызовов
+     *
+     * @throws ConfigException если конфигурация уже заморожена
+     */
+    public function setDefaultTtl(int $defaultTtl): static
+    {
+        $this->guard();
+        $this->defaultTtl = $defaultTtl;
 
         return $this;
     }

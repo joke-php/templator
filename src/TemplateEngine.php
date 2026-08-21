@@ -312,6 +312,7 @@ class TemplateEngine implements TemplateEngineInterface
         }
         $parentVars = !empty($this->engineContext) ? end($this->engineContext) : [];
         $currentVars = array_merge($parentVars, $extraEngineContext);
+        $currentVars['config'] = $this->container->get(TemplatorConfig::class);
         $this->engineContext[] = $currentVars;
 
         try {

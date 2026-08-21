@@ -13,6 +13,7 @@ use Vasoft\Joke\Templator\Exceptions\TemplatorException;
 use Vasoft\Joke\Templator\Handler\NodeHandler;
 use Vasoft\Joke\Templator\Parser\Node\BlockNode;
 use Vasoft\Joke\Templator\TemplateEngine;
+use Vasoft\Joke\Templator\TemplatorConfig;
 
 /**
  *  Обработчик директивы {%layout name%}.
@@ -93,7 +94,7 @@ class LayoutHandler extends NodeHandler
                 <?php
                  \$__content = ob_get_clean();
                 \$__layoutContext = ['__layout' => ['content' => \$__content, 'css' => '{$layoutCss}', 'js' => '{$layoutJs}']];
-                \$engine->includeFile('{$filename}',\$__layoutContext,0);
+                \$engine->includeFile('{$filename}',\$__layoutContext, \$config->defaultTtl);
                 ?>
             PHP;
     }

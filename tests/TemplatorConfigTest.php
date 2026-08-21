@@ -20,13 +20,14 @@ final class TemplatorConfigTest extends TestCase
     {
         $config = new TemplatorConfig();
         self::assertSame('UTF-8', $config->encoding);
+        self::assertSame(86400, $config->defaultTtl);
     }
 
     public function testNodeHandlerNotRegistered(): void
     {
         $config = new TemplatorConfig();
         self::expectException(TemplatorException::class);
-        self::expectExceptionMessage("Handler for 'stdClass' not found.");
+        self::expectExceptionMessageIs("Handler for 'stdClass' not found.");
         $config->getNodeHandler(\stdClass::class);
     }
 
@@ -34,7 +35,7 @@ final class TemplatorConfigTest extends TestCase
     {
         $config = new TemplatorConfig();
         self::expectException(TemplatorException::class);
-        self::expectExceptionMessage("Handler for directive 'unknown' not found.");
+        self::expectExceptionMessageIs("Handler for directive 'unknown' not found.");
         $config->getDirectiveHandler('unknown');
     }
 
@@ -45,7 +46,22 @@ final class TemplatorConfigTest extends TestCase
         self::assertSame('windows-1251', $config->encoding);
         $config->freeze();
         self::expectException(ConfigException::class);
-        self::expectExceptionMessage('Cannot modify frozen configuration of [Vasoft\Joke\Templator\TemplatorConfig].');
+        self::expectExceptionMessageIs(
+            'Cannot modify frozen configuration of [Vasoft\Joke\Templator\TemplatorConfig].',
+        );
         $config->setEncoding('UTF-8');
+    }
+
+    public function testCustomTtl(): void
+    {
+        $config = new TemplatorConfig();
+        $config->setDefaultTtl(30);
+        self::assertSame(30, $config->defaultTtl);
+        $config->freeze();
+        self::expectException(ConfigException::class);
+        self::expectExceptionMessageIs(
+            'Cannot modify frozen configuration of [Vasoft\Joke\Templator\TemplatorConfig].',
+        );
+        $config->setDefaultTtl(31);
     }
 }

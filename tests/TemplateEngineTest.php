@@ -18,6 +18,7 @@ use Vasoft\Joke\Templator\Exceptions\LexerException;
 use Vasoft\Joke\Templator\Exceptions\TemplatorException;
 use Vasoft\Joke\Templator\TemplateEngine;
 use PHPUnit\Framework\TestCase;
+use Vasoft\Joke\Templator\TemplatorConfig;
 
 /**
  * @internal
@@ -180,6 +181,7 @@ final class TemplateEngineTest extends TestCase
                 echo $context["testIncludeFile"],PHP_EOL;
                 echo spl_object_id($container), PHP_EOL;
                 echo spl_object_id($engine), PHP_EOL;
+                echo $config::class, PHP_EOL;
             PHP;
         $engine = new TemplateEngine($this->container);
         $containerId = spl_object_id($this->container);
@@ -190,6 +192,7 @@ final class TemplateEngineTest extends TestCase
             {$context['testIncludeFile']}
             {$containerId}
             {$engineId}
+            Vasoft\\Joke\\Templator\\TemplatorConfig
 
             TEXT;
 
@@ -203,6 +206,7 @@ final class TemplateEngineTest extends TestCase
     protected function setUp(): void
     {
         $this->container = new ServiceContainer();
+        $this->container->registerSingleton(TemplatorConfig::class, TemplatorConfig::class);
         $this->compiled = '<?php echo "Hi";';
 
         $env = self::getStubBuilder(Environment::class)

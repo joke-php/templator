@@ -59,7 +59,7 @@ final class LayoutHandlerTest extends TestCase
                 <?php
                  $__content = ob_get_clean();
                 $__layoutContext = ['__layout' => ['content' => $__content, 'css' => '/layouts/main.css', 'js' => '/layouts/main.js']];
-                $engine->includeFile('/layouts/main.php',$__layoutContext,0);
+                $engine->includeFile('/layouts/main.php',$__layoutContext, $config->defaultTtl);
                 ?>
             PHP;
         self::assertSame($expected, $handler->compile($node, self::$renderer, []));
