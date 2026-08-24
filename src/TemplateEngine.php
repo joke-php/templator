@@ -125,6 +125,9 @@ class TemplateEngine implements TemplateEngineInterface
      */
     public function setTemplate(string $templateName): static
     {
+        if ('' === $templateName) {
+            return $this;
+        }
         $this->templateName = $templateName;
         $this->templatePath = $this->fs->atBase('templates/' . $templateName);
         $this->layoutsPath = $this->fs->atBase('templates/' . $templateName . '/layouts');

@@ -33,11 +33,13 @@ final class TemplatedResponseTest extends TestCase
     private TemplateEngine $engine;
     private string $compiled;
 
-    protected function registerFileSystem(ServiceContainer $container): void{
+    protected function registerFileSystem(ServiceContainer $container): void
+    {
         $fs = new FileSystem($this->tempDir);
         $container->registerSingleton(FileSystem::class, $fs);
         $container->registerAlias('paths', FileSystem::class);
     }
+
     protected function setUp(): void
     {
         $this->tempDir = sys_get_temp_dir() . '/joke_tpl_response_test_' . uniqid();
@@ -104,25 +106,19 @@ final class TemplatedResponseTest extends TestCase
     }
 
     #[DataProvider('provideTemplatedResponseCases')]
-    public function testTemplatedResponse(string $templateName, string $templateNameAfter): void
+    public function testTemplatedResponse(string $templateName): void
     {
         $template = '%%testIncludeFile%%';
         $context = ['testIncludeFile' => 'testIncludeFileValue'];
         $fileName = $this->tempDir . '/testIncludeFile.php';
         file_put_contents($fileName, $template);
 
-        $response = new TemplatedResponse($this->container, $this->engine, $templateName);
+        $response = new TemplatedResponse($this->container, $this->engine);
         $response->builder->setTitle('example <small>1</small>');
         $containerId = spl_object_id($this->container);
         $engineId = spl_object_id($this->engine);
 
-        if ('' !== $templateNameAfter) {
-            $response->setTemplateName($templateNameAfter);
-            $templateName = $templateNameAfter;
-        }
-        if ('' === $templateName) {
-            $templateName = 'default';
-        }
+        $response->setTemplateName($templateName);
 
         $this->compiled = <<<'PHP'
             <?php
@@ -134,7 +130,9 @@ final class TemplatedResponseTest extends TestCase
                 echo $response->getDeferService()->register('page.title',(string)($context['page']['title']??'')).PHP_EOL;
                 echo $engine->templateName, PHP_EOL;
             PHP;
-
+        if ('' === $templateName) {
+            $templateName = 'default';
+        }
         $expected = <<<TEXT
             <html lang="ru">
             <head>
@@ -161,9 +159,8 @@ final class TemplatedResponseTest extends TestCase
 
     public static function provideTemplatedResponseCases(): iterable
     {
-        yield ['', ''];
-        yield ['main', ''];
-        yield ['main', 'custom'];
+        yield [''];
+        yield ['main'];
     }
 
     #[TestDox('Создает сервис отложенного вывода если не существовал в контейнере и возвращает')]
@@ -178,6 +175,7 @@ final class TemplatedResponseTest extends TestCase
         self::assertInstanceOf(DeferService::class, $response->getDeferService());
         self::assertTrue($this->container->has(DeferService::class));
     }
+
     #[TestDox('Возвращает сервис отложенного вывода из контейнера')]
     public function testGetDeferExists(): void
     {
@@ -190,6 +188,7 @@ final class TemplatedResponseTest extends TestCase
         $response = new TemplatedResponse($container, $this->engine, '');
         self::assertSame(spl_object_id($service), spl_object_id($response->getDeferService()));
     }
+
     #[TestDox('Выбрасывает исключение если некорректный сервис')]
     public function testGetNonCorrect(): void
     {

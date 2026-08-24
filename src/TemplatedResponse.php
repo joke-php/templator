@@ -30,22 +30,14 @@ class TemplatedResponse extends HtmlPageResponse
     /**
      * Создает ответ с привязкой к шаблонизатору.
      *
-     * Если передано имя шаблона, автоматически переключает движок на него
-     * через TemplateEngine::setTemplate().
-     *
-     * @param ServiceContainer $container    контейнер зависимостей
-     * @param TemplateEngine   $engine       движок шаблонизатора для рендеринга
-     * @param string           $templateName Имя шаблона сайта. Пустая строка означает использование текущего.
+     * @param ServiceContainer $container контейнер зависимостей
+     * @param TemplateEngine   $engine    движок шаблонизатора для рендеринга
      */
     public function __construct(
         public readonly ServiceContainer $container,
         public readonly TemplateEngine $engine,
-        string $templateName = '',
     ) {
         parent::__construct($container);
-        if ('' !== $templateName) {
-            $this->engine->setTemplate($templateName);
-        }
     }
 
     /**

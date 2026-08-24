@@ -8,6 +8,7 @@ use Vasoft\Joke\Http\Response\ResponseStatus;
 use Vasoft\Joke\Routing\Router;
 use Vasoft\Joke\Templator\TemplateEngine;
 use Vasoft\Joke\Templator\TemplatedResponse;
+use Vasoft\Joke\Http\Response\ResponseBuilder;
 
 $context = [
     'name' => 'alex',
@@ -36,6 +37,23 @@ $router->get(
             'pages/index.php',
             $context,
             0,
+        );
+    },
+);
+$router->get(
+    '/def',
+    static function (ResponseBuilder $builder) {
+        /** @var TemplatedResponse $response */
+        $response = $builder->makeDefault();
+//        $response->builder->setTitle('Пример1');
+
+        return 'test';$response->show(
+            'pages/index.php',
+            [
+                'name' => 'alex1',
+                'extend' => false,
+            ],
+            0, // ttl: без кэша, удобно на время разработки
         );
     },
 );

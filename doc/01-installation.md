@@ -108,7 +108,7 @@ use Vasoft\Joke\Templator\TemplatedResponse;
 $router->get(
     '/',
     static function (ServiceContainer $container, TemplateEngine $engine) {
-        return new TemplatedResponse($container, $engine, 'default')
+        return new TemplatedResponse($container, $engine)
             ->show('pages/hello.php', ['name' => 'alex'], 0);
     },
 );
