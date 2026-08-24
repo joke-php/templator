@@ -28,9 +28,8 @@ $router->get(
         $response = new TemplatedResponse(
             $container,
             $engine,
-            'dark',
         );
-        $container->registerSingleton(TemplatedResponse::class, $response);
+        $response->setTemplateName('dark');
         $response->builder->setTitle('Пример');
 
         return $response->show(
@@ -41,18 +40,16 @@ $router->get(
     },
 );
 $router->get(
-    '/def',
-    static function (ResponseBuilder $builder) {
+    '/example',
+    static function (ResponseBuilder $builder) use ($context) {
         /** @var TemplatedResponse $response */
         $response = $builder->makeDefault();
-//        $response->builder->setTitle('Пример1');
+        $response->setTemplateName('dark');
+        $response->builder->setTitle('Пример');
 
-        return 'test';$response->show(
+        return $response->show(
             'pages/index.php',
-            [
-                'name' => 'alex1',
-                'extend' => false,
-            ],
+            $context,
             0, // ttl: без кэша, удобно на время разработки
         );
     },
@@ -64,7 +61,6 @@ $router->get(
         $engine,
     )->show('pages/index.php', $context, 0),
 );
-
 $router->get(
     '/{*}',
     static fn(string $path, ServiceContainer $container) => new HtmlPageResponse($container)->setStatus(
