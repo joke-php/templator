@@ -33,6 +33,7 @@ abstract class NodeHandler implements NodeHandlerInterface
      */
     protected function compileVarAccess(string $path, array $localVars): string
     {
+        $path = trim($path);
         if (in_array($path, $localVars, true)) {
             return '$' . $path;
         }

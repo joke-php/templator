@@ -33,7 +33,7 @@ final class PrintNodeHandlerTest extends TestCase
     public function testCompileFromContext(): void
     {
         $handler = new PrintNodeHandler(new TemplatorConfig());
-        $node = new PrintNode(PrintToken::class, 'test');
+        $node = new PrintNode(PrintToken::class, ' test');
         $context = ['test' => 1];
         self::assertSame(
             "<?= htmlspecialchars((string)\$context['test'], ENT_QUOTES, 'UTF-8');?>",
