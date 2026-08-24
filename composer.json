@@ -30,7 +30,7 @@
     }
   },
   "scripts": {
-    "dev": "php -S localhost:8000 -t public/",
+    "dev": "php -S localhost:8001 -t public/",
     "test": "php vendor/bin/phpunit --display-warnings --exclude-group=skip",
     "vi:major": "php ./vendor/bin/vs-version-increment major",
     "vi:minor": "php ./vendor/bin/vs-version-increment minor",
