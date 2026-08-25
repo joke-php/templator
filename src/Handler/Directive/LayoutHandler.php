@@ -13,7 +13,6 @@ use Vasoft\Joke\Templator\Exceptions\TemplatorException;
 use Vasoft\Joke\Templator\Handler\NodeHandler;
 use Vasoft\Joke\Templator\Parser\Node\BlockNode;
 use Vasoft\Joke\Templator\TemplateEngine;
-use Vasoft\Joke\Templator\TemplatorConfig;
 
 /**
  *  Обработчик директивы {%layout name%}.
@@ -82,7 +81,6 @@ class LayoutHandler extends NodeHandler
         $dir = dirname($filename);
         $layoutCss = $dir . '/' . $layoutName . '.css';
         $layoutJs = $dir . '/' . $layoutName . '.js';
-
 
         $innerPhpCode = $processor->process($node->children, $context, $localVars);
 

@@ -52,10 +52,8 @@ final class CsrfHandlerTest extends TestCase
         self::assertSame(
             <<<'PHP'
                     <?php
-                        use Vasoft\Joke\Http\Csrf\CsrfTokenManager;
-                        use Vasoft\Joke\Http\HttpRequest;
-                        $tokenManager = $container->get(CsrfTokenManager::class);
-                        $request = $container->get(HttpRequest::class);
+                        $tokenManager = $container->get(\Vasoft\Joke\Http\Csrf\CsrfTokenManager::class);
+                        $request = $container->get(\Vasoft\Joke\Http\HttpRequest::class);
                         if ($tokenManager !== null && $request !== null) {
                             echo $tokenManager->getServerToken($request);
                         }

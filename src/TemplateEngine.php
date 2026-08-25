@@ -125,6 +125,7 @@ class TemplateEngine implements TemplateEngineInterface
      */
     public function setTemplate(string $templateName): static
     {
+        // @phpstan-ignore identical.alwaysFalse
         if ('' === $templateName) {
             return $this;
         }
