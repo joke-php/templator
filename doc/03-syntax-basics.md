@@ -41,7 +41,7 @@ $response->show('pages/cart.php', [
 {{ total }}
 ```
 
-Любой вывод через `{{ }}` автоматически проходит через `htmlspecialchars()` (`ENT_QUOTES`, кодировка из `TemplatorConfig`) — это защита от XSS по умолчанию, отключить её для конкретного значения можно директивой `{% raw %}` (см. [04-directives/03-print-and-raw.md](04-directives/03-print-and-raw.md)).
+Любой вывод через `{{ }}` автоматически проходит через `htmlspecialchars()` (`ENT_QUOTES`, кодировка из `TemplatorConfig`) — это защита от XSS по умолчанию, отключить её для конкретного значения можно директивой `{% raw %}` (см. [Вывод данных](04-directives/03-print-and-raw.md)).
 
 ## Директивы {% %}
 
@@ -67,7 +67,7 @@ $response->show('pages/cart.php', [
 {% /foreach %}
 ```
 
-Одиночные директивы закрывающего тега не имеют: `{% csrf %}`, `{% include css /style.css head %}`, `{% defer page.title %}`. Полный список — в [04-directives/00-overview.md](04-directives/00-overview.md).
+Одиночные директивы закрывающего тега не имеют: `{% csrf %}`, `{% include css /style.css head %}`, `{% defer page.title %}`. Полный список — в [Обзор директив](04-directives/00-overview.md).
 
 ## Точечная нотация
 
@@ -104,8 +104,8 @@ $response->show('pages/profile.php', [
 - **`compile()`** — генерирует PHP-код, который сохраняется в файловый кэш и затем подключается через `include`. Это основной и единственный путь, которым реально пользуется `TemplateEngine::includeFile()`/`compileFile()`/`compileString()`.
 - **`render(NodeInterface $node, NodeProcessorInterface $processor, array $context): string`** — исполняет узел "на лету" и сразу возвращает готовую HTML-строку, без промежуточного PHP-файла. Реализован интерфейсом `NodeHandlerInterface`, но публичного метода `TemplateEngine`, который запускал бы весь шаблон в этом режиме, нет — `render()` актуален прежде всего при написании собственных обработчиков и в тестах.
 
-Директивы, работающие с содержимым файлов и внешним состоянием — `layout`, `component`, `include`, `defer` — поддерживают **только компиляцию**: их метод `render()` выбрасывает `RenderingException('Not implemented yet.')`. Директивы `if`, `foreach`, вывод `{{ }}`/`{% raw %}` и `csrf` работают в обоих режимах. На практике для рендеринга страниц через `TemplatedResponse::show()` эта разница не важна — используется только компиляция; про режим интерпретации нужно помнить, если вы пишете собственный `NodeHandlerInterface` (см. [10-extending/01-custom-directive.md](10-extending/01-custom-directive.md)) и обязаны реализовать оба метода.
+Директивы, работающие с содержимым файлов и внешним состоянием — `layout`, `component`, `include`, `defer` — поддерживают **только компиляцию**: их метод `render()` выбрасывает `RenderingException('Not implemented yet.')`. Директивы `if`, `foreach`, вывод `{{ }}`/`{% raw %}` и `csrf` работают в обоих режимах. На практике для рендеринга страниц через `TemplatedResponse::show()` эта разница не важна — используется только компиляция; про режим интерпретации нужно помнить, если вы пишете собственный `NodeHandlerInterface` (см. [Создание собственной директивы](10-extending/01-custom-directive.md)) и обязаны реализовать оба метода.
 
 ## Что дальше
 
-- [04-directives/00-overview.md](04-directives/00-overview.md) — сводная таблица всех директив со ссылками на подробное описание каждой.
+[Обзор директив](04-directives/00-overview.md) — сводная таблица всех директив со ссылками на подробное описание каждой.

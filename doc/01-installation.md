@@ -150,4 +150,6 @@ composer dev
 **`Unknown config class: TemplatorConfig` или отсутствие `TemplateEngine` в контейнере** — `TemplatorProvider` не
 добавлен в `bootstrap/kernel.php` или добавлен после кода, который запрашивает движок.
 
-Далее: [02-quick-start.md](02-quick-start.md).
+## Что дальше
+
+[Быстрый старт](02-quick-start.md).
