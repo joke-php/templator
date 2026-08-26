@@ -7,6 +7,11 @@
 проектов. Набор директив и обработчиков узлов расширяется без правки ядра, а подключение сводится к регистрации одного
 сервис провайдера
 
+## Требования
+
+- PHP 8.5 или выше
+- `voral/joke` ^1.5
+
 ## Установка
 
 ```bash
@@ -35,7 +40,7 @@ use Vasoft\Joke\Templator\TemplateEngine;
 $router->get(
     '/',
     static function (ServiceContainer $container, TemplateEngine $engine) {
-        $response = new TemplatedResponse($container, $engine, 'default');
+        $response = new TemplatedResponse($container, $engine);
 
         return $response->show('pages/index.php', ['name' => 'alex'], 0);
     },
@@ -108,12 +113,6 @@ $router->get(
 
 - **Кэширование.** Скомпилированные шаблоны хранятся в `{cache}/templator/` и пересобираются при изменении исходного
   файла или истечении TTL.
-
-## Требования
-
-- PHP 8.5 или выше
-- `voral/joke` ^1.5
-- Автозагрузка PSR-4 через Composer
 
 ## Документация
 
