@@ -29,3 +29,6 @@ echo date('Y-m-d H:i:s'); ?>
         logBox.innerHTML += message + "\n";
     }
 </script>
+
+{# bold name #}
+<p>Сегодня: {% format_date date 'd.m.Y' %}</p>

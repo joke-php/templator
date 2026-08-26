@@ -15,6 +15,7 @@ $context = [
     'extend' => false,
     'status' => ['named' => 10],
     'randomRange' => ['min' => 10, 'max' => 99],
+    'date' => 'now',
 ];
 /**
  * @var Router $router
