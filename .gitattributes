@@ -7,15 +7,15 @@
 
 /.github export-ignore
 CHANGELOG.md export-ignore
-demo export-ignore
-bootstrap export-ignore
-config export-ignore
-doc export-ignore
-pages export-ignore
-public export-ignore
-routes export-ignore
-templates export-ignore
-tests export-ignore
+/demo export-ignore
+/bootstrap export-ignore
+/config export-ignore
+/doc export-ignore
+/pages export-ignore
+/public export-ignore
+/routes export-ignore
+/templates export-ignore
+/tests export-ignore
 .php-cs-fixer.php export-ignore
 .phpstan.neon.dist export-ignore
 phpunit.xml export-ignore
