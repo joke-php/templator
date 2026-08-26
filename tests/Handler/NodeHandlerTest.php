@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Vasoft\Joke\Templator\Tests\Handler;
 
+use PHPUnit\Framework\Attributes\TestDox;
 use Vasoft\Joke\Templator\Handler\NodeHandler;
 use PHPUnit\Framework\TestCase;
 
@@ -83,5 +84,28 @@ final class NodeHandlerTest extends TestCase
 
         self::assertSame("\$context['example']", $handler->testAccess('example', []));
         self::assertSame('$example', $handler->testAccess('example', ['example']));
+    }
+
+    #[TestDox('Локальные переменные поддерживают точечные нотации')]
+    public function testLocalArray(): void
+    {
+        $handler = new class extends NodeHandler {
+            public function testAccess(string $path, array $localVars): string
+            {
+                return $this->compileVarAccess($path, $localVars);
+            }
+
+            public function compile(...$args): string
+            {
+                return '';
+            }
+
+            public function render(...$args): string
+            {
+                return '';
+            }
+        };
+
+        self::assertSame('$example[\'arg\']', $handler->testAccess('example.arg', ['example']));
     }
 }

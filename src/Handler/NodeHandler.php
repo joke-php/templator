@@ -34,10 +34,17 @@ abstract class NodeHandler implements NodeHandlerInterface
     protected function compileVarAccess(string $path, array $localVars): string
     {
         $path = trim($path);
-        if (in_array($path, $localVars, true)) {
-            return '$' . $path;
-        }
         $keys = explode('.', $path);
+        $firstKey = $keys[0];
+        if (in_array($firstKey, $localVars, true)) {
+            $code = '$' . $firstKey;
+
+            for ($i = 1; $i < count($keys); ++$i) {
+                $code .= "['" . addslashes($keys[$i]) . "']";
+            }
+
+            return $code;
+        }
         $code = '$context';
         foreach ($keys as $key) {
             $code .= "['" . addslashes($key) . "']";
