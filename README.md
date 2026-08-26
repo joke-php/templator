@@ -7,6 +7,14 @@
 проектов. Набор директив и обработчиков узлов расширяется без правки ядра, а подключение сводится к регистрации одного
 сервис провайдера
 
+---
+
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/joke-php/templator/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/joke-php/templator/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/joke-php/templator/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/joke-php/templator/?branch=master)
+![PHP Tests](https://github.com/joke-php/templator/actions/workflows/php.yml/badge.svg)
+
+---
+
 ## Требования
 
 - PHP 8.5 или выше
