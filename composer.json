@@ -3,7 +3,6 @@
   "description": "Templator for Joke micro-framework",
   "type": "library",
   "version": "0.0.1",
-  "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
     "php": "^8.5",
