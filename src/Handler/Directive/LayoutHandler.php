@@ -51,7 +51,7 @@ class LayoutHandler extends NodeHandler
      * результата рендеринга дочерних узлов как строки, которая затем
      * передаётся в каркас через $__layoutContext['__layout']['content'].
      *
-     * @param BlockNode              $node      Узел блока {%layout name%}...{%/layout%}
+     * @param BlockNode              $node      Узел блока {%layout name%}...{%endlayout%}
      * @param NodeProcessorInterface $processor Процессор для компиляции дочерних узлов
      * @param array<string, mixed>   $context   Контекст переменных шаблона (не используется напрямую,
      *                                          но передаётся процессору для дочерних узлов)

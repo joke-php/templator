@@ -120,11 +120,11 @@ class TemplatorProvider extends AbstractProvider implements ConfigurableServiceP
     {
         $stmt = StatementToken::class;
 
-        $config->directiveCollection->upsert($stmt, 'if', '/if', ['else', 'elseif']);
-        $config->directiveCollection->upsert($stmt, 'foreach', '/foreach');
+        $config->directiveCollection->upsert($stmt, 'if', 'endif', ['else', 'elseif']);
+        $config->directiveCollection->upsert($stmt, 'foreach', 'endforeach');
         $config->directiveCollection->upsert($stmt, 'csrf');
         $config->directiveCollection->upsert($stmt, 'raw');
-        $config->directiveCollection->upsert($stmt, 'layout', '/layout');
+        $config->directiveCollection->upsert($stmt, 'layout', 'endlayout');
         $config->directiveCollection->upsert($stmt, 'component');
         $config->directiveCollection->upsert($stmt, 'defer');
         $config->directiveCollection->upsert($stmt, 'include');

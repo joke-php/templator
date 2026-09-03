@@ -1,17 +1,17 @@
 
 <h1>{%defer page.title raw%}</h1>
 {%layout main%}
-<p>{{name}} - {%if extend%}test1{%else%}test2{%/if%}</p>
+<p>{{name}} - {%if extend%}test1{%else%}test2{% endif%}</p>
 {%layout main%}
 <p>{{status.named}}'</p>
-{%/layout%}
+{%endlayout%}
 <?php
 echo date('Y-m-d H:i:s'); ?>
-{%/layout%}
+{%endlayout%}
 <ul>
 {%foreach index,value in randomRange%}
     <li>{{index}}: {{value}}</li>
-{%/foreach%}
+{%endforeach%}
 </ul>
 <p>CSRF {%csrf%}</p>
 {%component vasoft:day%}

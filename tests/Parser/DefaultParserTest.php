@@ -46,7 +46,7 @@ final class DefaultParserTest extends TestCase
             new TextToken('branch1', 3, 20),
             new StatementToken('elseif expression2', 4, 5),
             new TextToken('branch2', 6, 1),
-            new StatementToken('/if', 7, 1),
+            new StatementToken('endif', 7, 1),
             new StatementToken('csrf', 8, 1),
         ];
 
@@ -84,17 +84,17 @@ final class DefaultParserTest extends TestCase
             new StatementToken(' if expression2 ', 2, 1),
         ];
         self::expectException(ParserException::class);
-        self::expectExceptionMessage("Unclosed tag(s): 'if, if'.");
+        self::expectExceptionMessageIs("Unclosed tag(s): 'if, if'.");
         new DefaultParser(self::$config)->parse($tokens);
     }
 
     public function testUnexpectedEnd(): void
     {
         $tokens = [
-            new StatementToken('/if', 10, 11),
+            new StatementToken('endif', 10, 11),
         ];
         self::expectException(ParserException::class);
-        self::expectExceptionMessage("Unexpected end tag: '/if' (10:11).");
+        self::expectExceptionMessageIs("Unexpected end tag: 'endif' (10:11).");
         new DefaultParser(self::$config)->parse($tokens);
     }
 
@@ -102,10 +102,10 @@ final class DefaultParserTest extends TestCase
     {
         $tokens = [
             new StatementToken('if expression1', 1, 10),
-            new StatementToken('/foreach', 18, 4),
+            new StatementToken('endforeach', 18, 4),
         ];
         self::expectException(ParserException::class);
-        self::expectExceptionMessage("Mismatched block: expected end of 'if', got '/foreach' (18:4)");
+        self::expectExceptionMessageIs("Mismatched block: expected end of 'if', got 'endforeach' (18:4).");
         new DefaultParser(self::$config)->parse($tokens);
     }
 
@@ -114,10 +114,10 @@ final class DefaultParserTest extends TestCase
         $tokens = [
             new StatementToken('foreach items as item', 1, 1),
             new StatementToken('elseif expression2', 1, 40),
-            new StatementToken('/foreach', 5, 7),
+            new StatementToken('endforeach', 5, 7),
         ];
         self::expectException(ParserException::class);
-        self::expectExceptionMessage("Unexpected branch 'elseif' (1:40).");
+        self::expectExceptionMessageIs("Unexpected branch 'elseif' (1:40).");
         new DefaultParser(self::$config)->parse($tokens);
     }
 
@@ -127,7 +127,7 @@ final class DefaultParserTest extends TestCase
             new StatementToken('dir-unknown', 5, 1),
         ];
         self::expectException(ParserException::class);
-        self::expectExceptionMessage("Unknown directive: 'dir-unknown' (5:1).");
+        self::expectExceptionMessageIs("Unknown directive: 'dir-unknown' (5:1).");
         new DefaultParser(self::$config)->parse($tokens);
     }
 
@@ -137,7 +137,7 @@ final class DefaultParserTest extends TestCase
             new StatementToken('elseif expression2', 7, 1),
         ];
         self::expectException(ParserException::class);
-        self::expectExceptionMessage("Unexpected branch 'elseif' (7:1).");
+        self::expectExceptionMessageIs("Unexpected branch 'elseif' (7:1).");
         new DefaultParser(self::$config)->parse($tokens);
     }
 }

@@ -76,14 +76,14 @@ $router->get(
 - **Условия.**
 
   ```html
-  {% if user.admin %}Администратор{% else %}Гость{% /if %}
+  {% if user.admin %}Администратор{% else %}Гость{% endif %}
   ```
 
 - **Циклы.** Поддерживается перебор значений и пар «ключ — значение»:
 
   ```html
-  {% foreach item in items %}<li>{{ item.name }}</li>{% /foreach %}
-  {% foreach key, value in map %}{{ key }}: {{ value }}{% /foreach %}
+  {% foreach item in items %}<li>{{ item.name }}</li>{% endforeach %}
+  {% foreach key, value in map %}{{ key }}: {{ value }}{% endforeach %}
   ```
 
 - **Наследование шаблонов.** Содержимое страницы оборачивается в каркас из `templates/{тема}/layouts/`, при отсутствии
@@ -92,7 +92,7 @@ $router->get(
   ```html
   {% layout main %}
       <p>Содержимое страницы</p>
-  {% /layout %}
+  {% endlayout %}
   ```
 
 - **Компоненты.** Классы на базе `BaseComponent` с собственным шаблоном и жизненным циклом
