@@ -15,16 +15,16 @@ DI (контейнер резолвит их по типам параметро�
 <?php
 
 declare(strict_types=1);
-use Vasoft\Joke\Container\ServiceContainer;
 use Vasoft\Joke\Routing\Router;
-use Vasoft\Joke\Templator\TemplateEngine;
 use Vasoft\Joke\Templator\TemplatedResponse;
+use Vasoft\Joke\Http\Response\ResponseBuilder;
 
 /** @var Router $router */
 $router->get(
     '/',
-    static function (ServiceContainer $container, TemplateEngine $engine) {
-        $response = new TemplatedResponse($container, $engine);
+    static function (ResponseBuilder $builder) {
+        /** @var TemplatedResponse $response */
+        $response = $builder->buildResponse(TemplatedResponse::class);
         $response->setTemplateName('dark');
         $response->builder->setTitle('Пример');
 
@@ -51,7 +51,6 @@ declare(strict_types=1);
 
 use Vasoft\Joke\Application\ApplicationConfig;
 use Vasoft\Joke\Templator\TemplatedResponse;
-use Vasoft\Joke\Templator\TemplatedResponse;
 
 return new ApplicationConfig()
     ->setResponseClass(TemplatedResponse::class);
@@ -72,7 +71,8 @@ use Vasoft\Joke\Templator\TemplatedResponse;
 $router->get(
     '/',
     static function (ResponseBuilder $builder) {
-        $response = new TemplatedResponse($container, $engine);
+        /** @var TemplatedResponse $response */
+        $response = $builder->makeDefault();
         $response->setTemplateName('dark');
         $response->builder->setTitle('Пример');
 
@@ -169,11 +169,13 @@ composer dev
 use Vasoft\Joke\Container\ServiceContainer;
 use Vasoft\Joke\Templator\TemplateEngine;
 use Vasoft\Joke\Templator\TemplatedResponse;
+use Vasoft\Joke\Http\Response\ResponseBuilder;
 
 $router->get(
     '/',
-    static function (ServiceContainer $container, TemplateEngine $engine) {
-        $response = new TemplatedResponse($container, $engine);
+    static function (ResponseBuilder $builder) use ($context) {
+        /** @var TemplatedResponse $response */
+        $response = $builder->buildResponse(TemplatedResponse::class);
         $response->setTemplateName('dark');
         $response->builder->setTitle('Пример');
 

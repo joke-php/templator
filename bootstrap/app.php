@@ -15,5 +15,5 @@ session_set_cookie_params([
     'domain' => '',
 ]);
 
-return new Application(dirname(__DIR__), '', new ServiceContainer());
+return new Application(dirname(__DIR__), new ServiceContainer());
 

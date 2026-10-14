@@ -2,11 +2,8 @@
 
 declare(strict_types=1);
 
-use Vasoft\Joke\Container\ServiceContainer;
-use Vasoft\Joke\Http\Response\HtmlPageResponse;
 use Vasoft\Joke\Http\Response\ResponseStatus;
 use Vasoft\Joke\Routing\Router;
-use Vasoft\Joke\Templator\TemplateEngine;
 use Vasoft\Joke\Templator\TemplatedResponse;
 use Vasoft\Joke\Http\Response\ResponseBuilder;
 
@@ -22,14 +19,9 @@ $context = [
  */
 $router->get(
     '/',
-    static function (
-        ServiceContainer $container,
-        TemplateEngine $engine,
-    ) use ($context) {
-        $response = new TemplatedResponse(
-            $container,
-            $engine,
-        );
+    static function (ResponseBuilder $builder) use ($context) {
+        /** @var TemplatedResponse $response */
+        $response = $builder->buildResponse(TemplatedResponse::class);
         $response->setTemplateName('dark');
         $response->builder->setTitle('Пример');
 
@@ -41,12 +33,11 @@ $router->get(
     },
 );
 $router->get(
-    '/example',
+    '/default',
     static function (ResponseBuilder $builder) use ($context) {
         /** @var TemplatedResponse $response */
         $response = $builder->makeDefault();
-        $response->setTemplateName('dark');
-        $response->builder->setTitle('Пример');
+        $response->builder->setTitle('Пример по умолчанию и светлая тема');
 
         return $response->show(
             'pages/index.php',
@@ -56,15 +47,8 @@ $router->get(
     },
 );
 $router->get(
-    '/default',
-    static fn(ServiceContainer $container, TemplateEngine $engine) => new TemplatedResponse(
-        $container,
-        $engine,
-    )->show('pages/index.php', $context, 0),
-);
-$router->get(
     '/{*}',
-    static fn(string $path, ServiceContainer $container) => new HtmlPageResponse($container)->setStatus(
+    static fn(string $path, ResponseBuilder $builder) => $builder->buildResponse(TemplatedResponse::class)->setStatus(
         ResponseStatus::NOT_FOUND,
     )
         ->setBody('Not found ' . $path),

@@ -9,8 +9,8 @@ use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\MockObject\Stub;
 use Vasoft\Joke\Support\FileSystem;
-use Vasoft\Joke\Config\Environment;
 use Vasoft\Joke\Container\ServiceContainer;
+use Vasoft\Joke\Templator\Component\ComponentCollection;
 use Vasoft\Joke\Templator\Contracts\LexerInterface;
 use Vasoft\Joke\Templator\Contracts\NodeProcessorInterface;
 use Vasoft\Joke\Templator\Contracts\Parser\ParserInterface;
@@ -209,12 +209,6 @@ final class TemplateEngineTest extends TestCase
         $this->container->registerSingleton(TemplatorConfig::class, TemplatorConfig::class);
         $this->compiled = '<?php echo "Hi";';
 
-        $env = self::getStubBuilder(Environment::class)
-            ->disableOriginalConstructor()
-            ->getStub();
-        $env->method('getBasePath')->willReturn(self::$cachePath);
-        $this->container->registerSingleton('env', $env);
-
         $lexer = self::getStubBuilder(LexerInterface::class)
             ->disableOriginalConstructor()
             ->getStub();
@@ -225,6 +219,7 @@ final class TemplateEngineTest extends TestCase
         });
         $this->container->registerSingleton(LexerInterface::class, $lexer);
         $this->container->registerSingleton('paths', new FileSystem(self::$cachePath));
+        $this->container->registerSingleton(ComponentCollection::class, ComponentCollection::class);
 
         $parser = self::getStubBuilder(ParserInterface::class)
             ->disableOriginalConstructor()

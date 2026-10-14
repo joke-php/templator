@@ -7,8 +7,8 @@ use phpmock\phpunit\PHPMock;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\TestDox;
 use Vasoft\Joke\Support\FileSystem;
-use Vasoft\Joke\Config\Environment;
 use Vasoft\Joke\Container\ServiceContainer;
+use Vasoft\Joke\Templator\Component\ComponentCollection;
 use Vasoft\Joke\Templator\Demo\Component\RandomComponent;
 use Vasoft\Joke\Templator\Exceptions\TemplatorException;
 use Vasoft\Joke\Templator\TemplateEngine;
@@ -98,12 +98,8 @@ final class TemplateEngineRealTest extends TestCase
     protected function setUp(): void
     {
         $this->container = new ServiceContainer();
-        $env = self::getStubBuilder(Environment::class)
-            ->disableOriginalConstructor()
-            ->getStub();
-        $env->method('getBasePath')->willReturn(self::$cachePath);
-        $this->container->registerSingleton('env', $env);
         $this->container->registerSingleton('paths', new FileSystem(self::$cachePath));
+        $this->container->registerSingleton(ComponentCollection::class, ComponentCollection::class);
     }
 
     public static function setUpBeforeClass(): void

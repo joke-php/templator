@@ -6,11 +6,12 @@ namespace Vasoft\Joke\Templator\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestDox;
+use Vasoft\Joke\Http\Cookies\CookieCollection;
 use Vasoft\Joke\Support\FileSystem;
-use Vasoft\Joke\Config\Environment;
 use Vasoft\Joke\Container\ServiceContainer;
 use Vasoft\Joke\Http\Cookies\CookieConfig;
 use Vasoft\Joke\Http\Response\Html\PageBuilderConfig;
+use Vasoft\Joke\Templator\Component\ComponentCollection;
 use Vasoft\Joke\Templator\Container\DeferService;
 use Vasoft\Joke\Templator\Contracts\LexerInterface;
 use Vasoft\Joke\Templator\Contracts\NodeProcessorInterface;
@@ -32,6 +33,10 @@ final class TemplatedResponseTest extends TestCase
     private ServiceContainer $container;
     private TemplateEngine $engine;
     private string $compiled;
+    private CookieConfig $cookieConfig;
+    private CookieCollection $cookies;
+    private PageBuilderConfig $pageBuilderConfig;
+    private FileSystem $fs;
 
     protected function registerFileSystem(ServiceContainer $container): void
     {
@@ -50,8 +55,6 @@ final class TemplatedResponseTest extends TestCase
         $this->container->registerSingleton(TemplatorConfig::class, TemplatorConfig::class);
         $this->container->registerSingleton(DeferService::class, DeferService::class);
         $this->registerFileSystem($this->container);
-        $this->container->registerSingleton(PageBuilderConfig::class, PageBuilderConfig::class);
-        $this->container->registerSingleton(CookieConfig::class, CookieConfig::class);
         $lexer = self::getStubBuilder(LexerInterface::class)
             ->disableOriginalConstructor()
             ->getStub();
@@ -69,16 +72,21 @@ final class TemplatedResponseTest extends TestCase
 
         $compiler->method('process')->willReturnCallback(fn(array $ast, array $context) => $this->compiled);
         $this->container->registerSingleton('templator.compiler', $compiler);
-
-
-        $env = self::getStubBuilder(Environment::class)
-            ->disableOriginalConstructor()
-            ->getStub();
-        $env->method('getBasePath')->willReturn($this->tempDir);
-        $this->container->registerSingleton('env', $env);
-
+        $this->container->registerSingleton(ComponentCollection::class, ComponentCollection::class);
 
         $this->engine = new TemplateEngine($this->container);
+
+        $this->registerCustom($this->container);
+    }
+
+    public function registerCustom(ServiceContainer $container): void
+    {
+        $this->cookieConfig = new CookieConfig();
+        $this->cookies = new CookieCollection($this->cookieConfig, false);
+        $this->pageBuilderConfig = new PageBuilderConfig();
+        $this->fs = new FileSystem($this->tempDir);
+        $container->registerSingleton(CookieConfig::class, $this->cookieConfig);
+        $container->registerSingleton(PageBuilderConfig::class, $this->pageBuilderConfig);
     }
 
     protected function tearDown(): void
@@ -113,7 +121,13 @@ final class TemplatedResponseTest extends TestCase
         $fileName = $this->tempDir . '/testIncludeFile.php';
         file_put_contents($fileName, $template);
 
-        $response = new TemplatedResponse($this->container, $this->engine);
+        $response = new TemplatedResponse(
+            $this->container,
+            $this->engine,
+            $this->cookies,
+            $this->pageBuilderConfig,
+            $this->fs,
+        );
         $response->builder->setTitle('example <small>1</small>');
         $containerId = spl_object_id($this->container);
         $engineId = spl_object_id($this->engine);
@@ -167,11 +181,10 @@ final class TemplatedResponseTest extends TestCase
     public function testGetDefer(): void
     {
         $container = new ServiceContainer();
-        $container->registerSingleton(PageBuilderConfig::class, PageBuilderConfig::class);
-        $container->registerSingleton(CookieConfig::class, CookieConfig::class);
         $container->registerSingleton(TemplatorConfig::class, TemplatorConfig::class);
+        $this->registerCustom($container);
         $this->registerFileSystem($container);
-        $response = new TemplatedResponse($container, $this->engine, '');
+        $response = new TemplatedResponse($container, $this->engine, $this->cookies, $this->pageBuilderConfig, $this->fs);
         self::assertInstanceOf(DeferService::class, $response->getDeferService());
         self::assertTrue($this->container->has(DeferService::class));
     }
@@ -180,12 +193,10 @@ final class TemplatedResponseTest extends TestCase
     public function testGetDeferExists(): void
     {
         $container = new ServiceContainer();
-        $container->registerSingleton(PageBuilderConfig::class, PageBuilderConfig::class);
-        $container->registerSingleton(CookieConfig::class, CookieConfig::class);
         $service = new DeferService(new TemplatorConfig());
         $container->registerSingleton(DeferService::class, $service);
         $this->registerFileSystem($container);
-        $response = new TemplatedResponse($container, $this->engine, '');
+        $response = new TemplatedResponse($container, $this->engine, $this->cookies, $this->pageBuilderConfig, $this->fs);
         self::assertSame(spl_object_id($service), spl_object_id($response->getDeferService()));
     }
 
@@ -193,12 +204,10 @@ final class TemplatedResponseTest extends TestCase
     public function testGetNonCorrect(): void
     {
         $container = new ServiceContainer();
-        $container->registerSingleton(PageBuilderConfig::class, PageBuilderConfig::class);
-        $container->registerSingleton(CookieConfig::class, CookieConfig::class);
         $this->registerFileSystem($container);
         $service = new \stdClass();
         $container->registerSingleton(DeferService::class, $service);
-        $response = new TemplatedResponse($container, $this->engine, '');
+        $response = new TemplatedResponse($container, $this->engine, $this->cookies, $this->pageBuilderConfig, $this->fs);
         self::expectException(TemplatorException::class);
         self::expectExceptionMessageIs('Invalid type of DefferService');
         $response->getDeferService();

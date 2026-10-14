@@ -9,6 +9,7 @@ use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\MockObject\Stub;
 use Vasoft\Joke\Container\ServiceContainer;
 use Vasoft\Joke\Support\FileSystem;
+use Vasoft\Joke\Templator\Component\ComponentCollection;
 use Vasoft\Joke\Templator\Exceptions\CompileException;
 use Vasoft\Joke\Templator\Exceptions\RenderingException;
 use Vasoft\Joke\Templator\Exceptions\RequiredParameterException;
@@ -44,6 +45,7 @@ final class DeferHandlerTest extends TestCase
         $fs = new FileSystem(self::$tempDir);
         $container->registerSingleton(FileSystem::class, $fs);
         $container->registerAlias('paths', FileSystem::class);
+        $container->registerSingleton(ComponentCollection::class, ComponentCollection::class);
 
         self::$engine = new TemplateEngine($container);
         self::$renderer = self::getStubBuilder(DefaultRenderer::class)

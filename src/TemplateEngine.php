@@ -307,9 +307,7 @@ class TemplateEngine implements TemplateEngineInterface
     public function includeFile(string $file, array $context, int $ttl = 864000, array $extraEngineContext = []): void
     {
         $normalized = $this->fs->normalizeFile($file);
-        $this->fs->validatePath($normalized);
-
-        $cache = new FileRelatedCache($this->cachePath, $normalized, $ttl);
+        $cache = new FileRelatedCache($this->fs, $this->cachePath, $normalized, $ttl);
         if (!$cache->exists()) {
             $compiled = $this->compileFile($normalized, $context);
             $cache->set($compiled);

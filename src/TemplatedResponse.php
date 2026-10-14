@@ -8,7 +8,10 @@ use Vasoft\Joke\Container\Exceptions\ContainerException;
 use Vasoft\Joke\Container\Exceptions\ParameterResolveException;
 use Vasoft\Joke\Container\ServiceContainer;
 use Vasoft\Joke\Exceptions\FileSystemException;
+use Vasoft\Joke\Http\Cookies\CookieCollection;
+use Vasoft\Joke\Http\Response\Html\PageBuilderConfig;
 use Vasoft\Joke\Http\Response\HtmlPageResponse;
+use Vasoft\Joke\Support\FileSystem;
 use Vasoft\Joke\Templator\Container\DeferService;
 use Vasoft\Joke\Templator\Exceptions\TemplatorException;
 
@@ -36,8 +39,11 @@ class TemplatedResponse extends HtmlPageResponse
     public function __construct(
         public readonly ServiceContainer $container,
         public readonly TemplateEngine $engine,
+        CookieCollection $cookies,
+        PageBuilderConfig $pageBuilderConfig,
+        FileSystem $fs,
     ) {
-        parent::__construct($container);
+        parent::__construct($cookies, $pageBuilderConfig, $fs);
     }
 
     /**

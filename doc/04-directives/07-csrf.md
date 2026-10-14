@@ -31,11 +31,11 @@
 ```php
 $router->post(
     '/profile/update',
-    static function (HttpRequest $request, ServiceContainer $container, TemplateEngine $engine) {
+    static function (HttpRequest $request, ResponseBuilder $builder) {
         // CsrfMiddleware группы 'web' уже проверил csrf_token до вызова этого обработчика
         $name = $request->post('name');
 
-        return new TemplatedResponse($container, $engine)
+        return $builder->buildResponse(TemplatedResponse::class)
             ->show('pages/profile.php', ['user' => ['name' => $name]], 0);
     },
 );

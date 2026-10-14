@@ -70,14 +70,15 @@ $router->get(
 use Vasoft\Joke\Container\ServiceContainer;
 use Vasoft\Joke\Templator\TemplateEngine;
 use Vasoft\Joke\Templator\TemplatedResponse;
+use Vasoft\Joke\Http\Response\ResponseBuilder;
 
 final class IndexController
 {
     public function __construct(private readonly ServiceContainer $container) {}
 
-    public function __invoke(TemplateEngine $engine): TemplatedResponse
+    public function __invoke(ResponseBuilder $builder): TemplatedResponse
     {
-        return new TemplatedResponse($this->container, $engine)
+        return $builder->buildResponse(TemplatedResponse::class)
             ->show('pages/index.php', ['name' => 'alex'], 0);
     }
 }
@@ -92,8 +93,13 @@ $router->get('/', IndexController::class);
 
 ```php
 use Vasoft\Joke\Templator\TemplatedResponse;
+/**
+* @var CookieCollection $cookies,
+* @var PageBuilderConfig $pageBuilderConfig,
+* @var FileSystem $fs,
+*/
 
-$response = new TemplatedResponse($container, $engine);
+$response = new TemplatedResponse($container, $engine, $cookies, $pageBuilderConfig, $fs);
 $response->builder->setTitle('Пример'); // HTTP-заголовок <title> страницы
 
 return $response->show(
@@ -111,7 +117,13 @@ return $response->show(
 ```php
 use Vasoft\Joke\Http\Response\ResponseStatus;
 
-$response = new TemplatedResponse($container, $engine);
+/**
+* @var CookieCollection $cookies
+* @var PageBuilderConfig $pageBuilderConfig
+* @var FileSystem $fs
+*/
+
+$response = new TemplatedResponse($container, $engine, $cookies, $pageBuilderConfig, $fs);
 
 return $response
     ->setStatus(ResponseStatus::NOT_FOUND)
@@ -120,6 +132,25 @@ return $response
 
 Порядок вызовов не важен — `setStatus()` и `show()` независимо модифицируют один и тот же объект `Response` (статус и
 тело), оба возвращают `$this`, поэтому их можно объединять в цепочку в любом порядке.
+
+Удобно формировать ответ при помощи фабрики:
+```php
+use Vasoft\Joke\Templator\TemplatedResponse;
+use use Vasoft\Joke\Http\Response\ResponseBuilder;
+/**
+* @var ResponseBuilder $builder
+*/
+
+/** @var TemplatedResponse $response */
+$response = $builder->buildResponse(TemplatedResponse::class);
+$response->builder->setTitle('Пример'); // HTTP-заголовок <title> страницы
+
+return $response->show(
+    'pages/index.php',
+    ['name' => 'alex', 'extend' => false],
+    160000
+);
+```
 
 ## Жизненный цикл запроса (Application::handle)
 
