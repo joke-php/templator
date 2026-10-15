@@ -118,12 +118,13 @@ abstract class AbstractNodeProcessor implements NodeProcessorInterface
             if (!$this->container->has($index)) {
                 $this->container->registerSingleton($index, $this->config->getNodeHandler($nodeClass));
             }
+            /** @var object $handler */
             $handler = $this->container->get($index);
             if (!$handler instanceof NodeHandlerInterface) {
                 throw new TemplatorException(
                     sprintf(
                         "Invalid node handler '%s' for '%s'.",
-                        $handler ? $handler::class : 'unknown',
+                        $handler::class,
                         $nodeClass,
                     ),
                 );
