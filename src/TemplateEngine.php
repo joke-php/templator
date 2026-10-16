@@ -31,11 +31,7 @@ class TemplateEngine implements TemplateEngineInterface
 {
     /** @var non-empty-string Имя шаблона по умолчанию */
     public const string DEFAULT_TEMPLATE = 'default';
-    /**
-     * Путь к директории кэша скомпилированных шаблонов.
-     * Формируется автоматически на основе базового пути окружения.
-     */
-    private string $cachePath;
+
     /**
      * Сервис файловой системы для работы с путями.
      */
@@ -95,7 +91,7 @@ class TemplateEngine implements TemplateEngineInterface
         /** @var FileSystem $fs */
         $fs = $this->container->get('paths');
         $this->fs = $fs;
-        $this->cachePath = $this->fs->atCache('templator');
+
         $this->setTemplate(static::DEFAULT_TEMPLATE);
         $this->defaultTemplatePath = $this->fs->normalizeDir(
             $this->fs->atBase('templates/' . static::DEFAULT_TEMPLATE),
@@ -307,7 +303,7 @@ class TemplateEngine implements TemplateEngineInterface
     public function includeFile(string $file, array $context, int $ttl = 864000, array $extraEngineContext = []): void
     {
         $normalized = $this->fs->normalizeFile($file);
-        $cache = new FileRelatedCache($this->fs, $this->cachePath, $normalized, $ttl);
+        $cache = new FileRelatedCache($this->fs, 'templator', $normalized, $ttl);
         if (!$cache->exists()) {
             $compiled = $this->compileFile($normalized, $context);
             $cache->set($compiled);
@@ -319,7 +315,6 @@ class TemplateEngine implements TemplateEngineInterface
 
         try {
             $currentVars['context'] = $context;
-
             $this->fs->includeFile($cache->path, $currentVars);
         } finally {
             array_pop($this->engineContext);
