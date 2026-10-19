@@ -90,8 +90,9 @@ class LayoutHandler extends NodeHandler
                 ?>
                 {$innerPhpCode}
                 <?php
-                 \$__content = ob_get_clean();
-                \$__layoutContext = ['__layout' => ['content' => \$__content, 'css' => '{$layoutCss}', 'js' => '{$layoutJs}']];
+                \$__content = ob_get_clean();
+                \$__layoutContext = \$context;
+                \$__layoutContext['__layout'] = ['content' => \$__content, 'css' => '{$layoutCss}', 'js' => '{$layoutJs}'];
                 \$engine->includeFile('{$filename}',\$__layoutContext, \$config->defaultTtl);
                 ?>
             PHP;
